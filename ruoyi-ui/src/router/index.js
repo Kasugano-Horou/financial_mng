@@ -162,6 +162,7 @@ export const dynamicRoutes = [
       }
     ]
   }
+  
 ]
 
 export default new Router({

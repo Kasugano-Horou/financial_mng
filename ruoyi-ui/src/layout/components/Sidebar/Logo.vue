@@ -35,7 +35,7 @@ export default {
   },
   data() {
     return {
-      title: '若依管理系统',
+      title: '帆楼财务管理系统',
       logo: logoImg
     }
   }
@@ -70,6 +70,7 @@ export default {
       height: 32px;
       vertical-align: middle;
       margin-right: 12px;
+      margin-left: -20px;
     }
 
     & .sidebar-title {
@@ -78,7 +79,7 @@ export default {
       color: #fff;
       font-weight: 600;
       line-height: 50px;
-      font-size: 14px;
+      font-size: 15px;
       font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
       vertical-align: middle;
     }
@@ -87,6 +88,7 @@ export default {
   &.collapse {
     .sidebar-logo {
       margin-right: 0px;
+      
     }
   }
 }
