@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/financial/contract")
 public class FinContractController extends BaseController
 {
-
+    @Autowired
     private IFinContractService contractService;
 
     @Autowired
@@ -46,7 +46,6 @@ public class FinContractController extends BaseController
     /**
      * 获取合同列表
      */
-    @PreAuthorize("@ss.hasPermi('financial:contract:list')")
     @GetMapping("/list")
     public TableDataInfo list(FinContract contract)
     {
@@ -55,8 +54,10 @@ public class FinContractController extends BaseController
         return getDataTable(list);
     }
 
+    /**
+     * 导出合同
+     */
     @Log(title = "合同管理", businessType = BusinessType.EXPORT)
-    @PreAuthorize("@ss.hasPermi('financial:contract:export')")
     @PostMapping("/export")
     public void export(HttpServletResponse response, FinContract contract)
     {
@@ -65,8 +66,9 @@ public class FinContractController extends BaseController
         util.exportExcel(response, list, "合同数据");
     }
 
-    @Log(title = "合同管理", businessType = BusinessType.IMPORT)
-    @PreAuthorize("@ss.hasPermi('financial:contract:import')")
+    /**
+     * 导入合同
+     */
     @PostMapping("/importData")
     public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception
     {
@@ -83,7 +85,6 @@ public class FinContractController extends BaseController
     /**
      * 根据合同编号获取详细信息
      */
-    @PreAuthorize("@ss.hasPermi('financial:contract:query')")
     @GetMapping(value = { "/", "/{contractId}" })
     public AjaxResult getInfo(@PathVariable(value = "contractId", required = false) Long contractId)
     {
@@ -93,7 +94,6 @@ public class FinContractController extends BaseController
     /**
      * 新增合同
      */
-    @PreAuthorize("@ss.hasPermi('financial:contract:add')")
     @Log(title = "合同管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody FinContract contract)
@@ -104,7 +104,6 @@ public class FinContractController extends BaseController
     /**
      * 修改合同
      */
-    @PreAuthorize("@ss.hasPermi('financial:contract:edit')")
     @Log(title = "合同管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody FinContract contract)
@@ -115,7 +114,6 @@ public class FinContractController extends BaseController
     /**
      * 删除合同
      */
-    @PreAuthorize("@ss.hasPermi('financial:contract:remove')")
     @Log(title = "合同管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{contractIds}")
     public AjaxResult remove(@PathVariable Long[] contractIds)
@@ -126,7 +124,6 @@ public class FinContractController extends BaseController
     /**
      * 状态修改
      */
-    @PreAuthorize("@ss.hasPermi('financial:contract:edit')")
     @Log(title = "合同管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public AjaxResult changeStatus(@RequestBody FinContract contract)
@@ -137,7 +134,6 @@ public class FinContractController extends BaseController
     /**
      * 根据合同编号获取授权角色
      */
-    @PreAuthorize("@ss.hasPermi('financial:contract:query')")
     @GetMapping("/authRole/{contractId}")
     public AjaxResult authRole(@PathVariable("contractId") Long contractId)
     {

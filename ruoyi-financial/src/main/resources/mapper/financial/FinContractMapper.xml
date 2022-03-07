@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.financial.mapper.FinContractMapper">
+
+	<resultMap type="FinContract" id="FinContractResult">
+		<id     property="contractId"       column="contract_id"      />
+		<result property="contractName"     column="contract_name"    />
+		<result property="contractNumber"     column="contract_number"    />
+		<result property="contractDate"     column="contract_date"    />
+		<result property="contractStart"     column="contract_end"    />
+		<result property="contractType"     column="contract_type"    />
+		<result property="debtors"     column="debtors"    />
+		<result property="receivable"        column="receivable"        />
+		<result property="principal"  column="principal"  />
+		<result property="deptId"          column="dept_id"          />
+		<result property="oppositePartyUnit"       column="opposite_party_unit"       />
+		<result property="fileAddress"     column="file_address"     />
+		<result property="status"       column="status"       />
+		<result property="contractLocation"      column="contract_location"     />
+		<result property="introduction"      column="introduction"     />
+		<result property="remark"    column="remark"   />
+		<result property="delFlag"     column="del_flag"    />
+		<result property="createBy"   column="create_by"  />
+		<result property="createTime"   column="create_time"  />
+		<result property="updateBy"     column="update_by"    />
+		<result property="updateTime"   column="update_time"  />
+	</resultMap>
+	
+	<sql id="selectContractVo">
+        select c.contract_id, c.contract_name, c.contract_number, c.contract_date, c.contract_end, c.contract_type, c.debtors, c.receivable, c.principal, c.dept_id, c.opposite_party_unit, c.file_address, c.status, c.contract_location, c.introduction, c.remark, c.del_flag, c.create_by, c.create_time, c.update_by, c.update_time
+        from fin_contract c
+
+    </sql>
+    
+    <select id="selectContractList" parameterType="FinContract" resultMap="FinContractResult">
+		select c.contract_id, c.contract_name, c.contract_number, c.contract_date, c.contract_end, c.contract_type, c.debtors, c.receivable, c.principal, c.dept_id, c.opposite_party_unit, c.file_address, c.status, c.contract_location, c.introduction, c.remark, c.del_flag, c.create_by, c.create_time, c.update_by, c.update_time
+		from fin_contract c
+		where c.del_flag = '0'
+		<if test="contractId != null and contractId != 0">
+			AND c.contract_id = #{contractId}
+		</if>
+		<if test="contractName != null and contractName != ''">
+			AND c.contract_name like concat('%', #{contractName}, '%')
+		</if>
+		<if test="status != null and status != ''">
+			AND c.status = #{status}
+		</if>
+		<if test="contractNumber != null and contractNumber != ''">
+			AND c.contract_number like concat('%', #{contractNumber}, '%')
+		</if>
+		<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+			AND date_format(c.create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+		</if>
+		<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+			AND date_format(c.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+		</if>
+		<!-- 数据范围过滤 -->
+		${params.dataScope}
+	</select>
+
+	
+</mapper> 

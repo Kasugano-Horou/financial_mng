@@ -37,6 +37,8 @@ import DictTag from '@/components/DictTag'
 import VueMeta from 'vue-meta'
 // 字典数据组件
 import DictData from '@/components/DictData'
+// 解决chrome下mousewheel警告的问题，警告原因：Chrome51 版本以后，Chrome 增加了新的事件捕获机制－Passive Event Listeners
+import 'default-passive-events'
 
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts
