@@ -2,6 +2,8 @@ package com.ruoyi.common.core.domain.entity;
 
 import java.util.Date;
 import javax.validation.constraints.*;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
@@ -34,14 +36,17 @@ public class FinContract extends BaseEntity
 
     /** 合同日期 */
     @Excel(name = "合同日期")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date contractDate;
 
     /** 合同开始日期 */
     @Excel(name = "合同开始日期")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date contractStart;
 
     /** 合同结束日期 */
     @Excel(name = "合同结束日期")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date contractEnd;
 
     /** 合同类型 */

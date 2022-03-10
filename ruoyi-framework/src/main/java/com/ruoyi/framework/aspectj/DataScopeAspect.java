@@ -123,6 +123,7 @@ public class DataScopeAspect
             }
         }
 
+        System.out.println("sqlString"+sqlString.toString());
         if (StringUtils.isNotBlank(sqlString.toString()))
         {
             Object params = joinPoint.getArgs()[0];
@@ -132,6 +133,7 @@ public class DataScopeAspect
                 baseEntity.getParams().put(DATA_SCOPE, " AND (" + sqlString.substring(4) + ")");
             }
         }
+        System.out.println("sqlString"+sqlString.toString());
     }
 
     /**

@@ -1,173 +1,109 @@
 package com.ruoyi.financial.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.validation.Validator;
 
 import com.ruoyi.common.core.domain.entity.FinContract;
-import com.ruoyi.financial.mapper.FinContractMapper;
-import com.ruoyi.financial.service.IFinContractService;
-import org.apache.ibatis.annotations.Mapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.ruoyi.common.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-import com.ruoyi.common.annotation.DataScope;
-import com.ruoyi.common.constant.UserConstants;
-import com.ruoyi.common.core.domain.entity.SysRole;
-import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.bean.BeanValidators;
-import com.ruoyi.common.utils.spring.SpringUtils;
-import com.ruoyi.system.domain.SysPost;
-import com.ruoyi.system.domain.SysUserPost;
-import com.ruoyi.system.domain.SysUserRole;
-import com.ruoyi.system.mapper.SysPostMapper;
-import com.ruoyi.system.mapper.SysRoleMapper;
-import com.ruoyi.system.mapper.SysUserMapper;
-import com.ruoyi.system.mapper.SysUserPostMapper;
-import com.ruoyi.system.mapper.SysUserRoleMapper;
+import com.ruoyi.financial.mapper.FinContractMapper;
 import com.ruoyi.financial.service.IFinContractService;
-import com.ruoyi.system.service.ISysUserService;
+import java.util.List;
 
 /**
- * 合同 业务层处理
+ * 合同管理Service业务层处理
  *
- * @author ruoyi
+ * @author horou
+ * @date 2022-03-08
  */
 @Service
 public class FinContractServiceImpl implements IFinContractService
 {
-    private static final Logger log = LoggerFactory.getLogger(FinContractServiceImpl.class);
-
-
     @Autowired
-    private FinContractMapper contractMapper;
+    private FinContractMapper finContractMapper;
 
+    /**
+     * 查询合同管理
+     *
+     * @param contractId 合同管理主键
+     * @return 合同管理
+     */
     @Override
-    public List<FinContract> selectContractList(FinContract contract)
+    public FinContract selectFinContractByContractId(Long contractId)
     {
-        return  contractMapper.selectContractList(contract);
+        return finContractMapper.selectFinContractByContractId(contractId);
     }
 
+    /**
+     * 查询合同管理列表
+     *
+     * @param finContract 合同管理
+     * @return 合同管理
+     */
     @Override
-    public List<FinContract> selectAllocatedList(FinContract contract) {
-        return null;
+    public List<FinContract> selectFinContractList(FinContract finContract)
+    {
+        return finContractMapper.selectFinContractList(finContract);
     }
 
+    /**
+     * 新增合同管理
+     *
+     * @param finContract 合同管理
+     * @return 结果
+     */
     @Override
-    public List<FinContract> selectUnallocatedList(FinContract contract) {
-        return null;
+    public int insertFinContract(FinContract finContract)
+    {
+        finContract.setCreateTime(DateUtils.getNowDate());
+        return finContractMapper.insertFinContract(finContract);
     }
 
+    /**
+     * 修改合同管理
+     *
+     * @param finContract 合同管理
+     * @return 结果
+     */
     @Override
-    public FinContract selectContractByContractName(String contractName) {
-        return null;
+    public int updateFinContract(FinContract finContract)
+    {
+        finContract.setUpdateTime(DateUtils.getNowDate());
+        return finContractMapper.updateFinContract(finContract);
     }
 
+    /**
+     * 修改合同状态
+     *
+     * @param finContract 合同
+     * @return 结果
+     */
     @Override
-    public FinContract selectContractById(Long contractId) {
-        return null;
+    public int updateFinContractStatus(FinContract finContract){
+        finContract.setUpdateTime(DateUtils.getNowDate());
+        return finContractMapper.updateFinContractStatus(finContract);
     }
 
+    /**
+     * 批量删除合同管理
+     *
+     * @param contractIds 需要删除的合同管理主键
+     * @return 结果
+     */
     @Override
-    public String selectContractRoleGroup(String contractName) {
-        return null;
+    public int deleteFinContractByContractIds(Long[] contractIds)
+    {
+        return finContractMapper.deleteFinContractByContractIds(contractIds);
     }
 
+    /**
+     * 删除合同管理信息
+     *
+     * @param contractId 合同管理主键
+     * @return 结果
+     */
     @Override
-    public String selectContractPostGroup(String contractName) {
-        return null;
+    public int deleteFinContractByContractId(Long contractId)
+    {
+        return finContractMapper.deleteFinContractByContractId(contractId);
     }
-
-    @Override
-    public String checkContractNameUnique(String contractName) {
-        return null;
-    }
-
-    @Override
-    public String checkPhoneUnique(FinContract contract) {
-        return null;
-    }
-
-    @Override
-    public String checkEmailUnique(FinContract contract) {
-        return null;
-    }
-
-    @Override
-    public void checkContractAllowed(FinContract contract) {
-
-    }
-
-    @Override
-    public void checkContractDataScope(Long contractId) {
-
-    }
-
-    @Override
-    public int insertContract(FinContract contract) {
-        return 0;
-    }
-
-    @Override
-    public boolean registerContract(FinContract contract) {
-        return false;
-    }
-
-    @Override
-    public int updateContract(FinContract contract) {
-        return 0;
-    }
-
-    @Override
-    public void insertContractAuth(Long contractId, Long[] roleIds) {
-
-    }
-
-    @Override
-    public int updateContractStatus(FinContract contract) {
-        return 0;
-    }
-
-    @Override
-    public int updateContractProfile(FinContract contract) {
-        return 0;
-    }
-
-    @Override
-    public boolean updateContractAvatar(String contractName, String avatar) {
-        return false;
-    }
-
-    @Override
-    public int resetPwd(FinContract contract) {
-        return 0;
-    }
-
-    @Override
-    public int resetContractPwd(String contractName, String password) {
-        return 0;
-    }
-
-    @Override
-    public int deleteContractById(Long contractId) {
-        return 0;
-    }
-
-    @Override
-    public int deleteContractByIds(Long[] contractIds) {
-        return 0;
-    }
-
-    @Override
-    public String importContract(List<FinContract> contractList, Boolean isUpdateSupport, String operName) {
-        return null;
-    }
-
 }
