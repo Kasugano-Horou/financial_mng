@@ -35,18 +35,18 @@ public class FinContract extends BaseEntity
     private String contractNumber;
 
     /** 合同日期 */
-    @Excel(name = "合同日期")
+    @Excel(name = "合同日期", dateFormat = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date contractDate;
 
     /** 合同开始日期 */
-    @Excel(name = "合同开始日期")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "合同开始日期", dateFormat = "yyyy-MM-dd HH:mm:ss")
     private Date contractStart;
 
     /** 合同结束日期 */
-    @Excel(name = "合同结束日期")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "合同结束日期", dateFormat = "yyyy-MM-dd HH:mm:ss")
     private Date contractEnd;
 
     /** 合同类型 */

@@ -27,6 +27,10 @@ public class SysUser extends BaseEntity
     @Excel(name = "用户序号", cellType = ColumnType.NUMERIC, prompt = "用户编号")
     private Long userId;
 
+    /** 员工ID */
+    @Excel(name = "员工ID")
+    private Long empId;
+
     /** 部门ID */
     @Excel(name = "部门编号", type = Type.IMPORT)
     private Long deptId;
@@ -38,18 +42,6 @@ public class SysUser extends BaseEntity
     /** 用户昵称 */
     @Excel(name = "用户名称")
     private String nickName;
-
-    /** 用户邮箱 */
-    @Excel(name = "用户邮箱")
-    private String email;
-
-    /** 手机号码 */
-    @Excel(name = "手机号码")
-    private String phonenumber;
-
-    /** 用户性别 */
-    @Excel(name = "用户性别", readConverterExp = "0=男,1=女,2=未知")
-    private String sex;
 
     /** 用户头像 */
     private String avatar;
@@ -121,6 +113,13 @@ public class SysUser extends BaseEntity
         return userId != null && 1L == userId;
     }
 
+    public Long getEmpId()
+    {
+        return empId;
+    }
+
+    public void setEmpId(Long empId) { this.empId = empId; }
+
     public Long getDeptId()
     {
         return deptId;
@@ -156,38 +155,6 @@ public class SysUser extends BaseEntity
         this.userName = userName;
     }
 
-    @Email(message = "邮箱格式不正确")
-    @Size(min = 0, max = 50, message = "邮箱长度不能超过50个字符")
-    public String getEmail()
-    {
-        return email;
-    }
-
-    public void setEmail(String email)
-    {
-        this.email = email;
-    }
-
-    @Size(min = 0, max = 11, message = "手机号码长度不能超过11个字符")
-    public String getPhonenumber()
-    {
-        return phonenumber;
-    }
-
-    public void setPhonenumber(String phonenumber)
-    {
-        this.phonenumber = phonenumber;
-    }
-
-    public String getSex()
-    {
-        return sex;
-    }
-
-    public void setSex(String sex)
-    {
-        this.sex = sex;
-    }
 
     public String getAvatar()
     {
@@ -315,12 +282,10 @@ public class SysUser extends BaseEntity
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("userId", getUserId())
+            .append("empId", getEmpId())
             .append("deptId", getDeptId())
             .append("userName", getUserName())
             .append("nickName", getNickName())
-            .append("email", getEmail())
-            .append("phonenumber", getPhonenumber())
-            .append("sex", getSex())
             .append("avatar", getAvatar())
             .append("password", getPassword())
             .append("salt", getSalt())

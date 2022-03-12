@@ -116,12 +116,4 @@ public interface SysUserMapper
      * @return 结果
      */
     public SysUser checkPhoneUnique(String phonenumber);
-
-    /**
-     * 校验email是否唯一
-     *
-     * @param email 用户邮箱
-     * @return 结果
-     */
-    public SysUser checkEmailUnique(String email);
 }

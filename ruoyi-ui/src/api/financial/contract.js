@@ -13,7 +13,7 @@ export function listContract(query) {
 // 查询合同详细
 export function getContract(contractId) {
   return request({
-    url: '/financial/contract/' + contractId,
+    url: '/financial/contract/' + parseStrEmpty(contractId),
     method: 'get'
   })
 }
@@ -39,7 +39,7 @@ export function updateContract(data) {
 // 删除合同
 export function delContract(contractId) {
   return request({
-    url: '/financial/contract/' + contractId,
+    url: '/financial/contract/' + parseStrEmpty(contractId),
     method: 'delete'
   })
 }

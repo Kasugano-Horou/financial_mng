@@ -53,6 +53,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	        left join sys_user u on u.user_id = up.user_id
 	    where u.user_id = #{userId}
 	</select>
+
+	<select id="selectPostListByEmpId" parameterType="Long" resultType="Long">
+		select p.post_id
+		from sys_post p
+				 left join sys_emp_post ep on ep.post_id = p.post_id
+				 left join sys_emp e on e.emp_id = ep.emp_id
+		where e.emp_id = #{empId}
+	</select>
 	
 	<select id="selectPostsByUserName" parameterType="String" resultMap="SysPostResult">
 		select p.post_id, p.post_name, p.post_code

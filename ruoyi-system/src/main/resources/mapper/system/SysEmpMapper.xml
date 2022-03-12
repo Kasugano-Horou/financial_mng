@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysEmpMapper">
+
+    <resultMap type="SysEmp" id="SysEmpResult">
+        <id     property="empId"        column="emp_id"         />
+        <result property="empCode"      column="emp_code"       />
+        <result property="empName"      column="emp_name"       />
+        <result property="sex"          column="sex"            />
+        <result property="status"       column="status"         />
+        <result property="education"    column="education"      />
+        <result property="phonenumber"  column="phonenumber"    />
+        <result property="email"        column="email"          />
+        <result property="address"      column="address"        />
+        <result property="deptId"       column="dept_id"        />
+        <result property="hiredate"     column="hiredate"       />
+        <result property="termdate"     column="termdate"       />
+        <result property="baseWages"    column="base_wages"     />
+        <result property="houseWages"   column="house_wages"    />
+        <result property="delFlag"      column="del_flag"       />
+        <result property="createBy"     column="create_by"      />
+        <result property="createTime"   column="create_time"    />
+        <result property="updateBy"     column="update_by"      />
+        <result property="updateTime"   column="update_time"    />
+        <result property="remark"       column="remark"         />
+        <association property="dept"    column="dept_id" javaType="SysDept" resultMap="deptResult" />
+    </resultMap>
+
+    <resultMap id="deptResult" type="SysDept">
+        <id     property="deptId"   column="dept_id"     />
+        <result property="parentId" column="parent_id"   />
+        <result property="deptName" column="dept_name"   />
+        <result property="orderNum" column="order_num"   />
+        <result property="leader"   column="leader"      />
+        <result property="status"   column="dept_status" />
+    </resultMap>
+
+    <sql id="selectEmpVo">
+        select e.emp_id, e.emp_code, e.emp_name, e.sex, e.status, e.education, e.phonenumber, e.email, e.address, e.dept_id, e.hiredate, e.termdate, e.base_wages, e.house_wages, e.create_by, e.create_time, e.update_by, e.update_time, e.remark,
+            d.dept_id, d.parent_id, d.dept_name, d.order_num, d.leader, d.status as dept_status
+        from sys_emp e
+            left join sys_dept d on e.dept_id = d.dept_id
+    </sql>
+
+    <select id="selectEmpList" parameterType="SysEmp" resultMap="SysEmpResult">
+        <include refid="selectEmpVo"/>
+        where e.del_flag = '0'
+        <if test="empId != null  and empId != 0"> AND e.emp_id = #{empId}</if>
+        <if test="empCode != null  and empCode != ''"> AND e.emp_code like concat('%', #{empCode}, '%')</if>
+        <if test="empName != null  and empName != ''"> AND e.emp_name like concat('%', #{empName}, '%')</if>
+        <if test="sex != null  and sex != ''"> AND e.sex = #{sex}</if>
+        <if test="status != null  and status != ''"> AND e.status = #{status}</if>
+        <if test="deptId != null  and deptId != 0"> AND e.dept_id = #{deptId}</if>
+        <if test="hiredate != null ">
+         AND date_format(e.hiredate,'%y%m%d') &lt;= date_format(#{hiredate},'%y%m%d')
+         AND date_format(e.hiredate,'%y%m%d') &gt;= date_format(#{hiredate},'%y%m%d')
+        </if>
+        <if test="houseWages != null  and houseWages != ''"> AND e.house_wages = #{houseWages}</if>
+
+    </select>
+
+    <select id="selectEmpByEmpId" parameterType="Long" resultMap="SysEmpResult">
+        <include refid="selectEmpVo"/>
+        where e.emp_id = #{empId}
+    </select>
+
+    <insert id="insertEmp" parameterType="SysEmp" useGeneratedKeys="true" keyProperty="empId">
+        insert into sys_emp
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="empCode != null and empCode != ''">emp_code,</if>
+            <if test="empName != null and empName != ''">emp_name,</if>
+            <if test="sex != null and sex != ''">sex,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="education != null">education,</if>
+            <if test="phonenumber != null">phonenumber,</if>
+            <if test="email != null">email,</if>
+            <if test="address != null">address,</if>
+            <if test="deptId != null and deptId != ''">dept_id,</if>
+            <if test="hiredate != null">hiredate,</if>
+            <if test="termdate != null">termdate,</if>
+            <if test="baseWages != null">base_wages,</if>
+            <if test="houseWages != null">house_wages,</if>
+            <if test="createBy != null">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="empCode != null and empCode != ''">#{empCode},</if>
+            <if test="empName != null and empName != ''">#{empName},</if>
+            <if test="sex != null and sex != ''">#{sex},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="education != null">#{education},</if>
+            <if test="phonenumber != null">#{phonenumber},</if>
+            <if test="email != null">#{email},</if>
+            <if test="address != null">#{address},</if>
+            <if test="postId != null and postId != ''">#{postId},</if>
+            <if test="deptId != null and deptId != ''">#{deptId},</if>
+            <if test="hiredate != null">#{hiredate},</if>
+            <if test="termdate != null">#{termdate},</if>
+            <if test="baseWages != null">#{baseWages},</if>
+            <if test="houseWages != null">#{houseWages},</if>
+            <if test="createBy != null">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateEmp" parameterType="SysEmp">
+        update sys_emp
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="empCode != null and empCode != ''">emp_code = #{empCode},</if>
+            <if test="empName != null and empName != ''">emp_name = #{empName},</if>
+            <if test="sex != null and sex != ''">sex = #{sex},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="education != null">education = #{education},</if>
+            <if test="phonenumber != null">phonenumber = #{phonenumber},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="deptId != null and deptId != ''">dept_id = #{deptId},</if>
+            <if test="hiredate != null">hiredate = #{hiredate},</if>
+            <if test="termdate != null">termdate = #{termdate},</if>
+            <if test="baseWages != null">base_wages = #{baseWages},</if>
+            <if test="houseWages != null">house_wages = #{houseWages},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </trim>
+        where emp_id = #{empId}
+    </update>
+
+    <delete id="deleteEmpByEmpId" parameterType="Long">
+        update sys_emp set del_flag = '2' where emp_id = #{empId}
+    </delete>
+
+    <delete id="deleteEmpByEmpIds" parameterType="Long">
+        update sys_emp set del_flag = '2' where emp_id in
+        <foreach item="empId" collection="array" open="(" separator="," close=")">
+            #{empId}
+        </foreach>
+    </delete>
+</mapper>

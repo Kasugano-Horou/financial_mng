@@ -42,6 +42,14 @@ public interface SysPostMapper
     public List<Long> selectPostListByUserId(Long userId);
 
     /**
+     * 根据员工ID获取岗位选择框列表
+     *
+     * @param empId 员工ID
+     * @return 选中岗位ID列表
+     */
+    public List<Long> selectPostListByEmpId(Long empId);
+
+    /**
      * 查询用户所属岗位组
      * 
      * @param userName 用户名

@@ -42,6 +42,14 @@ public interface ISysPostService
     public List<Long> selectPostListByUserId(Long userId);
 
     /**
+     * 根据员工ID获取岗位选择框列表
+     *
+     * @param empId 员工ID
+     * @return 选中岗位ID列表
+     */
+    public List<Long> selectPostListByEmpId(Long empId);
+
+    /**
      * 校验岗位名称
      * 
      * @param post 岗位信息
