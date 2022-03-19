@@ -1,6 +1,6 @@
 package com.ruoyi.financial.service;
 
-import com.ruoyi.common.core.domain.entity.FinContract;
+import com.ruoyi.financial.domain.FinContract;
 import java.util.List;
 
 /**

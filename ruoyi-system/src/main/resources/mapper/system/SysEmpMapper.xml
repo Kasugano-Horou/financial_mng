@@ -52,7 +52,10 @@
         <if test="empName != null  and empName != ''"> AND e.emp_name like concat('%', #{empName}, '%')</if>
         <if test="sex != null  and sex != ''"> AND e.sex = #{sex}</if>
         <if test="status != null  and status != ''"> AND e.status = #{status}</if>
-        <if test="deptId != null  and deptId != 0"> AND e.dept_id = #{deptId}</if>
+        <if test="deptId != null  and deptId != 0">
+            AND (e.dept_id = #{deptId} OR e.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE find_in_set(#{deptId}, ancestors) ))
+
+        </if>
         <if test="hiredate != null ">
          AND date_format(e.hiredate,'%y%m%d') &lt;= date_format(#{hiredate},'%y%m%d')
          AND date_format(e.hiredate,'%y%m%d') &gt;= date_format(#{hiredate},'%y%m%d')

@@ -163,6 +163,7 @@ export default {
   height: 100%;
   background-image: url("../assets/images/login-background.jpg");
   background-size: cover;
+  padding-bottom: 50px;
 }
 .title {
   margin: 0px auto 30px auto;

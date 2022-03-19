@@ -67,6 +67,12 @@
             <artifactId>ruoyi-financial</artifactId>
         </dependency>
 
+        <!-- 项目模块-->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-project</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

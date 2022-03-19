@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.financial.mapper.FinWagesMapper">
+    
+    <resultMap type="FinWages" id="FinWagesResult">
+        <result property="wageId"    column="wage_id"    />
+        <result property="empCode"    column="emp_code"    />
+        <result property="empName"    column="emp_name"    />
+        <result property="issuingDate"    column="issuing_date"    />
+        <result property="baseWages"    column="base_wages"    />
+        <result property="bonus"    column="bonus"    />
+        <result property="insurance"    column="insurance"    />
+        <result property="houseFund"    column="house_fund"    />
+        <result property="deducted"    column="deducted"    />
+        <result property="others"    column="others"    />
+        <result property="tax"    column="tax"    />
+        <result property="finalWage"    column="final_wage"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+    
+    <sql id="selectFinWagesVo">
+        select wage_id, emp_code, emp_name, issuing_date, base_wages, bonus, insurance, house_fund, deducted, `others`, tax, final_wage, create_by, create_time, update_by, update_time, remark
+        from fin_wages
+    </sql>
+
+    <select id="selectFinWagesList" parameterType="FinWages" resultMap="FinWagesResult">
+        <include refid="selectFinWagesVo"/>
+        <where>  
+            <if test="empCode != null  and empCode != ''"> and emp_code like concat('%', #{empCode}, '%')</if>
+            <if test="empName != null  and empName != ''"> and emp_name like concat('%', #{empName}, '%')</if>
+            <if test="issuingDate != null "> and issuing_date = #{date}</if>
+            <if test="baseWages != null "> and base_wages = #{baseWages}</if>
+        </where>
+    </select>
+    
+    <select id="selectFinWagesByWageId" parameterType="Long" resultMap="FinWagesResult">
+        <include refid="selectFinWagesVo"/>
+        where wage_id = #{wageId}
+    </select>
+        
+    <insert id="insertFinWages" parameterType="FinWages" useGeneratedKeys="true" keyProperty="wageId">
+        insert into fin_wages
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="empCode != null and empCode != ''">emp_code,</if>
+            <if test="empName != null and empName != ''">emp_name,</if>
+            <if test="issuingDate != null">issuing_date,</if>
+            <if test="baseWages != null">base_wages,</if>
+            <if test="bonus != null">bonus,</if>
+            <if test="insurance != null">insurance,</if>
+            <if test="houseFund != null">house_fund,</if>
+            <if test="deducted != null">deducted,</if>
+            <if test="others != null">`others`,</if>
+            <if test="tax != null">tax,</if>
+            <if test="finalWage != null">final_wage,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="empCode != null and empCode != ''">#{empCode},</if>
+            <if test="empName != null and empName != ''">#{empName},</if>
+            <if test="issuingDate != null">#{issuingDate},</if>
+            <if test="baseWages != null">#{baseWages},</if>
+            <if test="bonus != null">#{bonus},</if>
+            <if test="insurance != null">#{insurance},</if>
+            <if test="houseFund != null">#{houseFund},</if>
+            <if test="deducted != null">#{deducted},</if>
+            <if test="others != null">#{others},</if>
+            <if test="tax != null">#{tax},</if>
+            <if test="finalWage != null">#{finalWage},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFinWages" parameterType="FinWages">
+        update fin_wages
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="empCode != null and empCode != ''">emp_code = #{empCode},</if>
+            <if test="empName != null and empName != ''">emp_name = #{empName},</if>
+            <if test="issuingDate != null">issuing_date = #{issuingDate},</if>
+            <if test="baseWages != null">base_wages = #{baseWages},</if>
+            <if test="bonus != null">bonus = #{bonus},</if>
+            <if test="insurance != null">insurance = #{insurance},</if>
+            <if test="houseFund != null">house_fund = #{houseFund},</if>
+            <if test="deducted != null">deducted = #{deducted},</if>
+            <if test="others != null">`others` = #{others},</if>
+            <if test="tax != null">tax = #{tax},</if>
+            <if test="finalWage != null">final_wage = #{finalWage},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where wage_id = #{wageId}
+    </update>
+
+    <delete id="deleteFinWagesByWageId" parameterType="Long">
+        update fin_wages set del_flag = '2' where wage_id = #{wageId}
+    </delete>
+
+    <delete id="deleteFinWagesByWageIds" parameterType="Long">
+        update fin_wages set del_flag = '2' where wage_id in
+        <foreach item="wageId" collection="array" open="(" separator="," close=")">
+            #{wageId}
+        </foreach>
+    </delete>
+
+</mapper>

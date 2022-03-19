@@ -275,6 +275,7 @@ public class SysEmp extends BaseEntity
             .append("phonenumber", getPhonenumber())
             .append("email", getEmail())
             .append("address", getAddress())
+            .append("deptId", getDeptId())
             .append("hiredate", getHiredate())
             .append("termdate", getTermdate())
             .append("baseWages", getBaseWages())

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.mapper.ProProjectMapper">
+
+    <resultMap type="ProProject" id="ProProjectResult">
+        <result property="projectId"    column="project_id"    />
+        <result property="projectName"    column="project_name"    />
+        <result property="contractId"    column="contract_id"    />
+        <result property="projectType"    column="project_type"    />
+        <result property="status"    column="status"    />
+        <result property="parta"    column="parta"    />
+        <result property="leader"    column="leader"    />
+        <result property="delFlag"     column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectProProjectVo">
+        select project_id, project_name, contract_id, project_type, status, parta, leader, del_flag, create_by, create_time, update_by, update_time, remark from pro_project
+    </sql>
+
+    <select id="selectProProjectList" parameterType="ProProject" resultMap="ProProjectResult">
+        <include refid="selectProProjectVo"/>
+        <where>
+            del_flag = '0'
+            <if test="projectName != null  and projectName != ''"> and project_name like concat('%', #{projectName}, '%')</if>
+            <if test="contractId != null "> and contract_id = #{contractId}</if>
+            <if test="projectType != null  and projectType != ''"> and project_type = #{projectType}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="parta != null  and parta != ''"> and parta like concat('%', #{parta}, '%')</if>
+            <if test="leader != null  and leader != ''"> and leader like concat('%', #{leader}, '%')</if>
+        </where>
+    </select>
+
+    <select id="selectProProjectTableData" parameterType="ProProject" resultMap="ProProjectResult">
+        select project_id, project_name, leader ,status from pro_project
+        <where>
+            del_flag = '0'
+            <if test="projectName != null  and projectName != ''"> and project_name like concat('%', #{projectName}, '%')</if>
+            <if test="contractId != null "> and contract_id = #{contractId}</if>
+            <if test="projectType != null  and projectType != ''"> and project_type = #{projectType}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="parta != null  and parta != ''"> and parta like concat('%', #{parta}, '%')</if>
+            <if test="leader != null  and leader != ''"> and leader like concat('%', #{leader}, '%')</if>
+        </where>
+    </select>
+
+    <select id="selectProProjectByProjectId" parameterType="Long" resultMap="ProProjectResult">
+        <include refid="selectProProjectVo"/>
+        where project_id = #{projectId}
+    </select>
+
+    <insert id="insertProProject" parameterType="ProProject" useGeneratedKeys="true" keyProperty="projectId">
+        insert into pro_project
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="projectName != null and projectName != ''">project_name,</if>
+            <if test="contractId != null">contract_id,</if>
+            <if test="projectType != null and projectType != ''">project_type,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="parta != null">parta,</if>
+            <if test="leader != null">leader,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="remark != null">remark,</if>
+            create_time,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="projectName != null and projectName != ''">#{projectName},</if>
+            <if test="contractId != null">#{contractId},</if>
+            <if test="projectType != null and projectType != ''">#{projectType},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="parta != null">#{parta},</if>
+            <if test="leader != null">#{leader},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            sysdate(),
+        </trim>
+    </insert>
+
+    <update id="updateProProject" parameterType="ProProject">
+        update pro_project
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="projectName != null and projectName != ''">project_name = #{projectName},</if>
+            <if test="contractId != null">contract_id = #{contractId},</if>
+            <if test="projectType != null and projectType != ''">project_type = #{projectType},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="parta != null">parta = #{parta},</if>
+            <if test="leader != null">leader = #{leader},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate(),
+        </trim>
+        where project_id = #{projectId}
+    </update>
+
+    <delete id="deleteProProjectByProjectId" parameterType="Long">
+        update pro_project set del_flag = '2' where project_id = #{projectId}
+    </delete>
+
+    <delete id="deleteProProjectByProjectIds" parameterType="Long">
+        update pro_project set del_flag = '2' where project_id in
+        <foreach item="projectId" collection="array" open="(" separator="," close=")">
+            #{projectId}
+        </foreach>
+    </delete>
+</mapper>

@@ -207,6 +207,13 @@
                 <version>${ruoyi.version}</version>
             </dependency>
 
+            <!-- 项目模块-->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-project</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -219,6 +226,7 @@
         <module>ruoyi-common</module>
 
         <module>ruoyi-financial</module>
+        <module>ruoyi-project</module>
     </modules>
     <packaging>pom</packaging>
 

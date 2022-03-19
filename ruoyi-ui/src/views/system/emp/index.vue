@@ -458,6 +458,7 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
+      this.getTreeselect();
       const empId = row.empId || this.ids
       getEmp(empId).then(response => {
         this.form = response.data;

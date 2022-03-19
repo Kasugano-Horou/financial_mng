@@ -1,7 +1,7 @@
 package com.ruoyi.financial.service.impl;
 
 
-import com.ruoyi.common.core.domain.entity.FinContract;
+import com.ruoyi.financial.domain.FinContract;
 import com.ruoyi.common.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

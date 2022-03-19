@@ -52,6 +52,7 @@ public class SysEmpController extends BaseController
     public TableDataInfo list(SysEmp sysEmp)
     {
         startPage();
+        System.out.println("EMP:"+sysEmp.toString());
         List<SysEmp> list = sysEmpService.selectEmpList(sysEmp);
         return getDataTable(list);
     }

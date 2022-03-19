@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.mapper.ProManhourMapper">
+    
+    <resultMap type="ProManhour" id="ProManhourResult">
+        <result property="manhourId"    column="manhour_id"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="empId"    column="emp_id"    />
+        <result property="manhour"    column="manhour"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <association property="proProject"    column="project_id" javaType="ProProject" resultMap="proProjectResult" />
+        <association property="sysEmp"    column="emp_id" javaType="SysEmp" resultMap="sysEmpResult" />
+    </resultMap>
+
+    <resultMap id="proProjectResult" type="ProProject">
+        <id     property="projectId"   column="project_id"     />
+        <result property="projectName" column="project_name"   />
+        <result property="leader"   column="leader"      />
+        <result property="projectType"   column="project_type" />
+    </resultMap>
+
+    <resultMap id="sysEmpResult" type="SysEmp">
+        <id     property="empId"   column="emp_id"     />
+        <result property="empCode" column="emp_code"   />
+        <result property="empName"   column="emp_name"      />
+        <result property="status"   column="emp_status" />
+    </resultMap>
+
+    <sql id="selectProManhourVo">
+        select m.manhour_id, m.project_id, m.emp_id, m.manhour, m.del_flag, m.create_by, m.create_time, m.update_by, m.update_time, m.remark,
+            p.project_id, p.project_name, p.leader, p.project_type,
+            e.emp_id, e.emp_code, e.emp_name, e.status as emp_status
+        from pro_manhour m
+            left join pro_project p on p.project_id = m.project_id
+            left join sys_emp e on e.emp_id = m.emp_id
+    </sql>
+
+    <select id="selectProManhourList" parameterType="ProManhour" resultMap="ProManhourResult">
+        <include refid="selectProManhourVo"/>
+        <where>
+            m.del_flag = '0'
+            <if test="projectId != null "> and m.project_id = #{projectId}</if>
+            <if test="empId != null  and empId != ''"> and m.emp_id = #{empId}</if>
+        </where>
+    </select>
+
+
+    
+    <select id="selectProManhourByManhourId" parameterType="Long" resultMap="ProManhourResult">
+        <include refid="selectProManhourVo"/>
+        where m.manhour_id = #{manhourId}
+    </select>
+        
+    <insert id="insertProManhour" parameterType="ProManhour" useGeneratedKeys="true" keyProperty="manhourId">
+        insert into pro_manhour
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="projectId != null">project_id,</if>
+            <if test="empId != null and empId != ''">emp_id,</if>
+            <if test="manhour != null">manhour,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="remark != null">remark,</if>
+            create_time,
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="projectId != null">#{projectId},</if>
+            <if test="empId != null and empId != ''">#{empId},</if>
+            <if test="manhour != null">#{manhour},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            sysdate(),
+         </trim>
+    </insert>
+
+    <update id="updateProManhour" parameterType="ProManhour">
+        update pro_manhour
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="empId != null and empId != ''">emp_id = #{empId},</if>
+            <if test="manhour != null">manhour = #{manhour},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate(),
+        </trim>
+        where manhour_id = #{manhourId}
+    </update>
+
+    <delete id="deleteProManhourByManhourId" parameterType="Long">
+        update pro_manhour set del_flag = '2' where manhour_id = #{manhourId}
+    </delete>
+
+    <delete id="deleteProManhourByManhourIds" parameterType="Long">
+        update pro_manhour set del_flag = '2' where manhour_id in
+        <foreach item="manhourId" collection="array" open="(" separator="," close=")">
+            #{manhourId}
+        </foreach>
+    </delete>
+</mapper>
