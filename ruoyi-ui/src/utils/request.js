@@ -32,18 +32,22 @@ service.interceptors.request.use(config => {
 
   // get请求映射params参数
   if (config.method === 'get' && config.params) {
+    console.log("www"+config.params);
     let url = config.url + '?' + tansParams(config.params);
     url = url.slice(0, -1);
     config.params = {};
     config.url = url;
+    console.log("uuu"+config.params);
   }
 
   if (!isRepeatSubmit && (config.method === 'post' || config.method === 'put')) {
+    
     const requestObj = {
       url: config.url,
       data: typeof config.data === 'object' ? JSON.stringify(config.data) : config.data,
       time: new Date().getTime()
     }
+    console.log("拦截后"+requestObj.data)
     const sessionObj = cache.session.getJSON('sessionObj')
     if (sessionObj === undefined || sessionObj === null || sessionObj === '') {
       cache.session.setJSON('sessionObj', requestObj)

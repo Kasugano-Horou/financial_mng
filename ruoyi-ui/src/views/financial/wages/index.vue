@@ -4,8 +4,8 @@
       <el-form-item label="年月" prop="issuingDate">
         <el-date-picker clearable size="small"
           v-model="queryParams.issuingDate"
-          type="date"
-          value-format="yyyy-MM-dd"
+          type="month"
+          value-format="yyyy-MM"
           placeholder="请选择年月">
         </el-date-picker>
       </el-form-item>
@@ -86,7 +86,7 @@
       <el-table-column label="员工姓名" align="center" prop="empName" />
       <el-table-column label="年月" align="center" prop="issuingDate" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.issuingDate, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.issuingDate, '{y}-{m}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="基础工资" align="center" prop="baseWages" />
@@ -138,8 +138,8 @@
         <el-form-item label="年月" prop="issuingDate">
           <el-date-picker clearable size="small"
             v-model="form.issuingDate"
-            type="date"
-            value-format="yyyy-MM-dd"
+            type="month"
+            value-format="yyyy-MM"
             placeholder="请选择年月">
           </el-date-picker>
         </el-form-item>
@@ -254,12 +254,14 @@ export default {
     };
   },
   created() {
+    this.queryParams.issuingDate = this.dateFormat("yyyy-MM");
     this.getList();
   },
   methods: {
     /** 查询工资列表 */
     getList() {
       this.loading = true;
+      console.log(this.queryParams);
       listWages(this.queryParams).then(response => {
         this.wagesList = response.rows;
         this.total = response.total;
@@ -302,6 +304,7 @@ export default {
     /** 重置按钮操作 */
     resetQuery() {
       this.resetForm("queryForm");
+      this.queryParams.issuingDate = this.dateFormat("yyyy-MM");
       this.handleQuery();
     },
     // 多选框选中数据
@@ -361,7 +364,29 @@ export default {
       this.download('financial/wages/export', {
         ...this.queryParams
       }, `wages_${new Date().getTime()}.xlsx`)
-    }
+    },
+
+
+    dateFormat(fmt){ //author: meizz  
+      var date = new Date(); 
+      var o = {   
+        "M+" : date.getMonth()+1,                 //月份   
+        "d+" : date.getDate(),                    //日   
+        "h+" : date.getHours(),                   //小时   
+        "m+" : date.getMinutes(),                 //分   
+        "s+" : date.getSeconds(),                 //秒   
+        "q+" : Math.floor((date.getMonth()+3)/3), //季度   
+        "S"  : date.getMilliseconds()             //毫秒   
+      };   
+      if(/(y+)/.test(fmt))   
+        fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substring(4 - RegExp.$1.length));   
+      for(var k in o)   
+        if(new RegExp("("+ k +")").test(fmt))   
+      fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substring((""+ o[k]).length)));   
+      return fmt;   
+    } 
   }
 };
+
+
 </script>

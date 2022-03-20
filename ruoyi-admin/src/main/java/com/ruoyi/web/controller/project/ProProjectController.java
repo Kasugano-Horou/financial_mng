@@ -28,7 +28,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
  * @date 2022-03-15
  */
 @RestController
-@RequestMapping("/project/project")
+@RequestMapping("/project/projectInfo")
 public class ProProjectController extends BaseController
 {
     @Autowired
@@ -37,7 +37,7 @@ public class ProProjectController extends BaseController
     /**
      * 查询项目列表
      */
-    @PreAuthorize("@ss.hasPermi('project:project:list')")
+    @PreAuthorize("@ss.hasPermi('project:projectInfo:list')")
     @GetMapping("/list")
     public TableDataInfo list(ProProject proProject)
     {
@@ -49,7 +49,7 @@ public class ProProjectController extends BaseController
     /**
      * 查询项目表格数据
      */
-    @PreAuthorize("@ss.hasPermi('project:project:list')")
+    @PreAuthorize("@ss.hasPermi('project:projectInfo:list')")
     @GetMapping("/table")
     public TableDataInfo tableData(ProProject proProject)
     {
@@ -63,7 +63,7 @@ public class ProProjectController extends BaseController
     /**
      * 导出项目列表
      */
-    @PreAuthorize("@ss.hasPermi('project:project:export')")
+    @PreAuthorize("@ss.hasPermi('project:projectInfo:export')")
     @Log(title = "项目", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, ProProject proProject)
@@ -76,7 +76,7 @@ public class ProProjectController extends BaseController
     /**
      * 获取项目详细信息
      */
-    @PreAuthorize("@ss.hasPermi('project:project:query')")
+    @PreAuthorize("@ss.hasPermi('project:projectInfo:query')")
     @GetMapping(value = "/{projectId}")
     public AjaxResult getInfo(@PathVariable("projectId") Long projectId)
     {
@@ -86,7 +86,7 @@ public class ProProjectController extends BaseController
     /**
      * 新增项目
      */
-    @PreAuthorize("@ss.hasPermi('project:project:add')")
+    @PreAuthorize("@ss.hasPermi('project:projectInfo:add')")
     @Log(title = "项目", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody ProProject proProject)
@@ -99,7 +99,7 @@ public class ProProjectController extends BaseController
     /**
      * 修改项目
      */
-    @PreAuthorize("@ss.hasPermi('project:project:edit')")
+    @PreAuthorize("@ss.hasPermi('project:projectInfo:edit')")
     @Log(title = "项目", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody ProProject proProject)
@@ -111,7 +111,7 @@ public class ProProjectController extends BaseController
     /**
      * 删除项目
      */
-    @PreAuthorize("@ss.hasPermi('project:project:remove')")
+    @PreAuthorize("@ss.hasPermi('project:projectInfo:remove')")
     @Log(title = "项目", businessType = BusinessType.DELETE)
     @DeleteMapping("/{projectIds}")
     public AjaxResult remove(@PathVariable Long[] projectIds)

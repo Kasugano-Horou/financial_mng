@@ -42,6 +42,7 @@ public class FinWagesController extends BaseController
     public TableDataInfo list(FinWages finWages)
     {
         startPage();
+        System.out.println(finWages);
         List<FinWages> list = finWagesService.selectFinWagesList(finWages);
         return getDataTable(list);
     }
@@ -77,6 +78,7 @@ public class FinWagesController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody FinWages finWages)
     {
+        finWages.setCreateBy(getUsername());
         return toAjax(finWagesService.insertFinWages(finWages));
     }
 
@@ -88,6 +90,7 @@ public class FinWagesController extends BaseController
     @PutMapping
     public AjaxResult edit(@RequestBody FinWages finWages)
     {
+        finWages.setUpdateBy(getUsername());
         return toAjax(finWagesService.updateFinWages(finWages));
     }
 

@@ -26,6 +26,10 @@
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-system</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-project</artifactId>
+        </dependency>
 
     </dependencies>
 

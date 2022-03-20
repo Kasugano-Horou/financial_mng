@@ -31,8 +31,8 @@ public class FinWages extends BaseEntity
     private String empName;
 
     /** 年月 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "年月", width = 30, dateFormat = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM")
+    @Excel(name = "年月", width = 30, dateFormat = "yyyy-MM")
     private Date issuingDate;
 
     /** 基础工资 */

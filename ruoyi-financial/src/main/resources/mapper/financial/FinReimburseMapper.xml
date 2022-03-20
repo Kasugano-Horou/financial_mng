@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.financial.mapper.FinReimburseMapper">
+    
+    <resultMap type="FinReimburse" id="FinReimburseResult">
+        <result property="reimburseId"    column="reimburse_id"    />
+        <result property="reimburseNumber"    column="reimburse_number"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="handBy"    column="hand_by"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="reimburseType"    column="reimburse_type"    />
+        <result property="annex"    column="annex"    />
+        <result property="details"    column="details"    />
+        <result property="status"    column="status"    />
+        <result property="flowId"    column="flow_id"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <association property="dept"    column="dept_id" javaType="SysDept" resultMap="deptResult" />
+        <association property="emp"    column="emp_id" javaType="SysEmp" resultMap="empResult" />
+        <association property="project"    column="project_id" javaType="ProProject" resultMap="ProProjectResult" />
+    </resultMap>
+
+    <resultMap id="deptResult" type="SysDept">
+        <id     property="deptId"   column="dept_id"     />
+        <result property="deptName" column="dept_name"   />
+        <result property="leader"   column="dept_leader"      />
+        <result property="status"   column="dept_status" />
+    </resultMap>
+
+    <resultMap id="empResult" type="SysEmp">
+        <id     property="empId"   column="emp_id"     />
+        <result property="empName" column="emp_name"   />
+        <result property="empCode" column="emp_code"   />
+        <result property="status"   column="emp_status" />
+    </resultMap>
+
+    <resultMap id="ProProjectResult" type="ProProject">
+        <id     property="projectId"   column="project_id"     />
+        <result property="projectName" column="project_name"   />
+        <result property="leader"   column="project_leader"      />
+        <result property="status"   column="project_status" />
+    </resultMap>
+
+    <sql id="selectFinReimburseVo">
+        select r.reimburse_id, r.reimburse_number, r.dept_id, r.hand_by, r.project_id, r.reimburse_type, r.annex, r.details, r.status, r.flow_id, r.del_flag, r.create_by, r.create_time, r.update_by, r.update_time, r.remark,
+            d.dept_name, d.leader as dept_leader, d.status as dept_status,
+            e.emp_name, e.emp_code, e.status as emp_status,
+            p.project_name, p.leader as project_leader, p.status as project_status
+        from fin_reimburse r
+            left join sys_dept d on d.dept_id = r.dept_id
+            left join sys_emp e on e.emp_id = r.hand_by
+            left join pro_project p on p.project_id = r.project_id
+
+    </sql>
+
+    <select id="selectFinReimburseList" parameterType="FinReimburse" resultMap="FinReimburseResult">
+        <include refid="selectFinReimburseVo"/>
+        <where>
+            <if test="reimburseNumber != null  and reimburseNumber != ''"> and r.reimburse_number like concat('%', #{reimburseNumber}, '%')</if>
+            <if test="deptId != null "> and r.dept_id = #{deptId}</if>
+            <if test="handBy != null "> and r.hand_by = #{handBy}</if>
+            <if test="projectId != null "> and r.project_id = #{projectId}</if>
+            <if test="reimburseType != null  and reimburseType != ''"> and r.reimburse_type = #{reimburseType}</if>
+            <if test="status != null  and status != ''"> and r.status = #{status}</if>
+            <if test="dept !=null and dept != ''">
+                <if test="dept.deptName != null  and dept.deptName != ''"> and d.dept_name like concat('%', #{dept.deptName}, '%')</if>
+            </if>
+            <if test="emp !=null and emp != ''">
+                <if test="emp.empName != null  and emp.empName != ''"> and e.emp_name like concat('%', #{emp.empName}, '%')</if>
+            </if>
+        </where>
+    </select>
+    
+    <select id="selectFinReimburseByReimburseId" parameterType="Long" resultMap="FinReimburseResult">
+        <include refid="selectFinReimburseVo"/>
+        where reimburse_id = #{reimburseId}
+    </select>
+        
+    <insert id="insertFinReimburse" parameterType="FinReimburse" useGeneratedKeys="true" keyProperty="reimburseId">
+        insert into fin_reimburse
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="reimburseNumber != null and reimburseNumber != ''">reimburse_number,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="handBy != null">hand_by,</if>
+            <if test="projectId != null">project_id,</if>
+            <if test="reimburseType != null">reimburse_type,</if>
+            <if test="annex != null">annex,</if>
+            <if test="details != null">details,</if>
+            <if test="status != null">status,</if>
+            <if test="flowId != null">flow_id,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="remark != null">remark,</if>
+            create_time,
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="reimburseNumber != null and reimburseNumber != ''">#{reimburseNumber},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="handBy != null">#{handBy},</if>
+            <if test="projectId != null">#{projectId},</if>
+            <if test="reimburseType != null">#{reimburseType},</if>
+            <if test="annex != null">#{annex},</if>
+            <if test="details != null">#{details},</if>
+            <if test="status != null">#{status},</if>
+            <if test="flowId != null">#{flowId},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            sysdate(),
+         </trim>
+    </insert>
+
+    <update id="updateFinReimburse" parameterType="FinReimburse">
+        update fin_reimburse
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="reimburseNumber != null and reimburseNumber != ''">reimburse_number = #{reimburseNumber},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="handBy != null">hand_by = #{handBy},</if>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="reimburseType != null">reimburse_type = #{reimburseType},</if>
+            <if test="annex != null">annex = #{annex},</if>
+            <if test="details != null">details = #{details},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="flowId != null">flow_id = #{flowId},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate(),
+        </trim>
+        where reimburse_id = #{reimburseId}
+    </update>
+
+    <delete id="deleteFinReimburseByReimburseId" parameterType="Long">
+        update fin_reimburse set del_flag = '2' where reimburse_id = #{reimburseId}
+    </delete>
+
+    <delete id="deleteFinReimburseByReimburseIds" parameterType="String">
+        update fin_reimburse set del_flag = '2' where reimburse_id in
+        <foreach item="reimburseId" collection="array" open="(" separator="," close=")">
+            #{reimburseId}
+        </foreach>
+    </delete>
+</mapper>

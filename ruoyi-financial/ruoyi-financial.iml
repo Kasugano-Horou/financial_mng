@@ -98,5 +98,6 @@
     <orderEntry type="library" name="Maven: eu.bitwalker:UserAgentUtils:1.21" level="project" />
     <orderEntry type="library" name="Maven: javax.servlet:javax.servlet-api:4.0.1" level="project" />
     <orderEntry type="module" module-name="ruoyi-system" />
+    <orderEntry type="module" module-name="ruoyi-project" />
   </component>
 </module>

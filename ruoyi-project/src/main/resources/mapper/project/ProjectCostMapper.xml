@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.mapper.ProjectCostMapper">
+    
+    <resultMap type="ProjectCost" id="ProjectCostResult">
+        <result property="projectCostId"    column="project_cost_id"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="projectName"    column="project_name"    />
+        <result property="contractNumber"    column="contract_number"    />
+        <result property="businessTax"    column="business_tax"    />
+        <result property="managenmentCost"    column="managenment_cost"    />
+        <result property="personnelCost"    column="personnel_cost"    />
+        <result property="procurementCost"    column="procurement_cost"    />
+        <result property="othersCost"    column="others_cost"    />
+        <result property="maintenanceCost"    column="maintenance_cost"    />
+        <result property="generalIncome"    column="general_income"    />
+        <result property="preTax"    column="pre_tax"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectProjectCostVo">
+        select project_cost_id, project_id, project_name, contract_number, business_tax, managenment_cost, personnel_cost, procurement_cost, others_cost, maintenance_cost, general_income, pre_tax, del_flag, create_by, create_time, update_by, update_time, remark from pro_project_cost
+    </sql>
+
+    <select id="selectProjectCostList" parameterType="ProjectCost" resultMap="ProjectCostResult">
+        <include refid="selectProjectCostVo"/>
+        <where>  
+            <if test="projectName != null  and projectName != ''"> and project_name like concat('%', #{projectName}, '%')</if>
+            <if test="contractNumber != null  and contractNumber != ''"> and contract_number = #{contractNumber}</if>
+        </where>
+    </select>
+    
+    <select id="selectProjectCostByProjectCostId" parameterType="Long" resultMap="ProjectCostResult">
+        <include refid="selectProjectCostVo"/>
+        where project_cost_id = #{projectCostId}
+    </select>
+        
+    <insert id="insertProjectCost" parameterType="ProjectCost" useGeneratedKeys="true" keyProperty="projectCostId">
+        insert into pro_project_cost
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="projectId != null">project_id,</if>
+            <if test="projectName != null and projectName != ''">project_name,</if>
+            <if test="contractNumber != null">contract_number,</if>
+            <if test="businessTax != null">business_tax,</if>
+            <if test="managenmentCost != null">managenment_cost,</if>
+            <if test="personnelCost != null">personnel_cost,</if>
+            <if test="procurementCost != null">procurement_cost,</if>
+            <if test="othersCost != null">others_cost,</if>
+            <if test="maintenanceCost != null">maintenance_cost,</if>
+            <if test="generalIncome != null">general_income,</if>
+            <if test="preTax != null">pre_tax,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="remark != null">remark,</if>
+            create_time,
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="projectId != null">#{projectId},</if>
+            <if test="projectName != null and projectName != ''">#{projectName},</if>
+            <if test="contractNumber != null">#{contractNumber},</if>
+            <if test="businessTax != null">#{businessTax},</if>
+            <if test="managenmentCost != null">#{managenmentCost},</if>
+            <if test="personnelCost != null">#{personnelCost},</if>
+            <if test="procurementCost != null">#{procurementCost},</if>
+            <if test="othersCost != null">#{othersCost},</if>
+            <if test="maintenanceCost != null">#{maintenanceCost},</if>
+            <if test="generalIncome != null">#{generalIncome},</if>
+            <if test="preTax != null">#{preTax},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            sysdate(),
+         </trim>
+    </insert>
+
+    <update id="updateProjectCost" parameterType="ProjectCost">
+        update pro_project_cost
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="projectName != null and projectName != ''">project_name = #{projectName},</if>
+            <if test="contractNumber != null">contract_number = #{contractNumber},</if>
+            <if test="businessTax != null">business_tax = #{businessTax},</if>
+            <if test="managenmentCost != null">managenment_cost = #{managenmentCost},</if>
+            <if test="personnelCost != null">personnel_cost = #{personnelCost},</if>
+            <if test="procurementCost != null">procurement_cost = #{procurementCost},</if>
+            <if test="othersCost != null">others_cost = #{othersCost},</if>
+            <if test="maintenanceCost != null">maintenance_cost = #{maintenanceCost},</if>
+            <if test="generalIncome != null">general_income = #{generalIncome},</if>
+            <if test="preTax != null">pre_tax = #{preTax},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate(),
+        </trim>
+        where project_cost_id = #{projectCostId}
+    </update>
+
+    <delete id="deleteProjectCostByProjectCostId" parameterType="Long">
+        update pro_project_cost set del_flag = '2' where project_cost_id = #{projectCostId}
+    </delete>
+
+    <delete id="deleteProjectCostByProjectCostIds" parameterType="String">
+        update pro_project_cost set del_flag = '2' where project_cost_id in
+        <foreach item="projectCostId" collection="array" open="(" separator="," close=")">
+            #{projectCostId}
+        </foreach>
+    </delete>
+</mapper>

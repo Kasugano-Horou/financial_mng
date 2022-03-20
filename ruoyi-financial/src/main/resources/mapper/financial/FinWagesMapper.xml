@@ -34,7 +34,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <where>  
             <if test="empCode != null  and empCode != ''"> and emp_code like concat('%', #{empCode}, '%')</if>
             <if test="empName != null  and empName != ''"> and emp_name like concat('%', #{empName}, '%')</if>
-            <if test="issuingDate != null "> and issuing_date = #{date}</if>
+            <if test="issuingDate != null "> and date_format(issuing_date,'%y%m') = date_format(#{issuingDate},'%y%m')</if>
             <if test="baseWages != null "> and base_wages = #{baseWages}</if>
         </where>
     </select>
@@ -59,10 +59,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="tax != null">tax,</if>
             <if test="finalWage != null">final_wage,</if>
             <if test="createBy != null">create_by,</if>
-            <if test="createTime != null">create_time,</if>
-            <if test="updateBy != null">update_by,</if>
-            <if test="updateTime != null">update_time,</if>
             <if test="remark != null">remark,</if>
+            create_time
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="empCode != null and empCode != ''">#{empCode},</if>
@@ -77,10 +75,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="tax != null">#{tax},</if>
             <if test="finalWage != null">#{finalWage},</if>
             <if test="createBy != null">#{createBy},</if>
-            <if test="createTime != null">#{createTime},</if>
-            <if test="updateBy != null">#{updateBy},</if>
-            <if test="updateTime != null">#{updateTime},</if>
             <if test="remark != null">#{remark},</if>
+            sysdate()
          </trim>
     </insert>
 
@@ -98,11 +94,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="others != null">`others` = #{others},</if>
             <if test="tax != null">tax = #{tax},</if>
             <if test="finalWage != null">final_wage = #{finalWage},</if>
-            <if test="createBy != null">create_by = #{createBy},</if>
-            <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
-            <if test="updateTime != null">update_time = #{updateTime},</if>
             <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate(),
         </trim>
         where wage_id = #{wageId}
     </update>

@@ -191,7 +191,7 @@
 
 <script>
 import { listManhour, listManhourByProjectId, getManhour, delManhour, addManhour, updateManhour } from "@/api/project/manhour";
-import { tableDataProject} from "@/api/project/project";
+import { tableDataProject} from "@/api/project/projectInfo";
 export default {
   name: "Manhour",
   data() {
