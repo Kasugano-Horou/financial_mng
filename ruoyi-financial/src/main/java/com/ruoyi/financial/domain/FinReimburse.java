@@ -3,12 +3,15 @@ package com.ruoyi.financial.domain;
 import com.ruoyi.common.annotation.Excels;
 import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.domain.entity.SysEmp;
+import com.ruoyi.common.core.domain.entity.SysFileInfo;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.annotation.Excel.Type;
 import com.ruoyi.common.core.domain.BaseEntity;
 import com.ruoyi.project.domain.ProProject;
+
+import java.math.BigDecimal;
 
 /**
  * 报销对象 fin_reimburse
@@ -38,6 +41,13 @@ public class FinReimburse extends BaseEntity
     /** 项目编号 */
     @Excel(name = "项目编号")
     private Long projectId;
+
+    /** 发票ID */
+    private Long invoiceId;
+
+    /** 报销金额 */
+    @Excel(name = "报销金额")
+    private BigDecimal amount;
 
     /** 报销类型 */
     @Excel(name = "报销类型")
@@ -83,7 +93,8 @@ public class FinReimburse extends BaseEntity
     })
     private ProProject project;
 
-
+    /** 文件对象 */
+    private SysFileInfo sysFileInfo;
 
     public void setReimburseId(Long reimburseId) 
     {
@@ -125,6 +136,10 @@ public class FinReimburse extends BaseEntity
     {
         return projectId;
     }
+    public void setInvoiceId(Long invoiceId) { this.invoiceId = invoiceId; }
+    public Long getInvoiceId() { return invoiceId; }
+    public void setAmount(BigDecimal amount) { this.amount = amount; }
+    public BigDecimal getAmount() { return amount; }
     public void setReimburseType(String reimburseType) 
     {
         this.reimburseType = reimburseType;
@@ -173,12 +188,21 @@ public class FinReimburse extends BaseEntity
     {
         return delFlag;
     }
-    public SysDept getDept() { return dept; }
+
     public void setDept(SysDept dept) { this.dept = dept; }
-    public SysEmp getEmp() { return emp; }
+    public SysDept getDept() { return dept; }
+
     public void setEmp(SysEmp emp) { this.emp = emp; }
-    public ProProject getProject() { return project; }
+    public SysEmp getEmp() { return emp; }
+
     public void setProject(ProProject project) { this.project = project; }
+    public ProProject getProject() { return project; }
+
+    public void setSysFileInfo(SysFileInfo sysFileInfo) {
+        this.sysFileInfo = sysFileInfo;
+    }
+
+    public SysFileInfo getSysFileInfo() { return this.sysFileInfo; }
 
     @Override
     public String toString() {
@@ -188,6 +212,8 @@ public class FinReimburse extends BaseEntity
             .append("deptId", getDeptId())
             .append("handBy", getHandBy())
             .append("projectId", getProjectId())
+            .append("invoiceId", getInvoiceId())
+            .append("amount", getAmount())
             .append("reimburseType", getReimburseType())
             .append("annex", getAnnex())
             .append("details", getDetails())
@@ -202,6 +228,7 @@ public class FinReimburse extends BaseEntity
             .append("dept", getDept())
             .append("emp", getEmp())
             .append("project", getProject())
+            .append("sysFileInfo", getSysFileInfo())
             .toString();
     }
 }

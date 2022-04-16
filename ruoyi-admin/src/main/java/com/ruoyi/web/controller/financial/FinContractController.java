@@ -1,6 +1,8 @@
 package com.ruoyi.web.controller.financial;
 
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import com.ruoyi.financial.domain.FinContract;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.financial.service.IFinContractService;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -59,6 +62,25 @@ public class FinContractController extends BaseController
         List<FinContract> list = finContractService.selectFinContractList(finContract);
         ExcelUtil<FinContract> util = new ExcelUtil<FinContract>(FinContract.class);
         util.exportExcel(response, list, "合同管理数据");
+    }
+
+    @Log(title = "用户管理", businessType = BusinessType.IMPORT)
+    @PreAuthorize("@ss.hasPermi('financial:contract:import')")
+    @PostMapping("/importData")
+    public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception
+    {
+        ExcelUtil<FinContract> util = new ExcelUtil<FinContract>(FinContract.class);
+        List<FinContract> finContractList = util.importExcel(file.getInputStream());
+        String operName = getUsername();
+        String message = finContractService.importFinContract(finContractList, updateSupport, operName);
+        return AjaxResult.success(message);
+    }
+
+    @PostMapping("/importTemplate")
+    public void importTemplate(HttpServletResponse response)
+    {
+        ExcelUtil<FinContract> util = new ExcelUtil<FinContract>(FinContract.class);
+        util.importTemplateExcel(response, "用户数据");
     }
 
     /**
@@ -102,15 +124,6 @@ public class FinContractController extends BaseController
     public AjaxResult remove(@PathVariable Long[] contractIds)
     {
         return toAjax(finContractService.deleteFinContractByContractIds(contractIds));
-    }
-
-
-
-    @PostMapping("/importTemplate")
-    public void importTemplate(HttpServletResponse response)
-    {
-        ExcelUtil<FinContract> util = new ExcelUtil<FinContract>(FinContract.class);
-        util.importTemplateExcel(response, "合同数据");
     }
 
     /**

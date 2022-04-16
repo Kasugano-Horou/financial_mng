@@ -1,6 +1,8 @@
 package com.ruoyi.system.service;
 
 import com.ruoyi.common.core.domain.entity.SysEmp;
+import com.ruoyi.common.core.domain.entity.SysUser;
+
 import java.util.List;
 
 /**
@@ -27,7 +29,13 @@ public interface ISysEmpService
      */
     public List<SysEmp> selectEmpList(SysEmp sysEmp);
 
-
+    /**
+     * 通过员工号查询员工
+     *
+     * @param empCode 员工号
+     * @return 员工对象信息
+     */
+    public SysEmp selectEmpByEmpCode(String empCode);
 
     /**
      * 新增员工
@@ -60,4 +68,14 @@ public interface ISysEmpService
      * @return 结果
      */
     public int deleteEmpByEmpId(Long empId);
+
+    /**
+     * 导入员工数据
+     *
+     * @param empList 员工数据列表
+     * @param isUpdateSupport 是否更新支持，如果已存在，则进行更新数据
+     * @param operName 操作用户
+     * @return 结果
+     */
+    public String importEmp(List<SysEmp> empList, Boolean isUpdateSupport, String operName);
 }

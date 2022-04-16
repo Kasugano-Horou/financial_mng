@@ -11,6 +11,7 @@ import com.ruoyi.project.domain.ProManhour;
  */
 public interface ProManhourMapper 
 {
+
     /**
      * 查询工时
      * 

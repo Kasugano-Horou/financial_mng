@@ -261,7 +261,6 @@ export default {
     /** 查询工资列表 */
     getList() {
       this.loading = true;
-      console.log(this.queryParams);
       listWages(this.queryParams).then(response => {
         this.wagesList = response.rows;
         this.total = response.total;

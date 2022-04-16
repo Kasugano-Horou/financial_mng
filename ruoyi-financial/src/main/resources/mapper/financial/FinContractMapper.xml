@@ -102,6 +102,11 @@
 		where c.contract_id = #{contractId}
 	</select>
 
+	<select id="selectFinContractByContractNumber" parameterType="String" resultMap="FinContractResult">
+		<include refid="selectFinContractVo"/>
+		where c.contract_number = #{contractNumber}
+	</select>
+
 	<insert id="insertFinContract" parameterType="FinContract">
 		insert into fin_contract
 		<trim prefix="(" suffix=")" suffixOverrides=",">
@@ -182,7 +187,7 @@
 		update fin_contract set del_flag = '2' where contract_id = #{contractId}
 	</delete>
 
-	<delete id="deleteFinContractByContractIds" parameterType="String">
+	<delete id="deleteFinContractByContractIds" parameterType="Long">
 		update fin_contract set del_flag = '2' where contract_id in
 		<foreach item="contractId" collection="array" open="(" separator="," close=")">
 			#{contractId}

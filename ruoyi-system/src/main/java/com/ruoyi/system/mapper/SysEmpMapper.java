@@ -27,7 +27,13 @@ public interface SysEmpMapper
      */
     public List<SysEmp> selectEmpList(SysEmp sysEmp);
 
-
+    /**
+     * 通过员工号查询员工
+     *
+     * @param empCode 员工号
+     * @return 员工对象信息
+     */
+    public SysEmp selectEmpByEmpCode(String empCode);
 
     /**
      * 新增员工

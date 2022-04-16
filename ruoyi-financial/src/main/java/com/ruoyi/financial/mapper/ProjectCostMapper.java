@@ -1,7 +1,9 @@
-package com.ruoyi.project.mapper;
+package com.ruoyi.financial.mapper;
+
+import com.ruoyi.financial.domain.ProjectCost;
 
 import java.util.List;
-import com.ruoyi.project.domain.ProjectCost;
+
 
 /**
  * 项目成本Mapper接口
@@ -11,6 +13,15 @@ import com.ruoyi.project.domain.ProjectCost;
  */
 public interface ProjectCostMapper 
 {
+
+    /**
+     * 核算项目成本
+     *
+     * @param projectIds 项目编号
+     * @return 结果
+     */
+    public int accountProjectCostByProjectIds(Long[] projectIds);
+
     /**
      * 查询项目成本
      * 
@@ -18,6 +29,14 @@ public interface ProjectCostMapper
      * @return 项目成本
      */
     public ProjectCost selectProjectCostByProjectCostId(Long projectCostId);
+
+    /**
+     * 查询项目成本
+     *
+     * @param projectId 项目主键
+     * @return 项目成本
+     */
+    public ProjectCost selectProjectCostByProjectId(Long projectId);
 
     /**
      * 查询项目成本列表

@@ -55,7 +55,17 @@ public interface IFinReimburseService
      * 删除报销信息
      * 
      * @param reimburseId 报销主键
+
      * @return 结果
      */
     public int deleteFinReimburseByReimburseId(Long reimburseId);
+
+    /**
+     * 上传报销发票信息
+     *
+     * @param reimburseId 报销主键
+     * @param fileName 文件名字
+     * @return 结果
+     */
+    public int addInvoice(Long reimburseId, String fileName);
 }

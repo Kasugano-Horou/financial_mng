@@ -18,6 +18,10 @@ public class ProProject extends BaseEntity
     /** 项目ID */
     private Long projectId;
 
+    /** 项目编号 */
+    @Excel(name = "项目编号")
+    private String projectNumber;
+
     /** 项目名称 */
     @Excel(name = "项目名称")
     private String projectName;
@@ -53,6 +57,8 @@ public class ProProject extends BaseEntity
     {
         return projectId;
     }
+    public void setProjectNumber(String projectNumber) { this.projectNumber = projectNumber; }
+    public String getProjectNumber() { return this.projectNumber; }
     public void setProjectName(String projectName)
     {
         this.projectName = projectName;
@@ -108,6 +114,7 @@ public class ProProject extends BaseEntity
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("projectId", getProjectId())
+            .append("projectNumber", getProjectNumber())
             .append("projectName", getProjectName())
             .append("contractId", getContractId())
             .append("projectType", getProjectType())

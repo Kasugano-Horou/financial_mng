@@ -1,4 +1,4 @@
-package com.ruoyi.web.controller.project;
+package com.ruoyi.web.controller.financial;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
@@ -16,8 +16,8 @@ import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.project.domain.ProjectCost;
-import com.ruoyi.project.service.IProjectCostService;
+import com.ruoyi.financial.domain.ProjectCost;
+import com.ruoyi.financial.service.IProjectCostService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
@@ -28,16 +28,28 @@ import com.ruoyi.common.core.page.TableDataInfo;
  * @date 2022-03-19
  */
 @RestController
-@RequestMapping("/project/projectCost")
+@RequestMapping("/financial/projectCost")
 public class ProjectCostController extends BaseController
 {
     @Autowired
     private IProjectCostService projectCostService;
 
     /**
+     * 核算项目成本
+     */
+    @PreAuthorize("@ss.hasPermi('financial:projectCost:account')")
+    @Log(title = "项目成本", businessType = BusinessType.OTHER)
+    @PutMapping("/account/{projectIds}")
+    public AjaxResult account(@PathVariable Long[] projectIds)
+    {
+        return toAjax(projectCostService.accountProjectCostByProjectIds(projectIds));
+    }
+
+
+    /**
      * 查询项目成本列表
      */
-    @PreAuthorize("@ss.hasPermi('project:projectCost:list')")
+    @PreAuthorize("@ss.hasPermi('financial:projectCost:list')")
     @GetMapping("/list")
     public TableDataInfo list(ProjectCost projectCost)
     {
@@ -49,7 +61,7 @@ public class ProjectCostController extends BaseController
     /**
      * 导出项目成本列表
      */
-    @PreAuthorize("@ss.hasPermi('project:projectCost:export')")
+    @PreAuthorize("@ss.hasPermi('financial:projectCost:export')")
     @Log(title = "项目成本", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, ProjectCost projectCost)
@@ -62,7 +74,7 @@ public class ProjectCostController extends BaseController
     /**
      * 获取项目成本详细信息
      */
-    @PreAuthorize("@ss.hasPermi('project:projectCost:query')")
+    @PreAuthorize("@ss.hasPermi('financial:projectCost:query')")
     @GetMapping(value = "/{projectCostId}")
     public AjaxResult getInfo(@PathVariable("projectCostId") Long projectCostId)
     {
@@ -72,7 +84,7 @@ public class ProjectCostController extends BaseController
     /**
      * 新增项目成本
      */
-    @PreAuthorize("@ss.hasPermi('project:projectCost:add')")
+    @PreAuthorize("@ss.hasPermi('financial:projectCost:add')")
     @Log(title = "项目成本", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody ProjectCost projectCost)
@@ -83,7 +95,7 @@ public class ProjectCostController extends BaseController
     /**
      * 修改项目成本
      */
-    @PreAuthorize("@ss.hasPermi('project:projectCost:edit')")
+    @PreAuthorize("@ss.hasPermi('financial:projectCost:edit')")
     @Log(title = "项目成本", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody ProjectCost projectCost)
@@ -94,7 +106,7 @@ public class ProjectCostController extends BaseController
     /**
      * 删除项目成本
      */
-    @PreAuthorize("@ss.hasPermi('project:projectCost:remove')")
+    @PreAuthorize("@ss.hasPermi('financial:projectCost:remove')")
     @Log(title = "项目成本", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{projectCostIds}")
     public AjaxResult remove(@PathVariable Long[] projectCostIds)

@@ -5,7 +5,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.ruoyi.project.mapper.ProManhourMapper">
     
     <resultMap type="ProManhour" id="ProManhourResult">
-        <result property="manhourId"    column="manhour_id"    />
+        <id property="manhourId"    column="manhour_id"    />
         <result property="projectId"    column="project_id"    />
         <result property="empId"    column="emp_id"    />
         <result property="manhour"    column="manhour"    />

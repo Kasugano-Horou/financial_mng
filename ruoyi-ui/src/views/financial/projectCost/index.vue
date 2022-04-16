@@ -1,6 +1,15 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="项目编号" prop="projectNumber">
+        <el-input
+          v-model="queryParams.projectNumber"
+          placeholder="请输入项目编号"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
       <el-form-item label="项目名称" prop="projectName">
         <el-input
           v-model="queryParams.projectName"
@@ -68,22 +77,32 @@
           v-hasPermi="['project:projectCost:export']"
         >导出</el-button>
       </el-col>
+      <el-col :span="2.0">
+        <el-button
+          type="danger"
+          plain
+          icon="el-icon-check"
+          size="mini"
+          :disabled="multiple"
+          @click="handleAccount"
+          v-hasPermi="['project:projectCost:account']"
+        >成本核算</el-button>
+      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="projectCostList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="主键ID" align="center" prop="projectCostId" />
-      <el-table-column label="项目ID" align="center" prop="projectId" />
-      <el-table-column label="项目名称" align="center" prop="projectName" />
-      <el-table-column label="合同编号" align="center" prop="contractNumber" />
+      <el-table-column type="selection" width="50" align="center" />
+      <el-table-column label="项目编号" align="center" prop="proProject.projectNumber" />
+      <el-table-column label="项目名称" align="center" prop="proProject.projectName" />
+      <el-table-column label="合同编号" align="center" prop="finContract.contractNumber" />
+      <el-table-column label="帐期总收入" align="center" prop="generalIncome" width="105"/>
       <el-table-column label="营业税金" align="center" prop="businessTax" />
       <el-table-column label="管理成本" align="center" prop="managenmentCost" />
       <el-table-column label="人员成本" align="center" prop="personnelCost" />
       <el-table-column label="采购支出" align="center" prop="procurementCost" />
       <el-table-column label="其他支出" align="center" prop="othersCost" />
       <el-table-column label="维护成本" align="center" prop="maintenanceCost" />
-      <el-table-column label="帐期总收入" align="center" prop="generalIncome" />
       <el-table-column label="税前利润" align="center" prop="preTax" />
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -119,12 +138,6 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="项目ID" prop="projectId">
           <el-input v-model="form.projectId" placeholder="请输入项目ID" />
-        </el-form-item>
-        <el-form-item label="项目名称" prop="projectName">
-          <el-input v-model="form.projectName" placeholder="请输入项目名称" />
-        </el-form-item>
-        <el-form-item label="合同编号" prop="contractNumber">
-          <el-input v-model="form.contractNumber" placeholder="请输入合同编号" />
         </el-form-item>
         <el-form-item label="营业税金" prop="businessTax">
           <el-input v-model="form.businessTax" placeholder="请输入营业税金" />
@@ -166,7 +179,7 @@
 </template>
 
 <script>
-import { listProjectCost, getProjectCost, delProjectCost, addProjectCost, updateProjectCost } from "@/api/project/projectCost";
+import { listProjectCost, getProjectCost, delProjectCost, addProjectCost, updateProjectCost, AccountProjectCost } from "@/api/financial/projectCost";
 
 export default {
   name: "ProjectCost",
@@ -174,8 +187,12 @@ export default {
     return {
       // 遮罩层
       loading: true,
-      // 选中数组
+      // 选中数组-项目成本ID
       ids: [],
+      // 选中数组-项目ID
+      projectIds: [],
+      // 选中数组-项目编号
+      projectNumbers: [],
       // 非单个禁用
       single: true,
       // 非多个禁用
@@ -194,6 +211,7 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
+        projectNumber: null,
         projectName: null,
         contractNumber: null,
       },
@@ -218,11 +236,17 @@ export default {
     getList() {
       this.loading = true;
       listProjectCost(this.queryParams).then(response => {
-        this.projectCostList = response.rows;
+        
+        this.account(response.rows);
         this.total = response.total;
         this.loading = false;
       });
     },
+
+    account(rows){
+      this.projectCostList = rows;
+    },
+
     // 取消按钮
     cancel() {
       this.open = false;
@@ -233,8 +257,6 @@ export default {
       this.form = {
         projectCostId: null,
         projectId: null,
-        projectName: null,
-        contractNumber: null,
         businessTax: null,
         managenmentCost: null,
         personnelCost: null,
@@ -252,6 +274,18 @@ export default {
       };
       this.resetForm("form");
     },
+
+    /**核算按钮操作 */
+    handleAccount(row) {
+      const projectNumbers = row.projectNumber || this.projectNumbers;
+      const projectIds = row.projectId || this.projectIds;
+      this.$modal.confirm('是否确认核算项目编号为"' + projectNumbers + '"的数据项？').then(function() {
+        return AccountProjectCost(projectIds);
+      }).then(() => {
+        this.getList();
+        this.$modal.msgSuccess("核算完成");
+      }).catch(() => {});
+    },
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
@@ -264,7 +298,9 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.projectCostId)
+      this.ids = selection.map(item => item.projectCostId);
+      this.projectNumbers = selection.map(item => item.proProject.projectNumber);
+      this.projectIds = selection.map(item => item.projectId);
       this.single = selection.length!==1
       this.multiple = !selection.length
     },

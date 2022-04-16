@@ -1,7 +1,9 @@
-package com.ruoyi.project.service;
+package com.ruoyi.financial.service;
+
+import com.ruoyi.financial.domain.ProjectCost;
 
 import java.util.List;
-import com.ruoyi.project.domain.ProjectCost;
+
 
 /**
  * 项目成本Service接口
@@ -11,6 +13,15 @@ import com.ruoyi.project.domain.ProjectCost;
  */
 public interface IProjectCostService 
 {
+
+    /**
+     * 核算项目成本
+     *
+     * @param projectIds 项目ID
+     * @return 结果
+     */
+    public int accountProjectCostByProjectIds(Long[] projectIds);
+
     /**
      * 查询项目成本
      * 

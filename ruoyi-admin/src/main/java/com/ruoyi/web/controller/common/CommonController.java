@@ -46,6 +46,7 @@ public class CommonController
     @GetMapping("/download")
     public void fileDownload(String fileName, Boolean delete, HttpServletResponse response, HttpServletRequest request)
     {
+        System.out.println("wwwwdownload"+fileName);
         try
         {
             if (!FileUtils.checkAllowDownload(fileName))
@@ -160,4 +161,6 @@ public class CommonController
             log.error("下载文件失败", e);
         }
     }
+
+
 }

@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { parseStrEmpty } from "@/utils/ruoyi";
 
 // 查询工资列表
 export function listWages(query) {
@@ -12,7 +13,7 @@ export function listWages(query) {
 // 查询工资详细
 export function getWages(wageId) {
   return request({
-    url: '/financial/wages/' + wageId,
+    url: '/financial/wages/' + parseStrEmpty(wageId),
     method: 'get'
   })
 }
@@ -38,7 +39,7 @@ export function updateWages(data) {
 // 删除工资
 export function delWages(wageId) {
   return request({
-    url: '/financial/wages/' + wageId,
+    url: '/financial/wages/' + parseStrEmpty(wageId),
     method: 'delete'
   })
 }

@@ -28,7 +28,7 @@ public class SysUser extends BaseEntity
     private Long userId;
 
     /** 员工ID */
-    @Excel(name = "员工ID")
+    @Excel(name = "员工ID", type = Type.IMPORT)
     private Long empId;
 
     /** 部门ID */
@@ -36,11 +36,11 @@ public class SysUser extends BaseEntity
     private Long deptId;
 
     /** 用户账号 */
-    @Excel(name = "登录名称")
+    @Excel(name = "用户账号")
     private String userName;
 
     /** 用户昵称 */
-    @Excel(name = "用户名称")
+    @Excel(name = "用户昵称")
     private String nickName;
 
     /** 用户头像 */

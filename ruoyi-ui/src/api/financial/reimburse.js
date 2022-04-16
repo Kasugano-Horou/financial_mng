@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { parseStrEmpty } from "@/utils/ruoyi";
 
 // 查询报销列表
 export function listReimburse(query) {
@@ -12,7 +13,7 @@ export function listReimburse(query) {
 // 查询报销详细
 export function getReimburse(reimburseId) {
   return request({
-    url: '/financial/reimburse/' + reimburseId,
+    url: '/financial/reimburse/' + parseStrEmpty(reimburseId),
     method: 'get'
   })
 }
@@ -38,7 +39,7 @@ export function updateReimburse(data) {
 // 删除报销
 export function delReimburse(reimburseId) {
   return request({
-    url: '/financial/reimburse/' + reimburseId,
+    url: '/financial/reimburse/' + parseStrEmpty(reimburseId),
     method: 'delete'
   })
 }

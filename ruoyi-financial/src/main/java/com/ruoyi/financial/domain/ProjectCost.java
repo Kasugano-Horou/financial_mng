@@ -1,6 +1,10 @@
-package com.ruoyi.project.domain;
+package com.ruoyi.financial.domain;
 
 import java.math.BigDecimal;
+
+import com.ruoyi.common.core.domain.entity.SysEmp;
+import com.ruoyi.financial.domain.FinContract;
+import com.ruoyi.project.domain.ProProject;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
@@ -22,14 +26,6 @@ public class ProjectCost extends BaseEntity
     /** 项目ID */
     @Excel(name = "项目ID")
     private Long projectId;
-
-    /** 项目名称 */
-    @Excel(name = "项目名称")
-    private String projectName;
-
-    /** 合同编号 */
-    @Excel(name = "合同编号")
-    private String contractNumber;
 
     /** 营业税金 */
     @Excel(name = "营业税金")
@@ -66,6 +62,10 @@ public class ProjectCost extends BaseEntity
     /** 删除标志（0代表存在 2代表删除） */
     private String delFlag;
 
+    private ProProject project;
+
+    private FinContract contract;
+
     public void setProjectCostId(Long projectCostId) 
     {
         this.projectCostId = projectCostId;
@@ -81,22 +81,6 @@ public class ProjectCost extends BaseEntity
     public Long getProjectId()
     {
         return projectId;
-    }
-    public void setProjectName(String projectName) 
-    {
-        this.projectName = projectName;
-    }
-    public String getProjectName()
-    {
-        return projectName;
-    }
-    public void setContractNumber(String contractNumber) 
-    {
-        this.contractNumber = contractNumber;
-    }
-    public String getContractNumber()
-    {
-        return contractNumber;
     }
     public void setBusinessTax(BigDecimal businessTax) 
     {
@@ -170,14 +154,16 @@ public class ProjectCost extends BaseEntity
     {
         return delFlag;
     }
+    public void setProProject(ProProject project) { this.project = project; }
+    public ProProject getProProject(){ return project;}
+    public void setFinContract(FinContract contract) {this.contract = contract;}
+    public FinContract getFinContract(){ return contract;}
 
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("projectCostId", getProjectCostId())
             .append("projectId", getProjectId())
-            .append("projectName", getProjectName())
-            .append("contractNumber", getContractNumber())
             .append("businessTax", getBusinessTax())
             .append("managenmentCost", getManagenmentCost())
             .append("personnelCost", getPersonnelCost())
@@ -192,6 +178,8 @@ public class ProjectCost extends BaseEntity
             .append("updateBy", getUpdateBy())
             .append("updateTime", getUpdateTime())
             .append("remark", getRemark())
+            .append("project", getProProject())
+            .append("contract", getFinContract())
             .toString();
     }
 }

@@ -5,7 +5,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.ruoyi.financial.mapper.FinWagesMapper">
     
     <resultMap type="FinWages" id="FinWagesResult">
-        <result property="wageId"    column="wage_id"    />
+        <id property="wageId"    column="wage_id"    />
         <result property="empCode"    column="emp_code"    />
         <result property="empName"    column="emp_name"    />
         <result property="issuingDate"    column="issuing_date"    />

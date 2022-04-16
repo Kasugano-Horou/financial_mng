@@ -46,7 +46,7 @@ public class SysEmp extends BaseEntity
 
     /** 学历 */
     @Excel(name = "学历", readConverterExp = "1=大专,2=本科,3=研究生,4=博士,5=其他")
-    private Long education;
+    private String education;
 
     /** 电话 */
     @Excel(name = "电话")
@@ -84,8 +84,6 @@ public class SysEmp extends BaseEntity
 
     /** 删除标志（0代表存在 2代表删除） */
     private String delFlag;
-
-
 
     /** 岗位组 */
     private Long[] postIds;
@@ -149,12 +147,12 @@ public class SysEmp extends BaseEntity
         return status;
     }
 
-    public void setEducation(Long education)
+    public void setEducation(String education)
     {
         this.education = education;
     }
 
-    public Long getEducation()
+    public String getEducation()
     {
         return education;
     }

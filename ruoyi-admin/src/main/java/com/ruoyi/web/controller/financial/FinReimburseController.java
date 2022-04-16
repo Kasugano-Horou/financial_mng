@@ -1,7 +1,17 @@
 package com.ruoyi.web.controller.financial;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.common.config.RuoYiConfig;
+import com.ruoyi.common.utils.file.FileUploadUtils;
+import com.ruoyi.common.utils.file.FileUtils;
+import com.ruoyi.financial.domain.FinInvoice;
+import com.ruoyi.financial.service.IFinInvoiceService;
+import com.ruoyi.framework.config.ServerConfig;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +30,7 @@ import com.ruoyi.financial.domain.FinReimburse;
 import com.ruoyi.financial.service.IFinReimburseService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 报销Controller
@@ -33,6 +44,12 @@ public class FinReimburseController extends BaseController
 {
     @Autowired
     private IFinReimburseService finReimburseService;
+
+    @Autowired
+    private IFinInvoiceService finInvoiceService;
+
+    @Autowired
+    private ServerConfig serverConfig;
 
     /**
      * 查询报销列表
@@ -101,5 +118,38 @@ public class FinReimburseController extends BaseController
     public AjaxResult remove(@PathVariable Long[] reimburseIds)
     {
         return toAjax(finReimburseService.deleteFinReimburseByReimburseIds(reimburseIds));
+    }
+
+    /**
+     * 报销发票上传请求
+     */
+    @Log(title = "报销发票", businessType = BusinessType.UPLOAD)
+    @PostMapping("/upload")
+    public AjaxResult uploadInvoice(MultipartFile file, @PathVariable("reimburseId") Long reimburseId) throws Exception
+    {
+        try
+        {
+            FinReimburse finReimburse = finReimburseService.selectFinReimburseByReimburseId(reimburseId);
+            if(finReimburse != null ){
+                if(Integer.parseInt(finReimburse.getStatus()) >= 2 ){
+                    return AjaxResult.error("报销单号:("+finReimburse.getReimburseNumber()+")所在状态不能上传发票");
+                }
+            }
+            // 上传文件路径
+            String filePath = RuoYiConfig.getInvoicePath();
+            // 上传并返回新文件名称
+            String fileName = FileUploadUtils.upload(filePath, file);
+            //添加发票文件信息到数据库
+            finReimburseService.addInvoice(reimburseId, fileName);
+            AjaxResult ajax = AjaxResult.success();
+            ajax.put("fileName", fileName);
+            ajax.put("newFileName", FileUtils.getName(fileName));
+            ajax.put("originalFilename", file.getOriginalFilename());
+            return ajax;
+        }
+        catch (Exception e)
+        {
+            return AjaxResult.error(e.getMessage());
+        }
     }
 }

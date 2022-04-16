@@ -113,26 +113,46 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="报销单号" align="center" prop="reimburseNumber" />
       <el-table-column label="报销部门" align="center" prop="dept.deptName" />
-      <el-table-column label="经手人" align="center" prop="emp.empName" />
+      <el-table-column label="经手人"  align="center" prop="emp.empName" />
       <el-table-column label="项目编号" align="center" prop="project.projectId" />
       <el-table-column label="项目名称" align="center" prop="project.projectName" />
-      <el-table-column label="报销状态" align="center" prop="status">
-        <template slot-scope="scope">
-          <dict-tag :options="dict.type.fin_reimburse_status" :value="scope.row.status"/>
-        </template>
-      </el-table-column>
+      <el-table-column label="报销金额" align="center" prop="amount" />
       <el-table-column label="报销类型" align="center" prop="reimburseType">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.fin_reimburse_type" :value="scope.row.reimburseType"/>
         </template>
       </el-table-column>
-      <el-table-column label="附件" align="center" prop="annex" />
+      <el-table-column label="报销状态" align="center" prop="status">
+        <template slot-scope="scope">
+          <dict-tag :options="dict.type.fin_reimburse_status" :value="scope.row.status"/>
+        </template>
+      </el-table-column>
+      <!-- <el-table-column label="附件" align="center" prop="annex" /> -->
+      <el-table-column label="发票" align="center" prop="sysFileInfo.filePath" width="160">
+        <template slot-scope="scope">
+          <div class="demo-image__lazy">
+              <el-image
+              style="width: 140px; height: 70px"
+              :src="scope.row.sysFileInfo.filePath"
+              :preview-src-list="[scope.row.sysFileInfo.filePath]"
+              fit="fill">
+            </el-image>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column label="费用说明" align="center" prop="details" />
 
       <!-- <el-table-column label="流程ID" align="center" prop="flowId" /> -->
       <!-- <el-table-column label="备注" align="center" prop="remark" /> -->
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
+            @click="handleUpload(scope.row)"
+            v-hasPermi="['financial:reimburse:edit']"
+          >上传发票</el-button>
           <el-button
             size="mini"
             type="text"
@@ -200,12 +220,13 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="附件" prop="annex">
-              <el-input v-model="form.annex" placeholder="请输入附件" />
+            <el-form-item label="报销金额" prop="amount">
+              <el-input v-model="form.amount" placeholder="请输入报销金额" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
+          
           <el-col :span="24">
             <el-form-item label="费用说明" prop="details">
               <el-input v-model="form.details" type="textarea" placeholder="请输入内容" />
@@ -225,6 +246,39 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 上传发票对话框 -->
+    <el-dialog :title="uploadTitle" :visible.sync="uploadOpen" width="500px" append-to-body>
+        <el-row>
+          <el-col :span="24">
+              <el-upload
+                ref="upload"
+                :limit="1"
+                accept=".jpg, .png"
+                :data="upload.uploadData"
+                :action="upload.url"
+                :headers="upload.headers"
+                :file-list="upload.fileList"
+                :on-progress="handleFileUploadProgress"
+                :on-success="handleFileSuccess"
+                :auto-upload="false">
+                <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+                <el-button style="margin-left: 10px;" size="small" type="success" :loading="upload.isUploading" @click="submitUpload">确认上传</el-button>
+                <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+              </el-upload>
+
+              <!-- <el-button
+                size="mini"
+                type="text"
+                icon="el-icon-edit"
+                @click="handleDownload()"
+              >下载</el-button> -->
+              <!-- <el-input v-model="form.annex" placeholder="请输入附件" /> -->
+
+          </el-col>
+        </el-row>
+
+    </el-dialog>
   </div>
 </template>
 
@@ -232,6 +286,8 @@
 import { listReimburse, getReimburse, delReimburse, addReimburse, updateReimburse } from "@/api/financial/reimburse";
 import { treeselect } from "@/api/system/dept";
 import Treeselect from "@riophae/vue-treeselect";
+import { getToken } from "@/utils/auth";
+import { parseStrEmpty } from "@/utils/ruoyi";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
 export default {
@@ -254,17 +310,33 @@ export default {
       total: 0,
       // 报销表格数据
       reimburseList: [],
-      // 弹出层标题
-      title: "",
       // 部门树选项
       deptOptions: undefined,
+      // 弹出层标题
+      title: "",
       // 是否显示弹出层
       open: false,
-      defaultProps: {
-        children: "children",
-        label: "label"
+      // 弹出层标题
+      uploadTitle: "",
+      // 是否显示弹出层
+      uploadOpen: false,
+      // 上传参数
+      upload: {
+        // 是否禁用上传
+        isUploading: false,
+              // 上传的附加数据
+      uploadData:{
+        reimburseId: undefined,
       },
-      // 查询参数
+        // 设置上传的请求头部
+        headers: { Authorization: "Bearer " + getToken() },
+        // 上传的地址
+        url: process.env.VUE_APP_BASE_API + "/financial/reimburse/upload",
+        // 上传的文件列表
+        fileList: [],
+      },
+
+      //查询参数
       queryParams: {
         pageNum: 1,
         pageSize: 10,
@@ -287,6 +359,9 @@ export default {
         deptId: [
           { required: true, message: "报销部门不能为空", trigger: "blur" }
         ],
+        amount: [
+          { required: true, message: "报销金额不能为空", trigger: "blur" }
+        ],
         handBy: [
           { required: true, message: "经手人不能为空", trigger: "blur" }
         ],
@@ -305,11 +380,18 @@ export default {
     getList() {
       this.loading = true;
       listReimburse(this.queryParams).then(response => {
+        console.log(response.rows);
         this.reimburseList = response.rows;
         this.total = response.total;
         this.loading = false;
       });
     },
+    // /** 判断是否有发票 */
+    // getSysFileInfo(row){
+    //   if(row.sysFileInfo){
+    //     return [];
+    //   }
+    // },
     /** 查询部门下拉树结构 */
     getTreeselect() {
       treeselect().then(response => {
@@ -329,6 +411,7 @@ export default {
         deptId: null,
         handBy: null,
         projectId: null,
+        amount: null,
         reimburseType: null,
         annex: null,
         details: null,
@@ -364,11 +447,14 @@ export default {
       this.reset();
       this.open = true;
       this.title = "添加报销";
+      this.upload.fileList = [];
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
       const reimburseId = row.reimburseId || this.ids
+      this.upload.fileList = [{ name: this.form.fileName, url: this.form.filePath }];
+      
       getReimburse(reimburseId).then(response => {
         this.form = response.data;
         this.open = true;
@@ -410,7 +496,54 @@ export default {
       this.download('financial/reimburse/export', {
         ...this.queryParams
       }, `reimburse_${new Date().getTime()}.xlsx`)
-    }
+    },
+
+    /** 上传发票按钮操作 */
+    handleUpload(row) {
+      if(row.status>=2){
+        this.uploadOpen=false;
+        this.$modal.msgWarning("不能上传发票");
+      }else{
+        this.uploadOpen = true;
+        this.upload.uploadData.reimburseId = row.reimburseId||this.ids
+        console.log("rererere");
+        console.log(this.upload.uploadData.reimburseId);
+        this.upload.fileList = [];
+        this.uploadTitle = "上传发票";
+      }
+    },
+
+    // 文件提交处理
+    submitUpload() {
+      //this.upload.url += parseStrEmpty(this.upload.reimburseId) + "/upload";
+      console.log(this.upload.url)
+      this.$refs.upload.submit();
+    },
+    // 文件上传中处理
+    handleFileUploadProgress(event, file, fileList) {
+      this.upload.isUploading = true;
+    },
+    // 文件上传成功处理
+    handleFileSuccess(response, file, fileList) {
+      console.log("dddddddddddddd");
+      console.log(response);
+      this.upload.isUploading = false;
+      this.form.filePath = response.url;
+      this.uploadOpen = false;
+      this.$modal.msgSuccess(response.msg);
+      this.getList();
+    },
+    // 文件下载处理
+    handleDownload() {
+      var name = "blob_20220303194154A001";
+      var url = "http://localhost:8080/profile/upload/2022/04/10/22年4月_20220410173629A001.rar";
+      var suffix = url.substring(url.lastIndexOf("."), url.length);
+      const a = document.createElement('a')
+      a.setAttribute('download', name + suffix)
+      a.setAttribute('target', '_blank')
+      a.setAttribute('href', url)
+      a.click()
+    },
   }
 };
 </script>

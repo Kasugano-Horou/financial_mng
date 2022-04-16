@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { parseStrEmpty } from "@/utils/ruoyi";
 
 // 查询岗位列表
 export function listPost(query) {

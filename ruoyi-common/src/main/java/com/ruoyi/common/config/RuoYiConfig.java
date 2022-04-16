@@ -118,6 +118,22 @@ public class RuoYiConfig
     }
 
     /**
+     * 获取发票上传路径
+     */
+    public static String getInvoicePath()
+    {
+        return getProfile() + "/invoice";
+    }
+
+    /**
+     * 获取合同上传路径
+     */
+    public static String getContractPath()
+    {
+        return getProfile() + "/contract";
+    }
+
+    /**
      * 获取下载路径
      */
     public static String getDownloadPath()

@@ -42,6 +42,7 @@
             d.dept_id, d.parent_id, d.dept_name, d.order_num, d.leader, d.status as dept_status
         from sys_emp e
             left join sys_dept d on e.dept_id = d.dept_id
+            left join sys_user u on e.emp_id = u.emp_id
     </sql>
 
     <select id="selectEmpList" parameterType="SysEmp" resultMap="SysEmpResult">
@@ -61,7 +62,8 @@
          AND date_format(e.hiredate,'%y%m%d') &gt;= date_format(#{hiredate},'%y%m%d')
         </if>
         <if test="houseWages != null  and houseWages != ''"> AND e.house_wages = #{houseWages}</if>
-
+        <!-- 数据范围过滤 -->
+        ${params.dataScope}
     </select>
 
     <select id="selectEmpByEmpId" parameterType="Long" resultMap="SysEmpResult">
@@ -72,6 +74,7 @@
     <insert id="insertEmp" parameterType="SysEmp" useGeneratedKeys="true" keyProperty="empId">
         insert into sys_emp
         <trim prefix="(" suffix=")" suffixOverrides=",">
+<!--             <if test="empId != null and empId != ''">emp_id,</if>-->
             <if test="empCode != null and empCode != ''">emp_code,</if>
             <if test="empName != null and empName != ''">emp_name,</if>
             <if test="sex != null and sex != ''">sex,</if>
@@ -89,6 +92,7 @@
             create_time
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
+<!--            <if test="empId != null and empId != ''">#{empId},</if>-->
             <if test="empCode != null and empCode != ''">#{empCode},</if>
             <if test="empName != null and empName != ''">#{empName},</if>
             <if test="sex != null and sex != ''">#{sex},</if>
@@ -97,7 +101,6 @@
             <if test="phonenumber != null">#{phonenumber},</if>
             <if test="email != null">#{email},</if>
             <if test="address != null">#{address},</if>
-            <if test="postId != null and postId != ''">#{postId},</if>
             <if test="deptId != null and deptId != ''">#{deptId},</if>
             <if test="hiredate != null">#{hiredate},</if>
             <if test="termdate != null">#{termdate},</if>
@@ -133,6 +136,11 @@
     <delete id="deleteEmpByEmpId" parameterType="Long">
         update sys_emp set del_flag = '2' where emp_id = #{empId}
     </delete>
+
+    <select id="selectEmpByEmpCode" parameterType="String" resultMap="SysEmpResult">
+        <include refid="selectEmpVo"/>
+        where e.emp_code = #{empCode}
+    </select>
 
     <delete id="deleteEmpByEmpIds" parameterType="Long">
         update sys_emp set del_flag = '2' where emp_id in

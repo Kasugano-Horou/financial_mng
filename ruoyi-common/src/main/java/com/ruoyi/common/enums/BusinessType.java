@@ -43,6 +43,11 @@ public enum BusinessType
     IMPORT,
 
     /**
+     * 上传
+     */
+    UPLOAD,
+
+    /**
      * 强退
      */
     FORCE,

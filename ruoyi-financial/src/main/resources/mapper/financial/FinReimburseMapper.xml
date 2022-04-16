@@ -5,11 +5,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.ruoyi.financial.mapper.FinReimburseMapper">
     
     <resultMap type="FinReimburse" id="FinReimburseResult">
-        <result property="reimburseId"    column="reimburse_id"    />
+        <id property="reimburseId"    column="reimburse_id"    />
         <result property="reimburseNumber"    column="reimburse_number"    />
         <result property="deptId"    column="dept_id"    />
         <result property="handBy"    column="hand_by"    />
         <result property="projectId"    column="project_id"    />
+        <result property="invoiceId"    column="invoice_id"    />
+        <result property="amount"    column="amount"    />
         <result property="reimburseType"    column="reimburse_type"    />
         <result property="annex"    column="annex"    />
         <result property="details"    column="details"    />
@@ -24,6 +26,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <association property="dept"    column="dept_id" javaType="SysDept" resultMap="deptResult" />
         <association property="emp"    column="emp_id" javaType="SysEmp" resultMap="empResult" />
         <association property="project"    column="project_id" javaType="ProProject" resultMap="ProProjectResult" />
+        <association property="sysFileInfo"    column="file_id" javaType="SysFileInfo" resultMap="fileInfoResult" />
     </resultMap>
 
     <resultMap id="deptResult" type="SysDept">
@@ -47,23 +50,34 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="status"   column="project_status" />
     </resultMap>
 
+    <resultMap id="fileInfoResult" type="SysFileInfo">
+        <id     property="fileId"   column="file_id"     />
+        <result property="fileName" column="file_name"   />
+        <result property="filePath"   column="file_path"      />
+    </resultMap>
+
     <sql id="selectFinReimburseVo">
-        select r.reimburse_id, r.reimburse_number, r.dept_id, r.hand_by, r.project_id, r.reimburse_type, r.annex, r.details, r.status, r.flow_id, r.del_flag, r.create_by, r.create_time, r.update_by, r.update_time, r.remark,
+        select r.reimburse_id, r.reimburse_number, r.dept_id, r.hand_by, r.project_id, r.invoice_id, r.amount, r.reimburse_type, r.annex, r.details, r.status, r.flow_id, r.del_flag, r.create_by, r.create_time, r.update_by, r.update_time, r.remark,
             d.dept_name, d.leader as dept_leader, d.status as dept_status,
             e.emp_name, e.emp_code, e.status as emp_status,
-            p.project_name, p.leader as project_leader, p.status as project_status
+            p.project_name, p.leader as project_leader, p.status as project_status,
+            sfi.file_name, sfi.file_path
         from fin_reimburse r
             left join sys_dept d on d.dept_id = r.dept_id
             left join sys_emp e on e.emp_id = r.hand_by
             left join pro_project p on p.project_id = r.project_id
+            left join sys_invoice_file sif on sif.invoice_id = r.invoice_id
+            left join sys_file_info sfi on sif.file_id = sfi.file_id
 
     </sql>
 
     <select id="selectFinReimburseList" parameterType="FinReimburse" resultMap="FinReimburseResult">
         <include refid="selectFinReimburseVo"/>
         <where>
+            r.del_flag = '0'
             <if test="reimburseNumber != null  and reimburseNumber != ''"> and r.reimburse_number like concat('%', #{reimburseNumber}, '%')</if>
             <if test="deptId != null "> and r.dept_id = #{deptId}</if>
+            <if test="invoiceId != null "> and r.invoice_id = #{invoiceId}</if>
             <if test="handBy != null "> and r.hand_by = #{handBy}</if>
             <if test="projectId != null "> and r.project_id = #{projectId}</if>
             <if test="reimburseType != null  and reimburseType != ''"> and r.reimburse_type = #{reimburseType}</if>
@@ -89,6 +103,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="deptId != null">dept_id,</if>
             <if test="handBy != null">hand_by,</if>
             <if test="projectId != null">project_id,</if>
+            <if test="invoiceId != null">invoice_id,</if>
+            <if test="amount != null">amount,</if>
             <if test="reimburseType != null">reimburse_type,</if>
             <if test="annex != null">annex,</if>
             <if test="details != null">details,</if>
@@ -104,6 +120,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="deptId != null">#{deptId},</if>
             <if test="handBy != null">#{handBy},</if>
             <if test="projectId != null">#{projectId},</if>
+            <if test="invoiceId != null">#{invoiceId},</if>
+            <if test="amount != null">#{amount},</if>
             <if test="reimburseType != null">#{reimburseType},</if>
             <if test="annex != null">#{annex},</if>
             <if test="details != null">#{details},</if>
@@ -123,6 +141,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="deptId != null">dept_id = #{deptId},</if>
             <if test="handBy != null">hand_by = #{handBy},</if>
             <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="invoiceId != null">invoice_id = #{invoiceId},</if>
+            <if test="amount != null">amount = #{amount},</if>
             <if test="reimburseType != null">reimburse_type = #{reimburseType},</if>
             <if test="annex != null">annex = #{annex},</if>
             <if test="details != null">details = #{details},</if>

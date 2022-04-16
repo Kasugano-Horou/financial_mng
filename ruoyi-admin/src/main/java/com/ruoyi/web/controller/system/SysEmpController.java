@@ -27,6 +27,7 @@ import com.ruoyi.common.core.domain.entity.SysEmp;
 import com.ruoyi.system.service.ISysEmpService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 员工Controller
@@ -68,6 +69,25 @@ public class SysEmpController extends BaseController
         List<SysEmp> list = sysEmpService.selectEmpList(sysEmp);
         ExcelUtil<SysEmp> util = new ExcelUtil<SysEmp>(SysEmp.class);
         util.exportExcel(response, list, "员工数据");
+    }
+
+    @Log(title = "员工管理", businessType = BusinessType.IMPORT)
+    @PreAuthorize("@ss.hasPermi('system:emp:import')")
+    @PostMapping("/importData")
+    public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception
+    {
+        ExcelUtil<SysEmp> util = new ExcelUtil<SysEmp>(SysEmp.class);
+        List<SysEmp> empList = util.importExcel(file.getInputStream());
+        String operName = getUsername();
+        String message = sysEmpService.importEmp(empList, updateSupport, operName);
+        return AjaxResult.success(message);
+    }
+
+    @PostMapping("/importTemplate")
+    public void importTemplate(HttpServletResponse response)
+    {
+        ExcelUtil<SysEmp> util = new ExcelUtil<SysEmp>(SysEmp.class);
+        util.importTemplateExcel(response, "员工数据");
     }
 
     /**

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.financial.mapper.FinPurchaseMapper">
+    
+    <resultMap type="FinPurchase" id="FinPurchaseResult">
+        <id property="purchaseId"    column="purchase_id"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="invoiceId"    column="invoice_id"    />
+        <result property="purchaseName"    column="purchase_name"    />
+        <result property="purchaseType"    column="purchase_type"    />
+        <result property="purchaser"    column="purchaser"    />
+        <result property="supplier"    column="supplier"    />
+        <result property="status"    column="status"    />
+        <result property="purchaseDate"    column="purchase_date"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <association property="project"    column="project_id" javaType="ProProject" resultMap="projectResult" />
+        <association property="sysFileInfo"    column="file_id" javaType="SysFileInfo" resultMap="fileInfoResult" />
+    </resultMap>
+
+    <resultMap id="projectResult" type="ProProject">
+        <id     property="projectId"   column="project_id"     />
+        <result property="projectNumber" column="project_number"   />
+        <result property="projectName" column="project_name"   />
+        <result property="projectType"   column="project_type" />
+    </resultMap>
+
+    <resultMap id="fileInfoResult" type="SysFileInfo">
+        <id     property="fileId"   column="file_id"     />
+        <result property="fileName" column="file_name"   />
+        <result property="filePath"   column="file_path"      />
+    </resultMap>
+
+    <sql id="selectFinPurchaseVo">
+        select pu.purchase_id, pu.project_id, pu.invoice_id, pu.purchase_name, pu.purchase_type, pu.purchaser, pu.supplier, pu.status, pu.purchase_date, pu.del_flag, pu.create_by, pu.create_time, pu.update_by, pu.update_time, pu.remark,
+               p.project_number, p.project_name, p.leader, p.project_type,
+               sfi.file_name, sfi.file_path
+        from fin_purchase pu
+            left join pro_project p on p.project_id = pu.project_id
+            left join sys_invoice_file sif on sif.invoice_id = pu.invoice_id
+            left join sys_file_info sfi on sif.file_id = sfi.file_id
+    </sql>
+
+    <select id="selectFinPurchaseList" parameterType="FinPurchase" resultMap="FinPurchaseResult">
+        <include refid="selectFinPurchaseVo"/>
+        <where>
+            pu.del_flag = '0'
+            <if test="projectId != null"> and pu.project_id = #{projectId}</if>
+            <if test="purchaseName != null  and purchaseName != ''"> and pu.purchase_name like concat('%', #{purchaseName}, '%')</if>
+            <if test="purchaseType != null  and purchaseType != ''"> and pu.purchase_type = #{purchaseType}</if>
+            <if test="supplier != null  and supplier != ''"> and pu.supplier = #{supplier}</if>
+            <if test="status != null  and status != ''"> and pu.status = #{status}</if>
+            <if test="params.beginPurchaseDate != null and params.beginPurchaseDate != '' and params.endPurchaseDate != null and params.endPurchaseDate != ''"> and pu.purchase_date between #{params.beginPurchaseDate} and #{params.endPurchaseDate}</if>
+        </where>
+    </select>
+    
+    <select id="selectFinPurchaseByPurchaseId" parameterType="Long" resultMap="FinPurchaseResult">
+        <include refid="selectFinPurchaseVo"/>
+        where pu.purchase_id = #{purchaseId}
+    </select>
+        
+    <insert id="insertFinPurchase" parameterType="FinPurchase">
+        insert into fin_purchase
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="purchaseId != null">purchase_id,</if>
+            <if test="projectId != null">project_id,</if>
+            <if test="invoiceId != null">invoice_id,</if>
+            <if test="purchaseName != null">purchase_name,</if>
+            <if test="purchaseType != null">purchase_type,</if>
+            <if test="purchaser != null">purchaser,</if>
+            <if test="supplier != null">supplier,</if>
+            <if test="status != null">status,</if>
+            <if test="purchaseDate != null">purchase_date,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="purchaseId != null">#{purchaseId},</if>
+            <if test="projectId != null">#{projectId},</if>
+            <if test="invoiceId != null">#{invoiceId},</if>
+            <if test="purchaseName != null">#{purchaseName},</if>
+            <if test="purchaseType != null">#{purchaseType},</if>
+            <if test="purchaser != null">#{purchaser},</if>
+            <if test="supplier != null">#{supplier},</if>
+            <if test="status != null">#{status},</if>
+            <if test="purchaseDate != null">#{purchaseDate},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFinPurchase" parameterType="FinPurchase">
+        update fin_purchase
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="invoiceId != null">invoice_id = #{invoiceId},</if>
+            <if test="purchaseName != null">purchase_name = #{purchaseName},</if>
+            <if test="purchaseType != null">purchase_type = #{purchaseType},</if>
+            <if test="purchaser != null">purchaser = #{purchaser},</if>
+            <if test="supplier != null">supplier = #{supplier},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="purchaseDate != null">purchase_date = #{purchaseDate},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where purchase_id = #{purchaseId}
+    </update>
+
+    <delete id="deleteFinPurchaseByPurchaseId" parameterType="Long">
+        update fin_purchase set del_flag = '2' where purchase_id = #{purchaseId}
+    </delete>
+
+    <delete id="deleteFinPurchaseByPurchaseIds" parameterType="String">
+        update fin_purchase set del_flag = '2' where purchase_id in
+        <foreach item="purchaseId" collection="array" open="(" separator="," close=")">
+            #{purchaseId}
+        </foreach>
+    </delete>
+</mapper>

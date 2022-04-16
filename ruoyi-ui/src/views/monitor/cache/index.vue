@@ -84,14 +84,15 @@ export default {
   },
   created() {
     this.getList();
-    this.openLoading();
+    //this.openLoading();
   },
   methods: {
     /** 查缓存询信息 */
     getList() {
       getCache().then((response) => {
         this.cache = response.data;
-        this.$modal.closeLoading();
+        console.log( this.cache);
+        // this.$modal.closeLoading();
 
         this.commandstats = echarts.init(this.$refs.commandstats, "macarons");
         this.commandstats.setOption({

@@ -2,13 +2,11 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ruoyi.project.mapper.ProjectCostMapper">
+<mapper namespace="com.ruoyi.financial.mapper.ProjectCostMapper">
     
     <resultMap type="ProjectCost" id="ProjectCostResult">
-        <result property="projectCostId"    column="project_cost_id"    />
+        <id property="projectCostId"    column="project_cost_id"    />
         <result property="projectId"    column="project_id"    />
-        <result property="projectName"    column="project_name"    />
-        <result property="contractNumber"    column="contract_number"    />
         <result property="businessTax"    column="business_tax"    />
         <result property="managenmentCost"    column="managenment_cost"    />
         <result property="personnelCost"    column="personnel_cost"    />
@@ -23,31 +21,88 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
         <result property="remark"    column="remark"    />
+        <association property="project"    column="project_id" javaType="ProProject" resultMap="projectResult" />
+        <association property="contract"    column="contract_id" javaType="FinContract" resultMap="contractResult" />
+    </resultMap>
+
+    <resultMap id="projectResult" type="ProProject">
+        <id     property="projectId"   column="project_id"     />
+        <result property="contractId"   column="contract_id"     />
+        <result property="projectNumber" column="project_number"   />
+        <result property="projectName" column="project_name"   />
+        <result property="projectType"   column="project_type" />
+    </resultMap>
+
+    <resultMap id="contractResult" type="FinContract">
+        <id     property="contractId"   column="contract_id"     />
+        <result property="contractNumber"   column="contract_number"      />
+        <result property="contractName"   column="contract_name"      />
+        <result property="debtors"   column="debtors"      />
+        <result property="receivable"   column="receivable"      />
+        <result property="status"   column="contract_status" />
     </resultMap>
 
     <sql id="selectProjectCostVo">
-        select project_cost_id, project_id, project_name, contract_number, business_tax, managenment_cost, personnel_cost, procurement_cost, others_cost, maintenance_cost, general_income, pre_tax, del_flag, create_by, create_time, update_by, update_time, remark from pro_project_cost
+        select pc.project_cost_id, pc.project_id, ifnull(pc.business_tax,0) as business_tax, ifnull(pc.managenment_cost,0) as managenment_cost, ifnull(pc.personnel_cost,0) as personnel_cost, ifnull(pc.procurement_cost,0) as procurement_cost, ifnull(pc.others_cost,0) as others_cost, ifnull(pc.maintenance_cost,0) as maintenance_cost, ifnull(pc.general_income,0) as general_income, ifnull(pc.pre_tax,0) as pre_tax, pc.del_flag, pc.create_by, pc.create_time, pc.update_by, pc.update_time, pc.remark,
+            p.project_number, p.contract_id, p.project_name, p.leader, p.project_type,
+            c.contract_id, c.contract_number, c.contract_name, c.status as contract_staus
+
+        from fin_project_cost pc
+            left join pro_project p on p.project_id = pc.project_id
+            left join fin_contract c on c.contract_id = p.contract_id
+
     </sql>
+
+    <select id="accountProjectCostByProjectNumbers" parameterType="Long">
+        update fin_project_cost
+        <trim prefix="SET" suffixOverrides=",">
+
+            <if test="businessTax != null">business_tax = #{businessTax},</if>
+            <if test="managenmentCost != null">managenment_cost = #{managenmentCost},</if>
+            <if test="personnelCost != null">personnel_cost = #{personnelCost},</if>
+            <if test="procurementCost != null">procurement_cost = #{procurementCost},</if>
+            <if test="othersCost != null">others_cost = #{othersCost},</if>
+            <if test="maintenanceCost != null">maintenance_cost = #{maintenanceCost},</if>
+            <if test="generalIncome != null">general_income = #{generalIncome},</if>
+            <if test="preTax != null">pre_tax = #{preTax},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate(),
+        </trim>
+        where project_id = #{projectId}
+    </select>
 
     <select id="selectProjectCostList" parameterType="ProjectCost" resultMap="ProjectCostResult">
         <include refid="selectProjectCostVo"/>
-        <where>  
-            <if test="projectName != null  and projectName != ''"> and project_name like concat('%', #{projectName}, '%')</if>
-            <if test="contractNumber != null  and contractNumber != ''"> and contract_number = #{contractNumber}</if>
+        <where>
+            pc.del_flag = '0'
+            <if test="project !=null and project != ''">
+                <if test="project.projectNumber != null  and project.projectNumber != ''"> and p.project_number like concat('%', #{project.projectNumber}, '%')</if>
+                <if test="project.projectName != null  and project.projectName != ''"> and p.project_name like concat('%', #{project.projectName}, '%')</if>
+            </if>
+            <if test="contract !=null and contract != ''">
+                <if test="contract.contractNumber != null  and contract.contractNumber != ''"> and c.contract_number like concat('%', #{contract.contractNumber}, '%')</if>
+            </if>
+
+
         </where>
     </select>
     
     <select id="selectProjectCostByProjectCostId" parameterType="Long" resultMap="ProjectCostResult">
         <include refid="selectProjectCostVo"/>
-        where project_cost_id = #{projectCostId}
+        where pc.project_cost_id = #{projectCostId}
+    </select>
+
+    <select id="selectProjectCostByProjectId" parameterType="Long" resultMap="ProjectCostResult">
+        <include refid="selectProjectCostVo"/>
+        where pc.project_id = #{projectId}
     </select>
         
     <insert id="insertProjectCost" parameterType="ProjectCost" useGeneratedKeys="true" keyProperty="projectCostId">
-        insert into pro_project_cost
+        insert into fin_project_cost
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="projectId != null">project_id,</if>
-            <if test="projectName != null and projectName != ''">project_name,</if>
-            <if test="contractNumber != null">contract_number,</if>
             <if test="businessTax != null">business_tax,</if>
             <if test="managenmentCost != null">managenment_cost,</if>
             <if test="personnelCost != null">personnel_cost,</if>
@@ -63,8 +118,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="projectId != null">#{projectId},</if>
-            <if test="projectName != null and projectName != ''">#{projectName},</if>
-            <if test="contractNumber != null">#{contractNumber},</if>
             <if test="businessTax != null">#{businessTax},</if>
             <if test="managenmentCost != null">#{managenmentCost},</if>
             <if test="personnelCost != null">#{personnelCost},</if>
@@ -81,11 +134,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </insert>
 
     <update id="updateProjectCost" parameterType="ProjectCost">
-        update pro_project_cost
+        update fin_project_cost
         <trim prefix="SET" suffixOverrides=",">
             <if test="projectId != null">project_id = #{projectId},</if>
-            <if test="projectName != null and projectName != ''">project_name = #{projectName},</if>
-            <if test="contractNumber != null">contract_number = #{contractNumber},</if>
             <if test="businessTax != null">business_tax = #{businessTax},</if>
             <if test="managenmentCost != null">managenment_cost = #{managenmentCost},</if>
             <if test="personnelCost != null">personnel_cost = #{personnelCost},</if>
@@ -103,11 +154,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
     <delete id="deleteProjectCostByProjectCostId" parameterType="Long">
-        update pro_project_cost set del_flag = '2' where project_cost_id = #{projectCostId}
+        update fin_project_cost set del_flag = '2' where project_cost_id = #{projectCostId}
     </delete>
 
-    <delete id="deleteProjectCostByProjectCostIds" parameterType="String">
-        update pro_project_cost set del_flag = '2' where project_cost_id in
+    <delete id="deleteProjectCostByProjectCostIds" parameterType="Long">
+        update fin_project_cost set del_flag = '2' where project_cost_id in
         <foreach item="projectCostId" collection="array" open="(" separator="," close=")">
             #{projectCostId}
         </foreach>

@@ -87,6 +87,7 @@ public class DataScopeAspect
 
         for (SysRole role : user.getRoles())
         {
+            System.out.println("role2222"+role.getRoleName()+" datascope: "+role.getDataScope());
             String dataScope = role.getDataScope();
             if (DATA_SCOPE_ALL.equals(dataScope))
             {

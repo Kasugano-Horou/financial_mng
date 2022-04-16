@@ -275,7 +275,6 @@ export default {
 
     onClickItem(row) {
       this.projectId = row.projectId;
-      console.log("ww"+this.projectId);
       this.getManhourListByProjectId();
     },
     
@@ -305,7 +304,6 @@ export default {
     getProjectList() {
       this.loading = true;
       tableDataProject(this.queryParams).then(response => {
-        console.log(response);
         this.tableData = response.rows;
         this.total = response.total;
         this.loading = false;
@@ -314,10 +312,8 @@ export default {
 
     /** 根据项目ID查工时 */
     getManhourListByProjectId() {
-      console.log("www"+this.projectId);
       this.loading = true;
       listManhourByProjectId(this.projectId).then(response => {
-        console.log("wwww"+response);
         this.manhourList = response.rows;
         this.total = response.total;
         this.loading = false;
@@ -330,7 +326,6 @@ export default {
     getManhourList() {
       this.loading = true;
       listManhour(this.queryParams).then(response => {
-        console.log(response);
         this.manhourList = response.rows;
         this.total = response.total;
         this.loading = false;

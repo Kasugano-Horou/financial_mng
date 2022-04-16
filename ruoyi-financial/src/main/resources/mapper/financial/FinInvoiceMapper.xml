@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.financial.mapper.FinInvoiceMapper">
+    
+    <resultMap type="FinInvoice" id="FinInvoiceResult">
+        <result property="invoiceId"    column="invoice_id"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="invoiceType"    column="invoice_type"    />
+        <result property="invoiceFrom"    column="invoice_from"    />
+        <result property="invoiceName"    column="invoice_name"    />
+        <result property="invoiceCode"    column="invoice_code"    />
+        <result property="invoiceNumber"    column="invoice_number"    />
+        <result property="invoiceDate"    column="invoice_date"    />
+        <result property="purchasesName"    column="purchases_name"    />
+        <result property="purchasesNumber"    column="purchases_number"    />
+        <result property="purchasesAddressTel"    column="purchases_address_tel"    />
+        <result property="purchasesBankersAccount"    column="purchases_bankers_account"    />
+        <result property="salersName"    column="salers_name"    />
+        <result property="salersNumber"    column="salers_number"    />
+        <result property="salersAddressTel"    column="salers_address_tel"    />
+        <result property="salersBankersCcount"    column="salers_bankers_ccount"    />
+        <result property="total"    column="total"    />
+        <result property="tax"    column="tax"    />
+        <result property="pricePlusChinese"    column="price_plus_chinese"    />
+        <result property="pricePlusArabic"    column="price_plus_arabic"    />
+        <result property="password"    column="password"    />
+        <result property="payee"    column="payee"    />
+        <result property="review"    column="review"    />
+        <result property="drawer"    column="drawer"    />
+        <result property="memo"    column="memo"    />
+        <result property="status"    column="status"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <association property="project"    column="project_id" javaType="ProProject" resultMap="projectResult" />
+        <association property="sysFileInfo"    column="file_id" javaType="SysFileInfo" resultMap="fileInfoResult" />
+    </resultMap>
+
+    <resultMap id="projectResult" type="ProProject">
+        <id     property="projectId"   column="project_id"     />
+        <result property="projectNumber" column="project_number"   />
+        <result property="projectName" column="project_name"   />
+        <result property="projectType"   column="project_type" />
+    </resultMap>
+
+    <resultMap id="fileInfoResult" type="SysFileInfo">
+        <id     property="fileId"   column="file_id"     />
+        <result property="fileName" column="file_name"   />
+        <result property="filePath"   column="file_path"      />
+    </resultMap>
+
+    <sql id="selectFinInvoiceVo">
+        select i.invoice_id, i.project_id, i.invoice_type, i.invoice_from, i.invoice_name, i.invoice_code, i.invoice_number, i.invoice_date, i.purchases_name, i.purchases_number, i.purchases_address_tel, i.purchases_bankers_account, i.salers_name, i.salers_number, i.salers_address_tel, i.salers_bankers_ccount, i.total, i.tax, i.price_plus_chinese, i.price_plus_arabic, i.password, i.payee, i.review, i.drawer, i.memo, i.status, i.del_flag, i.create_by, i.create_time, i.update_by, i.update_time, i.remark,
+               p.project_id, p.project_number, p.project_name, project_type,
+               sfi.file_name, sfi.file_path
+        from fin_invoice i
+            left join pro_project p on p.project_id = i.project_id
+            left join sys_invoice_file sif on sif.invoice_id = i.invoice_id
+            left join sys_file_info sfi on sif.file_id = sfi.file_id
+    </sql>
+
+    <select id="selectFinInvoiceList" parameterType="FinInvoice" resultMap="FinInvoiceResult">
+        <include refid="selectFinInvoiceVo"/>
+        <where>
+            and i.del_flag = '0'
+            <if test="project != null">
+                <if test="project.projectName != null and project.projectName != ''"> and p.project_name like concat('%', #{project.projectName}, '%')</if>
+                <if test="project.projectNumber != null and project.projectNumber != ''"> and p.project_number like concat('%', #{projectNumber}, '%')</if>
+            </if>
+            <if test="projectId != null "> and i.project_id = #{projectId}</if>
+            <if test="invoiceType != null  and invoiceType != ''"> and i.invoice_type = #{invoiceType}</if>
+            <if test="invoiceFrom != null  and invoiceFrom != ''"> and i.invoice_from = #{invoiceFrom}</if>
+            <if test="invoiceName != null  and invoiceName != ''"> and i.invoice_name like concat('%', #{invoiceName}, '%')</if>
+            <if test="invoiceNumber != null  and invoiceNumber != ''"> and i.invoice_number = #{invoiceNumber}</if>
+            <if test="invoiceDate != null "> and i.invoice_date = #{invoiceDate}</if>
+            <if test="purchasesName != null  and purchasesName != ''"> and i.purchases_name like concat('%', #{purchasesName}, '%')</if>
+            <if test="salersName != null  and salersName != ''"> and i.salers_name like concat('%', #{salersName}, '%')</if>
+            <if test="payee != null  and payee != ''"> and i.payee = #{payee}</if>
+            <if test="drawer != null  and drawer != ''"> and i.drawer = #{drawer}</if>
+            <if test="status != null  and status != ''"> and i.status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectFinInvoiceByInvoiceId" parameterType="Long" resultMap="FinInvoiceResult">
+        <include refid="selectFinInvoiceVo"/>
+        where i.invoice_id = #{invoiceId}
+    </select>
+
+    <insert id="insertFinInvoiceFile">
+        insert into sys_invoice_file(invoice_id, file_id) values (#{invoiceId}, #{fileId})
+    </insert>
+        
+    <insert id="insertFinInvoice" parameterType="FinInvoice" useGeneratedKeys="true" keyProperty="invoiceId">
+        insert into fin_invoice
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="invoiceId != null">invoice_id,</if>
+            <if test="projectId != null">project_id,</if>
+            <if test="invoiceType != null">invoice_type,</if>
+            <if test="invoiceFrom != null">invoice_from,</if>
+            <if test="invoiceName != null">invoice_name,</if>
+            <if test="invoiceCode != null">invoice_code,</if>
+            <if test="invoiceNumber != null">invoice_number,</if>
+            <if test="invoiceDate != null">invoice_date,</if>
+            <if test="purchasesName != null">purchases_name,</if>
+            <if test="purchasesNumber != null">purchases_number,</if>
+            <if test="purchasesAddressTel != null">purchases_address_tel,</if>
+            <if test="purchasesBankersAccount != null">purchases_bankers_account,</if>
+            <if test="salersName != null">salers_name,</if>
+            <if test="salersNumber != null">salers_number,</if>
+            <if test="salersAddressTel != null">salers_address_tel,</if>
+            <if test="salersBankersCcount != null">salers_bankers_ccount,</if>
+            <if test="total != null">total,</if>
+            <if test="tax != null">tax,</if>
+            <if test="pricePlusChinese != null">price_plus_chinese,</if>
+            <if test="pricePlusArabic != null">price_plus_arabic,</if>
+            <if test="password != null">password,</if>
+            <if test="payee != null">payee,</if>
+            <if test="review != null">review,</if>
+            <if test="drawer != null">drawer,</if>
+            <if test="memo != null">memo,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="remark != null">remark,</if>
+            create_time,
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="invoiceId != null">#{invoiceId},</if>
+            <if test="projectId != null">#{projectId},</if>
+            <if test="invoiceType != null">#{invoiceType},</if>
+            <if test="invoiceFrom != null">#{invoiceFrom},</if>
+            <if test="invoiceName != null">#{invoiceName},</if>
+            <if test="invoiceCode != null">#{invoiceCode},</if>
+            <if test="invoiceNumber != null">#{invoiceNumber},</if>
+            <if test="invoiceDate != null">#{invoiceDate},</if>
+            <if test="purchasesName != null">#{purchasesName},</if>
+            <if test="purchasesNumber != null">#{purchasesNumber},</if>
+            <if test="purchasesAddressTel != null">#{purchasesAddressTel},</if>
+            <if test="purchasesBankersAccount != null">#{purchasesBankersAccount},</if>
+            <if test="salersName != null">#{salersName},</if>
+            <if test="salersNumber != null">#{salersNumber},</if>
+            <if test="salersAddressTel != null">#{salersAddressTel},</if>
+            <if test="salersBankersCcount != null">#{salersBankersCcount},</if>
+            <if test="total != null">#{total},</if>
+            <if test="tax != null">#{tax},</if>
+            <if test="pricePlusChinese != null">#{pricePlusChinese},</if>
+            <if test="pricePlusArabic != null">#{pricePlusArabic},</if>
+            <if test="password != null">#{password},</if>
+            <if test="payee != null">#{payee},</if>
+            <if test="review != null">#{review},</if>
+            <if test="drawer != null">#{drawer},</if>
+            <if test="memo != null">#{memo},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            sysdate(),
+         </trim>
+    </insert>
+
+    <update id="updateFinInvoice" parameterType="FinInvoice">
+        update fin_invoice
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="invoiceType != null">invoice_type = #{invoiceType},</if>
+            <if test="invoiceFrom != null">invoice_from = #{invoiceFrom},</if>
+            <if test="invoiceName != null">invoice_name = #{invoiceName},</if>
+            <if test="invoiceCode != null">invoice_code = #{invoiceCode},</if>
+            <if test="invoiceNumber != null">invoice_number = #{invoiceNumber},</if>
+            <if test="invoiceDate != null">invoice_date = #{invoiceDate},</if>
+            <if test="purchasesName != null">purchases_name = #{purchasesName},</if>
+            <if test="purchasesNumber != null">purchases_number = #{purchasesNumber},</if>
+            <if test="purchasesAddressTel != null">purchases_address_tel = #{purchasesAddressTel},</if>
+            <if test="purchasesBankersAccount != null">purchases_bankers_account = #{purchasesBankersAccount},</if>
+            <if test="salersName != null">salers_name = #{salersName},</if>
+            <if test="salersNumber != null">salers_number = #{salersNumber},</if>
+            <if test="salersAddressTel != null">salers_address_tel = #{salersAddressTel},</if>
+            <if test="salersBankersCcount != null">salers_bankers_ccount = #{salersBankersCcount},</if>
+            <if test="total != null">total = #{total},</if>
+            <if test="tax != null">tax = #{tax},</if>
+            <if test="pricePlusChinese != null">price_plus_chinese = #{pricePlusChinese},</if>
+            <if test="pricePlusArabic != null">price_plus_arabic = #{pricePlusArabic},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="payee != null">payee = #{payee},</if>
+            <if test="review != null">review = #{review},</if>
+            <if test="drawer != null">drawer = #{drawer},</if>
+            <if test="memo != null">memo = #{memo},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate(),
+        </trim>
+        where invoice_id = #{invoiceId}
+    </update>
+
+    <delete id="deleteFinInvoiceByInvoiceId" parameterType="Long">
+        update fin_invoice set del_flag = '2' where invoice_id = #{invoiceId}
+    </delete>
+
+    <delete id="deleteFinInvoiceByInvoiceIds" parameterType="String">
+        update fin_invoice set del_flag = '2' where invoice_id in
+        <foreach item="invoiceId" collection="array" open="(" separator="," close=")">
+            #{invoiceId}
+        </foreach>
+    </delete>
+</mapper>

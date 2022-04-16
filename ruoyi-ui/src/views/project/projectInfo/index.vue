@@ -1,19 +1,19 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="100px">
-      <el-form-item label="项目名称" prop="projectName">
+      <el-form-item label="项目编号" prop="projectNumber">
         <el-input
-          v-model="queryParams.projectName"
-          placeholder="请输入项目名称"
+          v-model="queryParams.projectNumber"
+          placeholder="请输入项目编号"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="合同id" prop="contractId">
+      <el-form-item label="项目名称" prop="projectName">
         <el-input
-          v-model="queryParams.contractId"
-          placeholder="请输入合同id"
+          v-model="queryParams.projectName"
+          placeholder="请输入项目名称"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -111,7 +111,7 @@
 
     <el-table v-loading="loading" :data="projectList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="项目ID" align="center" prop="projectId" />
+      <el-table-column label="项目编号" align="center" prop="projectNumber" />
       <el-table-column label="项目名称" align="center" prop="projectName" />
       <el-table-column label="合同id" align="center" prop="contractId" />
       <el-table-column label="项目类型" align="center" prop="projectType">
@@ -158,6 +158,9 @@
     <!-- 添加或修改项目对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="项目编号" prop="projectNumber">
+          <el-input v-model="form.projectNumber" placeholder="请输入项目编号" />
+        </el-form-item>
         <el-form-item label="项目名称" prop="projectName">
           <el-input v-model="form.projectName" placeholder="请输入项目名称" />
         </el-form-item>
@@ -222,6 +225,7 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
+        projectNumber: null,
         projectName: null,
         contractId: null,
         projectType: null,
@@ -233,6 +237,9 @@ export default {
       form: {},
       // 表单校验
       rules: {
+        projectNumber: [
+          { required: true, message: "项目编号不能为空", trigger: "blur" }
+        ],
         projectName: [
           { required: true, message: "项目名称不能为空", trigger: "blur" }
         ],
@@ -264,6 +271,7 @@ export default {
     reset() {
       this.form = {
         projectId: null,
+        projectNumber: null,
         projectName: null,
         contractId: null,
         projectType: null,
@@ -299,7 +307,9 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      const projectId = row.projectId || this.ids
+      const projectId = row.projectId || this.ids;
+      console.log(projectId);
+
       getProject(projectId).then(response => {
         this.form = response.data;
         this.open = true;

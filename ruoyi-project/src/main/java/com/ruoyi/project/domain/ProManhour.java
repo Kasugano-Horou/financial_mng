@@ -26,7 +26,7 @@ public class ProManhour extends BaseEntity
 
     /** 员工ID */
     @Excel(name = "员工ID")
-    private String empId;
+    private Long empId;
 
     /** 项目工时 */
     @Excel(name = "项目工时")
@@ -55,11 +55,11 @@ public class ProManhour extends BaseEntity
     {
         return projectId;
     }
-    public void setEmpId(String empId) 
+    public void setEmpId(Long empId)
     {
         this.empId = empId;
     }
-    public String getEmpId() 
+    public Long getEmpId()
     {
         return empId;
     }

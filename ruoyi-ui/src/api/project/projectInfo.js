@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { parseStrEmpty } from "@/utils/ruoyi";
 
 // 查询项目列表
 export function listProject(query) {
@@ -22,7 +23,7 @@ export function tableDataProject(query) {
 // 查询项目详细
 export function getProject(projectId) {
   return request({
-    url: '/project/projectInfo/' + projectId,
+    url: '/project/projectInfo/' + parseStrEmpty(projectId),
     method: 'get'
   })
 }
@@ -48,7 +49,7 @@ export function updateProject(data) {
 // 删除项目
 export function delProject(projectId) {
   return request({
-    url: '/project/projectInfo/' + projectId,
+    url: '/project/projectInfo/' + parseStrEmpty(projectId),
     method: 'delete'
   })
 }

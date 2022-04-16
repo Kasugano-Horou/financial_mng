@@ -1,5 +1,6 @@
 package com.ruoyi.financial.service;
 
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.financial.domain.FinContract;
 import java.util.List;
 
@@ -26,6 +27,14 @@ public interface IFinContractService
      * @return 合同管理集合
      */
     public List<FinContract> selectFinContractList(FinContract finContract);
+
+    /**
+     * 通过合同编号查询合同
+     *
+     * @param ContractNumber 合同编号
+     * @return 用户对象信息
+     */
+    public FinContract selectFinContractByContractNumber(String ContractNumber);
 
     /**
      * 新增合同管理
@@ -66,4 +75,14 @@ public interface IFinContractService
      * @return 结果
      */
     public int deleteFinContractByContractId(Long contractId);
+
+    /**
+     * 导入合同数据
+     *
+     * @param finContractList 合同数据列表
+     * @param isUpdateSupport 是否更新支持，如果已存在，则进行更新数据
+     * @param operName 操作用户
+     * @return 结果
+     */
+    public String importFinContract(List<FinContract> finContractList, Boolean isUpdateSupport, String operName);
 }

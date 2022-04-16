@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { parseStrEmpty } from "@/utils/ruoyi";
 
 // 查询部门列表
 export function listDept(query) {
@@ -12,7 +13,7 @@ export function listDept(query) {
 // 查询部门列表（排除节点）
 export function listDeptExcludeChild(deptId) {
   return request({
-    url: '/system/dept/list/exclude/' + deptId,
+    url: '/system/dept/list/exclude/' + parseStrEmpty(deptId),
     method: 'get'
   })
 }
@@ -36,7 +37,7 @@ export function treeselect() {
 // 根据角色ID查询部门树结构
 export function roleDeptTreeselect(roleId) {
   return request({
-    url: '/system/dept/roleDeptTreeselect/' + roleId,
+    url: '/system/dept/roleDeptTreeselect/' + parseStrEmpty(roleId),
     method: 'get'
   })
 }
@@ -62,7 +63,7 @@ export function updateDept(data) {
 // 删除部门
 export function delDept(deptId) {
   return request({
-    url: '/system/dept/' + deptId,
+    url: '/system/dept/' + parseStrEmpty(deptId),
     method: 'delete'
   })
 }

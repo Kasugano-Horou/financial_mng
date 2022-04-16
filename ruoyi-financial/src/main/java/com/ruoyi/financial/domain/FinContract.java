@@ -1,5 +1,6 @@
 package com.ruoyi.financial.domain;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import javax.validation.constraints.*;
 
@@ -51,23 +52,23 @@ public class FinContract extends BaseEntity
     private Date contractEnd;
 
     /** 合同类型 */
-    @Excel(name = "合同类型", readConverterExp = "0=内部,1=外部,2=未知")
+    @Excel(name = "合同类型")
     private String contractType;
 
     /** 应收款 */
     @Excel(name = "应收款")
-    private Double debtors;
+    private BigDecimal debtors;
 
     /** 已收款 */
     @Excel(name = "已收款")
-    private Double receivable;
+    private BigDecimal receivable;
 
     /** 授权委托人 */
     @Excel(name = "授权委托人")
     private String principal;
 
     /** 部门ID */
-    @Excel(name = "部门ID", type = Type.IMPORT)
+    @Excel(name = "部门编号", type = Type.IMPORT)
     private Long deptId;
 
     /** 对方单位 */
@@ -75,11 +76,11 @@ public class FinContract extends BaseEntity
     private String oppositePartyUnit;
 
     /** 合同文件地址 */
-    @Excel(name = "合同文件地址")
+    @Excel(name = "合同文件地址", type = Type.EXPORT)
     private String fileAddress;
 
     /** 合同状态 */
-    @Excel(name = "合同状态", readConverterExp = "0=未通过,1=未开始,2=进行中,3=已结束")
+    @Excel(name = "合同状态")
     private String status;
 
     /** 合同签订地点 */
@@ -100,6 +101,7 @@ public class FinContract extends BaseEntity
     })
     private SysDept dept;
 
+
     public FinContract() { }    public FinContract(Long contractId) { this.contractId=contractId; }
     public Long getContractId() { return contractId; }
     public void setContractId(Long contractId) { this.contractId = contractId; }
@@ -118,10 +120,10 @@ public class FinContract extends BaseEntity
     public void setContractEnd(Date contractEnd) { this.contractEnd = contractEnd; }
     public String getContractType() { return contractType; }
     public void setContractType(String contractType) { this.contractType = contractType; }
-    public Double getDebtors() { return debtors; }
-    public void setDebtors(Double debtors) { this.debtors = debtors; }
-    public Double getReceivable() { return receivable; }
-    public void setReceivable(Double receivable) { this.receivable = receivable; }
+    public BigDecimal getDebtors() { return debtors; }
+    public void setDebtors(BigDecimal debtors) { this.debtors = debtors; }
+    public BigDecimal getReceivable() { return receivable; }
+    public void setReceivable(BigDecimal receivable) { this.receivable = receivable; }
     public String getPrincipal() { return principal; }
     public void setPrincipal(String principal) { this.principal = principal; }
     public Long getDeptId() { return deptId; }

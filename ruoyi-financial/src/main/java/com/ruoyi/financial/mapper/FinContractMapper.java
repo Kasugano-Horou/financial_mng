@@ -9,8 +9,8 @@ import java.util.List;
  * @author horou
  * @date 2022-03-08
  */
-public interface FinContractMapper
-{
+public interface FinContractMapper {
+
 
     /**
      * 查询合同列表
@@ -30,7 +30,13 @@ public interface FinContractMapper
      */
     public FinContract selectFinContractByContractId(Long contractId);
 
-
+    /**
+     * 通过合同编号查询合同
+     *
+     * @param contractNumber 合同编号
+     * @return 用户对象信息
+     */
+    public FinContract selectFinContractByContractNumber(String contractNumber);
 
     /**
      * 新增合同
