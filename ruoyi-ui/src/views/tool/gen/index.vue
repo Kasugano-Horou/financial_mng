@@ -161,7 +161,7 @@
       @pagination="getList"
     />
     <!-- 预览界面 -->
-    <el-dialog :title="preview.title" :visible.sync="preview.open" width="80%" top="5vh" append-to-body class="scrollbar">
+    <el-dialog :title="preview.title" :visible.sync="preview.open" width="80%" top="5vh" append-to-body>
       <el-tabs v-model="preview.activeName">
         <el-tab-pane
           v-for="(value, key) in preview.data"
@@ -169,8 +169,7 @@
           :name="key.substring(key.lastIndexOf('/')+1,key.indexOf('.vm'))"
           :key="key"
         >
-          <el-link :underline="false" icon="el-icon-document-copy" v-clipboard:copy="value" v-clipboard:success="clipboardSuccess" style="float:right">复制</el-link>
-          <pre><code class="hljs" v-html="highlightedCode(value, key)"></code></pre>
+        <pre><code class="hljs" v-html="highlightedCode(value, key)"></code></pre>
         </el-tab-pane>
       </el-tabs>
     </el-dialog>
@@ -181,6 +180,7 @@
 <script>
 import { listTable, previewTable, delTable, genCode, synchDb } from "@/api/tool/gen";
 import importTable from "./importTable";
+import { downLoadZip } from "@/utils/zipdownload";
 import hljs from "highlight.js/lib/highlight";
 import "highlight.js/styles/github-gist.css";
 hljs.registerLanguage("java", require("highlight.js/lib/languages/java"));
@@ -238,8 +238,7 @@ export default {
     const time = this.$route.query.t;
     if (time != null && time != this.uniqueId) {
       this.uniqueId = time;
-      this.queryParams.pageNum = Number(this.$route.query.pageNum);
-      this.getList();
+      this.resetQuery();
     }
   },
   methods: {
@@ -262,7 +261,7 @@ export default {
     handleGenTable(row) {
       const tableNames = row.tableName || this.tableNames;
       if (tableNames == "") {
-        this.$modal.msgError("请选择要生成的数据");
+        this.msgError("请选择要生成的数据");
         return;
       }
       if(row.genType === "1") {
@@ -270,17 +269,21 @@ export default {
           this.$modal.msgSuccess("成功生成到自定义路径：" + row.genPath);
         });
       } else {
-        this.$download.zip("/tool/gen/batchGenCode?tables=" + tableNames, "ruoyi");
+        downLoadZip("/tool/gen/batchGenCode?tables=" + tableNames, "ruoyi");
       }
     },
     /** 同步数据库操作 */
     handleSynchDb(row) {
       const tableName = row.tableName;
-      this.$modal.confirm('确认要强制同步"' + tableName + '"表结构吗？').then(function() {
-        return synchDb(tableName);
+      this.$confirm('确认要强制同步"' + tableName + '"表结构吗？', "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function() {
+          return synchDb(tableName);
       }).then(() => {
-        this.$modal.msgSuccess("同步成功");
-      }).catch(() => {});
+          this.$modal.msgSuccess("同步成功");
+      })
     },
     /** 打开导入表弹窗 */
     openImportTable() {
@@ -297,7 +300,6 @@ export default {
       previewTable(row.tableId).then(response => {
         this.preview.data = response.data;
         this.preview.open = true;
-        this.preview.activeName = "domain.java";
       });
     },
     /** 高亮显示 */
@@ -306,10 +308,6 @@ export default {
       var language = vmName.substring(vmName.indexOf(".") + 1, vmName.length);
       const result = hljs.highlight(language, code || "", true);
       return result.value || '&nbsp;';
-    },
-    /** 复制代码成功 */
-    clipboardSuccess(){
-      this.$modal.msgSuccess("复制成功");
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
@@ -321,17 +319,21 @@ export default {
     /** 修改按钮操作 */
     handleEditTable(row) {
       const tableId = row.tableId || this.ids[0];
-      this.$router.push({ path: '/tool/gen-edit/index/' + tableId, query: { pageNum: this.queryParams.pageNum } });
+      this.$router.push("/gen/edit/" + tableId);
     },
     /** 删除按钮操作 */
     handleDelete(row) {
       const tableIds = row.tableId || this.ids;
-      this.$modal.confirm('是否确认删除表编号为"' + tableIds + '"的数据项？').then(function() {
-        return delTable(tableIds);
+      this.$confirm('是否确认删除表编号为"' + tableIds + '"的数据项?', "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function() {
+          return delTable(tableIds);
       }).then(() => {
-        this.getList();
-        this.$modal.msgSuccess("删除成功");
-      }).catch(() => {});
+          this.getList();
+          this.$modal.msgSuccess("删除成功");
+      })
     }
   }
 };

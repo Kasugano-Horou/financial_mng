@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.flowable.mapper.survey.SurveyQuestionMapper">
+    
+    <resultMap type="SurveyQuestion" id="SurveyQuestionResult">
+        <result property="questionId" column="question_id"/>
+        <result property="questionTitle" column="question_title"/>
+        <result property="answer" column="answer"/>
+        <result property="createBy" column="create_by"/>
+        <result property="paperTitle" column="paper_title"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+        <result property="paperId" column="paper_id"/>
+    </resultMap>
+
+    <!--调查题目选项关联查询-->
+    <resultMap type="SurveyQuestion" id="SurveyQuestionOptionsResult">
+        <result property="questionId" column="question_id"/>
+        <result property="questionTitle" column="question_title"/>
+        <result property="answer" column="answer"/>
+        <result property="createTime" column="create_time"/>
+        <result property="remark" column="remark"/>
+        <result property="paperId" column="paper_id"/>
+        <collection property="options" column="question_Id" ofType="SurveyOptions" select="selectSurveyOptionsById" />
+    </resultMap>
+
+    <resultMap type="SurveyOptions" id="SurveyOptionsResult">
+        <id property="optionId" column="option_id"/>
+        <result property="optionContent" column="option_content"/>
+        <result property="questionId" column="question_id"/>
+        <result property="optionOrder" column="option_order"/>
+        <result property="createTime" column="create_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectSurveyQuestionVo">
+        select question_id, question_title, answer, create_by, create_time, update_by, update_time, remark, paper_id from t_survey_question
+    </sql>
+
+    <select id="selectSurveyQuestionList" parameterType="SurveyQuestion" resultMap="SurveyQuestionResult">
+        select question_id, question_title, answer, paper_title, t1.create_time, t1.remark, paper_id from t_survey_question t1,t_survey_paper t2
+        <where>
+            t1.paper_id = t2.id
+            <if test="questionTitle != null  and questionTitle != ''"> and question_title = #{questionTitle}</if>
+            <if test="answer != null "> and answer = #{answer}</if>
+            <if test="paperId != null "> and paper_id = #{paperId}</if>
+        </where>
+    </select>
+    
+    <select id="selectSurveyQuestionById" parameterType="Long" resultMap="SurveyQuestionOptionsResult">
+        <include refid="selectSurveyQuestionVo"/>
+        where question_id = #{questionId}
+    </select>
+
+    <select id="selectSurveyOptionsById" parameterType="Long" resultMap="SurveyOptionsResult">
+      select option_id, option_content, question_id, option_order, create_time,remark from t_survey_options
+        where question_id = #{questionId}
+    </select>
+        
+    <insert id="insertSurveyQuestion" keyProperty="questionId" useGeneratedKeys="true"  parameterType="SurveyQuestion">
+        insert into t_survey_question
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="questionId != null">question_id,</if>
+            <if test="questionTitle != null">question_title,</if>
+            <if test="answer != null">answer,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+            <if test="paperId != null">paper_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="questionId != null">#{questionId},</if>
+            <if test="questionTitle != null">#{questionTitle},</if>
+            <if test="answer != null">#{answer},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="paperId != null">#{paperId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSurveyQuestion" parameterType="SurveyQuestion">
+        update t_survey_question
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="questionTitle != null">question_title = #{questionTitle},</if>
+            <if test="answer != null">answer = #{answer},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="paperId != null">paper_id = #{paperId},</if>
+        </trim>
+        where question_id = #{questionId}
+    </update>
+
+    <delete id="deleteSurveyQuestionById" parameterType="Long">
+        delete from t_survey_question where question_id = #{questionId}
+    </delete>
+
+    <delete id="deleteSurveyQuestionByIds" parameterType="String">
+        delete from t_survey_question where question_id in 
+        <foreach item="questionId" collection="array" open="(" separator="," close=")">
+            #{questionId}
+        </foreach>
+    </delete>
+</mapper>

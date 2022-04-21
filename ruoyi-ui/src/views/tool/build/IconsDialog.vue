@@ -1,33 +1,14 @@
 <template>
   <div class="icon-dialog">
-    <el-dialog
-      v-bind="$attrs"
-      width="980px"
-      :modal-append-to-body="false"
-      v-on="$listeners"
-      @open="onOpen"
-      @close="onClose"
-    >
+    <el-dialog v-bind="$attrs" width="980px" :modal-append-to-body="false" v-on="$listeners" @open="onOpen" @close="onClose" v-drag>
       <div slot="title">
         选择图标
-        <el-input
-          v-model="key"
-          size="mini"
-          :style="{width: '260px'}"
-          placeholder="请输入图标名称"
-          prefix-icon="el-icon-search"
-          clearable
-        />
+        <el-input v-model="key" size="mini" :style="{width: '260px'}" placeholder="请输入图标名称" prefix-icon="el-icon-search" clearable />
       </div>
       <ul class="icon-ul">
-        <li
-          v-for="icon in iconList"
-          :key="icon"
-          :class="active===icon?'active-item':''"
-          @click="onSelect(icon)"
-        >
+        <li v-for="icon in iconList" :key="icon" :class="active===icon?'active-item':''" @click="onSelect(icon)">
           <i :class="icon" />
-          <div>{{ icon }}</div>
+          <div>{{icon}}</div>
         </li>
       </ul>
     </el-dialog>
@@ -35,7 +16,6 @@
 </template>
 <script>
 import iconList from '@/utils/generator/icon.json'
-
 const originList = iconList.map(name => `el-icon-${name}`)
 
 export default {

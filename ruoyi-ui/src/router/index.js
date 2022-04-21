@@ -87,7 +87,85 @@ export const constantRoutes = [
         meta: { title: '个人中心', icon: 'user' }
       }
     ]
-  }
+  },
+  {
+    path: '/flowable',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'definition/model/',
+        component: (resolve) => require(['@/views/flowable/definition/model'], resolve),
+        name: 'Model',
+        meta: { title: '流程设计', icon: '' }
+      }
+    ]
+  },
+  {
+    path: '/flowable',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'task/start',
+        component: (resolve) => require(['@/views/flowable/task/process/StartTask'], resolve),
+        name: 'StartTask',
+        meta: { title: '发起任务', icon: '' }
+      }
+    ]
+  },
+  // {
+  //   path: '/flowable',
+  //   component: Layout,
+  //   hidden: true,
+  //   children: [
+  //     {
+  //       path: 'task/todo',
+  //       component: (resolve) => require(['@/views/flowable/task/process/TodoTask'], resolve),
+  //       name: 'Todo',
+  //       meta: { title: '执行任务', icon: '' }
+  //     }
+  //   ]
+  // },
+  {
+    path: '/flowable',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'task/process/detail',
+        component: (resolve) => require(['@/views/flowable/task/process/FlowDetail'], resolve),
+        name: 'flowDetail',
+        meta: { title: '流程详情', icon: '' }
+      }
+    ]
+  },
+  {
+    path: '/flowable',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'task/record/index',
+        component: (resolve) => require(['@/views/flowable/task/record/index'], resolve),
+        name: 'Record',
+        meta: { title: '流程处理', icon: '' }
+      }
+    ]
+  },
+  {
+    path: '/tool',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'build/index',
+        component: (resolve) => require(['@/views/tool/build/index'], resolve),
+        name: 'FormBuild',
+        meta: { title: '表单配置', icon: '' }
+      }
+    ]
+  },
 ]
 
 // 动态路由，基于用户权限动态去加载

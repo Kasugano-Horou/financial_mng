@@ -94,7 +94,7 @@
             >
             </el-date-picker>
           </el-form-item>
-          <!-- 
+          <!--
           <el-form-item label="合同开始日期" prop="contractStart">
             <el-date-picker clearable size="small"
               v-model="queryParams.contractStart"
@@ -201,7 +201,7 @@
         <el-table v-loading="loading" :data="contractList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="55" align="center" />
           <el-table-column label="合同名称" align="center" prop="contractName" />
-          <el-table-columnlabel="合同编号" align="center" prop="contractNumber" />
+          <el-table-columnlabel label="合同编号" align="center" prop="contractNumber" />
           <el-table-column label="合同状态" align="center" prop="status">
             <template slot-scope="scope">
               <dict-tag
@@ -252,7 +252,7 @@
           <el-table-column label="应收款" align="center" prop="debtors" />
           <el-table-column label="已收款" align="center" prop="receivable" />
           <el-table-column label="授权委托人" align="center" prop="principal" />
-          
+
           <el-table-column
             label="合同文件地址"
             align="center"
@@ -270,7 +270,7 @@
             prop="introduction"
           />
           <el-table-column label="备注" align="center" prop="remark" />
-          <!-- 
+          <!--
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <el-button

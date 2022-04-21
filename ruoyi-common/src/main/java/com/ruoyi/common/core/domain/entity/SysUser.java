@@ -1,7 +1,9 @@
 package com.ruoyi.common.core.domain.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.validation.constraints.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -256,6 +258,10 @@ public class SysUser extends BaseEntity
     public void setRoleIds(Long[] roleIds)
     {
         this.roleIds = roleIds;
+    }
+
+    public List<Long> getRoleIdList() {
+        return roles == null ? new ArrayList<>() : roles.stream().map(SysRole::getRoleId).collect(Collectors.toList());
     }
 
     public Long[] getPostIds()

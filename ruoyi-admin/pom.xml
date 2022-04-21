@@ -73,6 +73,13 @@
             <artifactId>ruoyi-project</artifactId>
         </dependency>
 
+        <!-- 流程模块-->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-flowable</artifactId>
+        </dependency>
+
+
     </dependencies>
 
     <build>

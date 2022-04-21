@@ -15,7 +15,7 @@ export default {
                 // 当前宽度
                 const curWidth = dragDom.offsetWidth;
                 document.onmousemove = function (e) {
-                    e.preventDefault(); // 移动时禁用默认事件
+                    e.passive = false; // 移动时禁用默认事件
                     // 通过事件委托，计算移动的距离
                     const l = e.clientX - disX;
                     dragDom.style.width = `${curWidth + l}px`;

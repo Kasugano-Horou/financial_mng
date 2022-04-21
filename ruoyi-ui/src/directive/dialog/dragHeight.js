@@ -17,7 +17,7 @@ export default {
                 const curWidth = dragDom.offsetWidth;
                 const curHeight = dragDom.offsetHeight;
                 document.onmousemove = function(e) {
-                    e.preventDefault(); // 移动时禁用默认事件
+                    e.passive = false; // 移动时禁用默认事件
                     // 通过事件委托，计算移动的距离
                     const xl = e.clientX - disX;
                     const yl = e.clientY - disY

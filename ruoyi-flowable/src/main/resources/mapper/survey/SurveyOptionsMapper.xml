@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.flowable.mapper.survey.SurveyOptionsMapper">
+    
+    <resultMap type="SurveyOptions" id="SurveyOptionsResult">
+        <result property="optionId"    column="option_id"    />
+        <result property="optionContent"    column="option_content"    />
+        <result property="questionId"    column="question_id"    />
+        <result property="optionOrder"    column="option_order"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectSurveyOptionsVo">
+        select option_id, option_content, question_id, option_order, create_by, create_time, update_by, update_time, remark from t_survey_options
+    </sql>
+
+    <select id="selectSurveyOptionsList" parameterType="SurveyOptions" resultMap="SurveyOptionsResult">
+        <include refid="selectSurveyOptionsVo"/>
+        <where>  
+            <if test="optionContent != null  and optionContent != ''"> and option_content = #{optionContent}</if>
+            <if test="questionId != null "> and question_id = #{questionId}</if>
+            <if test="optionOrder != null "> and option_order = #{optionOrder}</if>
+        </where>
+    </select>
+    
+    <select id="selectSurveyOptionsById" parameterType="Long" resultMap="SurveyOptionsResult">
+        <include refid="selectSurveyOptionsVo"/>
+        where option_id = #{optionId}
+    </select>
+        
+    <insert id="insertSurveyOptions" parameterType="SurveyOptions">
+        insert into t_survey_options
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="optionId != null">option_id,</if>
+            <if test="optionContent != null">option_content,</if>
+            <if test="questionId != null">question_id,</if>
+            <if test="optionOrder != null">option_order,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="optionId != null">#{optionId},</if>
+            <if test="optionContent != null">#{optionContent},</if>
+            <if test="questionId != null">#{questionId},</if>
+            <if test="optionOrder != null">#{optionOrder},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <insert id="insertSurveyOptionList">
+        insert into t_survey_options
+        (
+            option_content,
+            question_id,
+            option_order,
+            create_time,
+            remark
+        )
+        values
+        <foreach collection="list" item="option" open="(" close=")" separator="),(">
+                <if test="option.optionContent != null">#{option.optionContent},</if>
+                <if test="option.questionId != null">#{option.questionId},</if>
+                <if test="option.optionOrder != null">#{option.optionOrder},</if>
+                <if test="option.createTime != null">#{option.createTime},</if>
+                <if test="option.remark != null">#{option.remark}</if>
+            </foreach>
+
+    </insert>
+
+    <update id="updateSurveyOptions" parameterType="SurveyOptions">
+        update t_survey_options
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="optionContent != null">option_content = #{optionContent},</if>
+            <if test="questionId != null">question_id = #{questionId},</if>
+            <if test="optionOrder != null">option_order = #{optionOrder},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where option_id = #{optionId}
+    </update>
+
+    <delete id="deleteSurveyOptionsById" parameterType="Long">
+        delete from t_survey_options where option_id = #{optionId}
+    </delete>
+
+    <delete id="deleteSurveyOptionsByIds" parameterType="String">
+        delete from t_survey_options where option_id in 
+        <foreach item="optionId" collection="array" open="(" separator="," close=")">
+            #{optionId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteSurveyOptionsByQuestionId" parameterType="Long">
+         delete from t_survey_options where question_id = #{questionId}
+    </delete>
+</mapper>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.flowable.mapper.survey.SurveyAnswerMapper">
+    
+    <resultMap type="SurveyAnswer" id="SurveyAnswerResult">
+        <result property="answerId"    column="answer_id"    />
+        <result property="paperId"    column="paper_id"    />
+        <result property="questionId"    column="question_id"    />
+        <result property="optionId"    column="option_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="content"    column="content"    />
+    </resultMap>
+
+    <sql id="selectSurveyAnswerVo">
+        select answer_id,paper_id, question_id, option_id, user_id, create_time, content from t_survey_answer
+    </sql>
+
+    <select id="selectSurveyAnswerList" parameterType="SurveyAnswer" resultMap="SurveyAnswerResult">
+        <include refid="selectSurveyAnswerVo"/>
+        <where>  
+            <if test="questionId != null "> and question_id = #{questionId}</if>
+            <if test="paperId != null "> and paper_id = #{paperId}</if>
+            <if test="optionId != null "> and option_id = #{optionId}</if>
+            <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+        </where>
+    </select>
+    
+    <select id="selectSurveyAnswerById" parameterType="Long" resultMap="SurveyAnswerResult">
+        <include refid="selectSurveyAnswerVo"/>
+        where answer_id = #{answerId}
+    </select>
+    <select id="selectAllList" resultType="com.ruoyi.flowable.domain.survey.dto.SurveyAnswerDto">
+        SELECT
+            t1.answer_id as answerId,
+            t4.paper_title as paperTitle,
+            t5.nick_name as nickName,
+            t5.user_id as userId,
+            t1.paper_id as paperId
+        FROM
+            `t_survey_answer` t1
+            LEFT JOIN t_survey_paper t4 ON t1.paper_id = t4.id
+            LEFT JOIN sys_user t5 ON t1.user_id = t5.user_id
+            GROUP BY t1.paper_id
+            ORDER BY t1.create_time DESC
+    </select>
+
+    <select id="searchAllByUserId" resultType="com.ruoyi.flowable.domain.survey.dto.SurveyAnswerDto">
+        SELECT
+            t1.content,
+            t1.question_id as questionId,
+            t1.option_id as optionId,
+            t3.answer
+        FROM
+            `t_survey_answer` t1
+            LEFT JOIN t_survey_options t2 ON t1.option_id = t2.option_id
+            LEFT JOIN t_survey_question t3 ON t1.question_id = t3.question_id
+            LEFT JOIN t_survey_paper t4 ON t1.paper_id = t4.id
+            LEFT JOIN sys_user t5 ON t1.user_id = t5.user_id
+        where t5.user_id = #{userId}
+        order by t1.question_id
+    </select>
+
+    <insert id="insertSurveyAnswer" parameterType="SurveyAnswer">
+        insert into t_survey_answer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="answerId != null">answer_id,</if>
+            <if test="paperId != null">paper_id,</if>
+            <if test="questionId != null">question_id,</if>
+            <if test="optionId != null">option_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="content != null">content,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="answerId != null">#{answerId},</if>
+            <if test="paperId != null">#{paperId},</if>
+            <if test="questionId != null">#{questionId},</if>
+            <if test="optionId != null">#{optionId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="content != null">#{content},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSurveyAnswer" parameterType="SurveyAnswer">
+        update t_survey_answer
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="questionId != null">question_id = #{questionId},</if>
+            <if test="paperId != null">paper_id = #{paperId},</if>
+            <if test="optionId != null">option_id = #{optionId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="content != null">content = #{content},</if>
+        </trim>
+        where answer_id = #{answerId}
+    </update>
+
+    <delete id="deleteSurveyAnswerById" parameterType="Long">
+        delete from t_survey_answer where answer_id = #{answerId}
+    </delete>
+
+    <delete id="deleteSurveyAnswerByIds" parameterType="String">
+        delete from t_survey_answer where answer_id in 
+        <foreach item="answerId" collection="array" open="(" separator="," close=")">
+            #{answerId}
+        </foreach>
+    </delete>
+</mapper>

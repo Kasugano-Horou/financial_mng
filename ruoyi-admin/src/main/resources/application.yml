@@ -121,3 +121,18 @@ xss:
   excludes: /system/notice
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
+
+flowable:
+  database-schema-update: true
+
+assist4j:
+  sequence-setting:
+    innerStep: 100
+    retryTimes: 5
+    segmentCount: 1
+    maxSkipCount: 5
+    maxWaitMillis: 5000
+    ruleClassName: com.yuweix.assist4j.sequence.dao.loadbalancer.RoundRobinRule
+    tableName: sequence
+  sequence-map:
+    seqCustomer: seq_customer

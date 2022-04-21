@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.flowable.mapper.survey.SurveyPaperMapper">
+    
+    <resultMap type="SurveyPaper" id="SurveyPaperResult">
+        <result property="id"    column="id"    />
+        <result property="paperTitle"    column="paper_title"    />
+        <result property="paperPreface"    column="paper_preface"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectSurveyPaperVo">
+        select id, paper_title, paper_preface, start_time, end_time, create_by, create_time, update_by, update_time, remark from t_survey_paper
+    </sql>
+
+    <select id="selectSurveyPaperList" parameterType="SurveyPaper" resultMap="SurveyPaperResult">
+        <include refid="selectSurveyPaperVo"/>
+        <where>  
+            <if test="paperTitle != null  and paperTitle != ''"> and paper_title = #{paperTitle}</if>
+            <if test="paperPreface != null  and paperPreface != ''"> and paper_preface = #{paperPreface}</if>
+            <if test="startTime != null "> and start_time = #{startTime}</if>
+            <if test="endTime != null "> and end_time = #{endTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectSurveyPaperById" parameterType="Long" resultMap="SurveyPaperResult">
+        <include refid="selectSurveyPaperVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectPaperAll" resultMap="SurveyPaperResult">
+        <include refid="selectSurveyPaperVo"/> order by create_time desc
+    </select>
+
+    <!--查询问卷信息-->
+    <resultMap type="SurveyPaper" id="SurveyPaperQuestionResult">
+        <result property="id" column="id"/>
+        <result property="paperTitle" column="paper_title"/>
+        <result property="paperPreface" column="paper_preface"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="createTime" column="create_time"/>
+        <collection property="questions" column="id" ofType="SurveyOptions" select="selectSurveyQuestionById" />
+    </resultMap>
+
+    <!--查询问卷题目信息-->
+    <resultMap type="SurveyQuestion" id="SurveyQuestionOptionsResult">
+        <result property="questionId" column="question_id"/>
+        <result property="questionTitle" column="question_title"/>
+        <result property="answer" column="answer"/>
+        <result property="createTime" column="create_time"/>
+        <result property="remark" column="remark"/>
+        <result property="paperId" column="paper_id"/>
+        <collection property="options" column="question_Id" ofType="SurveyOptions" select="selectSurveyOptionsById" />
+    </resultMap>
+
+    <!--查询问卷题目选项信息-->
+    <resultMap type="SurveyOptions" id="SurveyOptionsResult">
+        <id property="optionId" column="option_id"/>
+        <result property="optionContent" column="option_content"/>
+        <result property="questionId" column="question_id"/>
+        <result property="optionOrder" column="option_order"/>
+        <result property="createTime" column="create_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <!--查询问卷信息-->
+    <select id="selectSurveyPaperDetail" resultMap="SurveyPaperQuestionResult">
+        select id, paper_title, paper_preface, start_time, end_time from t_survey_paper where id = #{id}
+    </select>
+
+    <!--查询问卷题目信息-->
+    <select id="selectSurveyQuestionById" parameterType="Long" resultMap="SurveyQuestionOptionsResult">
+       select question_id, question_title, answer, create_time, paper_id from t_survey_question
+        where paper_id = #{id}
+    </select>
+
+    <!--查询问卷题目选项信息-->
+    <select id="selectSurveyOptionsById" parameterType="Long" resultMap="SurveyOptionsResult">
+      select option_id, option_content, question_id, option_order, create_time,remark from t_survey_options
+        where question_id = #{questionId}
+    </select>
+
+    <insert id="insertSurveyPaper" parameterType="SurveyPaper">
+        insert into t_survey_paper
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="paperTitle != null">paper_title,</if>
+            <if test="paperPreface != null">paper_preface,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="paperTitle != null">#{paperTitle},</if>
+            <if test="paperPreface != null">#{paperPreface},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSurveyPaper" parameterType="SurveyPaper">
+        update t_survey_paper
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="paperTitle != null">paper_title = #{paperTitle},</if>
+            <if test="paperPreface != null">paper_preface = #{paperPreface},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSurveyPaperById" parameterType="Long">
+        delete from t_survey_paper where id = #{id}
+    </delete>
+
+    <delete id="deleteSurveyPaperByIds" parameterType="String">
+        delete from t_survey_paper where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
