@@ -35,6 +35,14 @@ export function getProjectCost(projectCostId) {
   })
 }
 
+// 查询项目成本列表
+export function listRate() {
+  return request({
+    url: '/financial/projectCost/rate',
+    method: 'get'
+  })
+}
+
 // 新增项目成本
 export function addProjectCost(data) {
   return request({

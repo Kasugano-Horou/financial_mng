@@ -255,6 +255,10 @@ export default {
     this.taskForm.taskId  = this.$route.query && this.$route.query.taskId;
     this.taskForm.procInsId = this.$route.query && this.$route.query.procInsId;
     this.taskForm.instanceId = this.$route.query && this.$route.query.procInsId;
+
+    console.log("taskIdtaskId");
+    console.log(this.taskForm.taskId);
+
     // 初始化表单
     this.taskForm.procDefId  = this.$route.query && this.$route.query.procDefId;
     // 回显流程记录
@@ -443,11 +447,11 @@ export default {
     /** 审批任务 */
     taskComplete() {
       if (!this.taskForm.values && this.checkSendUser){
-        this.msgError("请选择流程接收人员");
+        this.$modal.msgError("请选择流程接收人员");
         return;
       }
       if (!this.taskForm.comment){
-        this.msgError("请输入审批意见");
+        this.$modal.msgError("请输入审批意见");
         return;
       }
       complete(this.taskForm).then(response => {
@@ -526,8 +530,10 @@ export default {
     },
     /** 可退回任务列表 */
     handleReturn() {
+      console.log("可退回任务列表1");
       this.returnOpen = true;
       this.returnTitle = "退回流程";
+      console.log("可退回任务列表2");
       returnList(this.taskForm).then(res => {
         this.returnTaskList = res.data;
         this.taskForm.values = null;
@@ -535,8 +541,12 @@ export default {
     },
     /** 提交退回任务 */
    taskReturn() {
+      console.log("可退回任务列表3");
+      console.log(this.taskForm);
       this.$refs["taskForm"].validate(valid => {
         if (valid) {
+          console.log("可退回任务列表4");
+          console.log(this.taskForm);
           returnTask(this.taskForm).then(res => {
             this.$modal.msgSuccess(res.msg);
             this.goBack()

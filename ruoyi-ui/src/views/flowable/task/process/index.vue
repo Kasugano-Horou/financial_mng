@@ -24,15 +24,15 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini"
-                  @click="handleAdd" v-hasPermi="['system:deployment:add']">新增流程</el-button>
+                  @click="handleAdd" v-hasPermi="['flowable:deployment:add']">新增流程</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button type="danger" plain icon="el-icon-delete" size="mini" :disabled="multiple"
-                  @click="handleDelete" v-hasPermi="['flowable:instance:remove']">删除</el-button>
+                  @click="handleDelete" v-hasPermi="['flowable:deployment:remove']">删除</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button type="warning" plain icon="el-icon-download" size="mini"
-                  @click="handleExport" v-hasPermi="['system:deployment:export']">导出</el-button>
+                  @click="handleExport" v-hasPermi="['flowable:deployment:export']">导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -70,7 +70,7 @@
               <el-dropdown-item icon="el-icon-tickets" @click.native="handleFlowRecord(scope.row)">详情</el-dropdown-item>
               <el-dropdown-item icon="el-icon-circle-close" @click.native="handleStop(scope.row)">取消申请</el-dropdown-item>
               <el-dropdown-item icon="el-icon-delete" @click.native="handleDelete(scope.row)"
-                    v-hasPermi="['flowable:instance:remove']">删除</el-dropdown-item>
+                    v-hasPermi="['flowable:deployment:remove']">删除</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </template>

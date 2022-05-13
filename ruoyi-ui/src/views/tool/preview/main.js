@@ -12,7 +12,7 @@ const childAttrs = {
   dialog: ' width="600px" class="dialog-width" v-if="visible" :visible.sync="visible" :modal-append-to-body="false" '
 }
 
-window.addEventListener('message', init, false)
+window.addEventListener('message', init, {passive: false})
 
 function buildLinks(links) {
   let strs = ''

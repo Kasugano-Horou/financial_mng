@@ -19,7 +19,7 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button type="danger" plain icon="el-icon-delete" size="mini" :disabled="multiple"
-          @click="handleDelete" v-hasPermi="['system:deployment:remove']">删除</el-button>
+          @click="handleDelete" v-hasPermi="['flowable:todo:remove']">删除</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>

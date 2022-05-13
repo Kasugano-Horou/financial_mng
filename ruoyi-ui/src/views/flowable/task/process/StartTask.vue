@@ -13,6 +13,7 @@
           <parser :key="new Date().getTime()" :form-conf="formConf" @submit="submitForm"/>
         </div>
       </el-col>
+    
     </el-card>
 
     <!--流程图-->
@@ -47,6 +48,10 @@ export default {
 
       formConf: {}, // 默认表单数据
 
+      //数据回显
+      formData: {},
+      
+
       xmlData: "",
       taskList: []
     };
@@ -57,6 +62,10 @@ export default {
   mounted() {
     this.deployId = this.$route.query && this.$route.query.deployId;
     this.procDefId = this.$route.query && this.$route.query.procDefId;
+
+    this.formData = this.$route.query && this.$route.query.formData;
+    console.log("start process");
+    console.log(this.formData);
 
     //获取流程表单数据
     this.getFlowFrm(this.deployId);
@@ -82,10 +91,47 @@ export default {
       const params = {deployId: deployId};
       getFlowForm(params).then(res => {
         this.formConf = res.data;
+        console.log("formConf1");
+        console.log(this.formConf);
+        //数据回显
+        this.formConf.fields.map(item => {
+          var __config__ = item.__config__;
+          var __vModel__ = item.__vModel__;
+          //__config__.defaultValue = this.formData[item.__vModel__] ? this.formData[item.__vModel__] : __config__.defaultValue;
+          var data = this.formData;
+          if(item.__vModel__.indexOf(".")>0){
+            var models = item.__vModel__.split(".");
+            //遍历子对象
+            for(var i=0;i<models.length;i++){
+              var o = models[i];
+              if(data[o]==null){
+                console.log("sss");
+                data = __config__.defaultValue;
+                break;
+              }else{
+                
+                data = data[o];
+                //更改props，不然会报Error in mounted hook: "Error: please transfer a valid prop path to form item!"错
+                item.__vModel__ = o;
+
+              }
+            }
+          }else{
+            data = this.formData[item.__vModel__];
+          }
+         
+          __config__.defaultValue = data;
+          if(typeof(__config__.defaultValue) == "undefined")__config__.defaultValue=null;
+          return item
+        })
+        console.log("formConf2");
+        console.log(this.formConf);
       }).catch(res => {
         this.goBack();
       });
+
     },
+
     /** 返回页面 */
     goBack() {
       // 关闭当前标签页并返回上个页面

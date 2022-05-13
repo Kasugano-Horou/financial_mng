@@ -1,5 +1,6 @@
 package com.ruoyi.financial.service;
 
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.financial.domain.ProjectCost;
 
 import java.util.List;
@@ -69,4 +70,12 @@ public interface IProjectCostService
      * @return 结果
      */
     public int deleteProjectCostByProjectCostId(Long projectCostId);
+
+    /**
+     * 获取利润分析数据
+     *
+     * @param
+     * @return 项目成本
+     */
+    public AjaxResult selectRate();
 }

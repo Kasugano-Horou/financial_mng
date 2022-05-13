@@ -48,7 +48,7 @@ export default {
     },
     show(value) {
       if (value) {
-        document.body.addEventListener('click', this.close)
+        document.body.addEventListener('click', this.close,{passive: false})
       } else {
         document.body.removeEventListener('click', this.close)
       }

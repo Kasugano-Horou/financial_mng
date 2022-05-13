@@ -160,6 +160,7 @@ public class FlowTaskController {
     @RequestMapping(value = "/flowable/task/complete", method = POST)
     @ResponseBody
     public Response<Integer, Void> complete(@RequestBody FlowTaskVo flowTaskVo) {
+        System.out.println("shenpi审批");
         return flowTaskService.complete(flowTaskVo.getTaskId(), flowTaskVo.getInstanceId()
                 , flowTaskVo.getComment(), flowTaskVo.getValues());
     }
@@ -175,10 +176,11 @@ public class FlowTaskController {
     @ApiOperation(value = "退回任务")
     @RequestMapping(value = "/flowable/task/return", method = POST)
     @ResponseBody
-    public Response<Integer, Void> taskReturn(@RequestParam(value = "taskId", required = true) String taskId
-            , @RequestParam(value = "targetKey", required = true) String targetKey
-            , @RequestParam(value = "comment", required = true) String comment) {
-        flowTaskService.taskReturn(taskId, targetKey, comment);
+//    public Response<Integer, Void> taskReturn(@RequestParam(value = "taskId", required = true) String taskId
+//            , @RequestParam(value = "targetKey", required = true) String targetKey
+//            , @RequestParam(value = "comment", required = true) String comment) {
+    public Response<Integer, Void> taskReturn(@RequestBody FlowTaskVo flowTaskVo) {
+        flowTaskService.taskReturn(flowTaskVo.getTaskId(), flowTaskVo.getTargetKey(), flowTaskVo.getComment());
         return Response.create(HttpStatus.SUCCESS, "ok");
     }
 

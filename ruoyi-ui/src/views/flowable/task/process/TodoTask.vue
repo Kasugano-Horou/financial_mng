@@ -318,7 +318,7 @@ export default {
           this.returnOpen = true;
         } else {
           this.returnOpen = false;
-          this.msgError("当前节点不可退回");
+          this.$modal.msgError("当前节点不可退回");
         }
       }).catch(() => {
 

@@ -49,7 +49,7 @@ export default {
   watch: {},
   created() {},
   mounted() {
-    window.addEventListener('keydown', this.preventDefaultSave)
+    window.addEventListener('keydown', this.preventDefaultSave,{passive: false})
     const clipboard = new ClipboardJS('.copy-json-btn', {
       text: trigger => {
         this.$notify({
@@ -70,7 +70,7 @@ export default {
   methods: {
     preventDefaultSave(e) {
       if (e.key === 's' && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault()
+        //e.preventDefault()
       }
     },
     onOpen() {
@@ -141,4 +141,5 @@ export default {
 .json-editor{
   height: calc(100vh - 33px);
 }
+* { touch-action: pan-y; } 
 </style>

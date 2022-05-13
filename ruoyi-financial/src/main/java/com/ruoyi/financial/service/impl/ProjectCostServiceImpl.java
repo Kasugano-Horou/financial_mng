@@ -3,12 +3,10 @@ package com.ruoyi.financial.service.impl;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysEmp;
 import com.ruoyi.common.utils.DateUtils;
-import com.ruoyi.financial.domain.FinInvoice;
-import com.ruoyi.financial.domain.FinPurchase;
-import com.ruoyi.financial.domain.FinReimburse;
-import com.ruoyi.financial.domain.ProjectCost;
+import com.ruoyi.financial.domain.*;
 import com.ruoyi.financial.mapper.*;
 import com.ruoyi.financial.service.IProjectCostService;
 import com.ruoyi.project.domain.ProManhour;
@@ -46,6 +44,8 @@ public class ProjectCostServiceImpl implements IProjectCostService
     private FinInvoiceMapper finInvoiceMapper;
     @Autowired
     private FinPurchaseMapper finPurchaseMapper;
+    @Autowired
+    private FinWagesMapper finWagesMapper;
 
     //每月工作时间 365/12*5/7
     private static final String DATE = "21.75";
@@ -243,6 +243,36 @@ public class ProjectCostServiceImpl implements IProjectCostService
     public int deleteProjectCostByProjectCostId(Long projectCostId)
     {
         return projectCostMapper.deleteProjectCostByProjectCostId(projectCostId);
+    }
+
+//    /**
+//     * 查询利润走势列表
+//     *
+//     * @param
+//     * @return 项目成本
+//     */
+//    @Override
+//    public List<ProjectCost> selectRateTrend()
+//    {
+//
+//
+//        return
+//    }
+    /**
+     * 获取利润分析数据
+     *
+     * @param
+     * @return 项目成本
+     */
+    @Override
+    public AjaxResult selectRate(){
+
+        AjaxResult ajaxResult = new AjaxResult();
+        ajaxResult.put("invoiceList", finInvoiceMapper.selectFinInvoiceList(new FinInvoice()));
+        ajaxResult.put("finWagesList", finWagesMapper.selectFinWagesList(new FinWages()));
+
+
+        return ajaxResult;
     }
 
 

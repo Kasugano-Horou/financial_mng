@@ -52,9 +52,9 @@ export function returnTask(data) {
   return request({
     url: '/flowable/task/return',
     method: 'post',
-    headers: {
-      'Content-Type': "application/x-www-form-urlencoded; charset=utf-8"
-    },
+    // headers: {
+    //   'Content-Type': "application/x-www-form-urlencoded; charset=utf-8"
+    // },
     data: data
   })
 }
@@ -69,7 +69,7 @@ export function rejectTask(data) {
 }
 
 // 可退回任务列表
-export function getReturnList(query) {
+export function returnList(query) {
   return request({
     url: '/flowable/task/returnList',
     method: 'get',

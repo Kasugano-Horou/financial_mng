@@ -37,6 +37,14 @@ public interface IFinContractService
     public FinContract selectFinContractByContractNumber(String ContractNumber);
 
     /**
+     * 校验合同编号是否唯一
+     *
+     * @param finContract 合同信息
+     * @return 结果
+     */
+    public String checkFnContractNumberUnique(FinContract finContract);
+
+    /**
      * 新增合同管理
      *
      * @param finContract 合同管理

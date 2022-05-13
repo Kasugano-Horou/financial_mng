@@ -62,7 +62,7 @@ export default {
   },
   methods: {
     addEventClick() {
-      window.addEventListener('click', this.closeSidebar)
+      window.addEventListener('click', this.closeSidebar,{passive: false})
     },
     closeSidebar(evt) {
       const parent = evt.target.closest('.rightPanel')

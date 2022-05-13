@@ -61,7 +61,7 @@ export default {
     },
     visible(value) {
       if (value) {
-        document.body.addEventListener('click', this.closeMenu)
+        document.body.addEventListener('click', this.closeMenu,{passive: false})
       } else {
         document.body.removeEventListener('click', this.closeMenu)
       }

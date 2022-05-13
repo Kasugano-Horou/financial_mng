@@ -35,7 +35,7 @@
       </el-col>
       <el-col :span="1.5">
         <el-button type="warning" plain icon="el-icon-download" size="mini"
-          @click="handleExport" v-hasPermi="['system:deployment:export']">导出</el-button>
+          @click="handleExport" v-hasPermi="['flowable:deployment:export']">导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -271,7 +271,7 @@ export default {
       form: {},
       // 表单校验
       rules: {
-      }
+      },
     };
   },
   created() {
@@ -363,7 +363,7 @@ export default {
       getForm(formId).then(res =>{
         this.formTitle = "表单详情";
         this.formConfOpen = true;
-        this.formConf = JSON.parse(res.data.formContent)
+        this.formConf = JSON.parse(res.data.formContent);
       })
     },
     /** 启动流程 */

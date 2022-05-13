@@ -31,6 +31,7 @@ export default function loadMonaco(cb) {
   window.require.paths.vs = vs
 
   loadScript(`${vs}/loader.js`, () => {
+    
     window.require(['vs/editor/editor.main'], () => {
       loading.close()
       monacoEidtor = window.monaco

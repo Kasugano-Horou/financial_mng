@@ -45,7 +45,7 @@
           v-hasPermi="['project:projectCost:add']"
         >新增</el-button>
       </el-col>
-      <el-col :span="1.5">
+      <!-- <el-col :span="1.5">
         <el-button
           type="success"
           plain
@@ -55,7 +55,7 @@
           @click="handleUpdate"
           v-hasPermi="['project:projectCost:edit']"
         >修改</el-button>
-      </el-col>
+      </el-col> -->
       <el-col :span="1.5">
         <el-button
           type="danger"
@@ -104,16 +104,23 @@
       <el-table-column label="其他支出" align="center" prop="othersCost" />
       <el-table-column label="维护成本" align="center" prop="maintenanceCost" />
       <el-table-column label="税前利润" align="center" prop="preTax" />
+      <el-table-column label="最后核算时间" align="center" prop="updateTime"  width="100">
+      <template slot-scope="scope">
+              <span>{{
+                parseTime(scope.row.updateTime, "{y}-{m}-{d}")
+              }}</span>
+            </template>
+      </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button
+          <!-- <el-button
             size="mini"
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['project:projectCost:edit']"
-          >修改</el-button>
+          >修改</el-button> -->
           <el-button
             size="mini"
             type="text"

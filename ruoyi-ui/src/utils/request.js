@@ -62,6 +62,8 @@ service.interceptors.request.use(config => {
       }
     }
   }
+  // console.log("urlllllllllllllllllllllllllll");
+  // console.log(config);
   return config
 }, error => {
     console.log(error)

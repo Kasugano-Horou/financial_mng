@@ -28,6 +28,14 @@ public interface FinInvoiceMapper
      */
     public List<FinInvoice> selectFinInvoiceList(FinInvoice finInvoice);
 
+//    /**
+//     * 查询同一来源所有发票信息
+//     *
+//     * @param invoiceFrom 发票来源
+//     * @return 发票
+//     */
+//    public List<FinInvoice> selectFinInvoiceByInvoiceFrom(String invoiceFrom);
+
     /**
      * 新增发票
      * 

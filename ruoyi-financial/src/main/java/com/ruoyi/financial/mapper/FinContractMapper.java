@@ -39,6 +39,14 @@ public interface FinContractMapper {
     public FinContract selectFinContractByContractNumber(String contractNumber);
 
     /**
+     * 校验合同编号是否唯一
+     *
+     * @param finContract 合同信息
+     * @return 结果
+     */
+    public int checkFnContractNumberUnique(FinContract finContract);
+
+    /**
      * 新增合同
      *
      * @param finContract 合同

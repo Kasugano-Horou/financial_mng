@@ -117,7 +117,7 @@ export default {
       // 表单校验
       rules: {
 
-      }
+      },
     };
   },
   created() {

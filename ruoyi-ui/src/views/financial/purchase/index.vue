@@ -100,13 +100,25 @@
           v-hasPermi="['financial:purchase:export']"
         >导出</el-button>
       </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          plain
+          icon="el-icon-check"
+          size="mini"
+          :disabled="single"
+          @click="handleApproval"
+          v-hasPermi="['financial:purchase:approval']"
+          >提交申请</el-button
+        >
+      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="purchaseList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="采购ID" align="center" prop="purchaseId" />
-      <el-table-column label="项目ID" align="center" prop="projectId" />
+      <el-table-column label="项目名称" align="center" prop="project.projectName" />
       <el-table-column label="采购主题" align="center" prop="purchaseName" />
       <el-table-column label="采购类别" align="center" prop="purchaseType">
         <template slot-scope="scope">
@@ -265,12 +277,33 @@
         </el-row>
 
     </el-dialog>
+
+    <!-- 发起流程 -->
+    <el-dialog :title="approval.title" :visible.sync="approval.open" width="650px" append-to-body v-drag>
+      <el-table v-loading="processLoading" fit :data="definitionList" border>
+        <el-table-column label="流程名称" align="left" prop="name" />
+        <el-table-column label="流程版本" align="left" width="85px">
+          <template slot-scope="scope">
+            <el-tag size="medium" >v{{scope.row.version}}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="流程分类" align="left" prop="category" width="150px" />
+        <el-table-column label="操作" align="left" width="120px" class-name="small-padding fixed-width">
+          <template slot-scope="scope">
+            <el-button size="mini" type="text" icon="el-icon-edit-outline" @click="handleStartProcess(scope.row)">发起流程</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <pagination v-show="processTotal>0" :total="processTotal" :page.sync="processQueryParams.pageNo"
+            :limit.sync="processQueryParams.pageSize" @pagination="listDefinition" />
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { listPurchase, getPurchase, delPurchase, addPurchase, updatePurchase } from "@/api/financial/purchase";
 import { getToken } from "@/utils/auth";
+import {listDefinition} from "@/api/flowable/definition";
 
 export default {
   name: "Purchase",
@@ -279,6 +312,7 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      processLoading: true,
       // 选中数组
       ids: [],
       // 非单个禁用
@@ -334,7 +368,33 @@ export default {
         invoiceId: [
           { required: true, message: "发票ID不能为空", trigger: "blur" }
         ],
-      }
+      },
+      //流程列表数据
+      definitionList:[],
+      //流程总条数
+      processTotal:0,
+      // 是否显示弹出层（流程列表）
+      approval:{
+        open: false,
+        title: undefined,
+
+        purchaseId: undefined,
+        formData: {},
+      },
+      // 流程查询参数
+      processQueryParams: {
+        pageNo: 1,
+        pageSize: 10,
+        name: null,
+        category: null,
+        key: null,
+        tenantId: null,
+        deployTime: null,
+        derivedFrom: null,
+        derivedFromRoot: null,
+        parentDeploymentId: null,
+        engineVersion: null
+      },
     };
   },
   created() {
@@ -494,6 +554,44 @@ export default {
     //   a.setAttribute('href', url)
     //   a.click()
     // },
+    // 提交审批
+    handleApproval(row) {
+      this.approval.purchaseId = row.purchaseId || this.ids;
+      this.approval.open = true;
+      this.approval.title = "发起流程";
+      this.listDefinition();
+
+    },
+    //打开流程列表
+    listDefinition() {
+      this.processQueryParams.category = "purchase";
+      listDefinition(this.processQueryParams).then(resp => {
+        this.definitionList = resp.data.list;
+        this.processTotal = resp.data.size;
+        this.processLoading = false;
+        
+      });
+    },
+    /**  发起流程申请 */
+    handleStartProcess(def) {
+      console.log("purchaseId");
+      console.log(this.approval.purchaseId);
+      getPurchase(this.approval.purchaseId).then((response) => {
+        console.log(response.data);
+        this.approval.formData = response.data;
+        console.log("contract process");
+        console.log(this.approval.formData);
+        this.$router.push({path: '/flowable/task/start',
+          query: {
+            deployId: def.deploymentId,
+            procDefId: def.id,
+
+            formData: this.approval.formData,
+          }
+        });
+      });
+      this.approval.open = false;
+    },
   }
 };
 </script>

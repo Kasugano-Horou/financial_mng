@@ -20,7 +20,7 @@
         <el-button
           icon="el-icon-document"
           @click="toPage('Contract')"
-          v-hasPermi="['system:contract:list']"
+          v-hasPermi="['financial:contract:list']"
         >合同管理</el-button>
         <el-button
           icon="el-icon-box"
@@ -30,18 +30,18 @@
         <el-button
           icon="el-icon-copy-document"
           @click="toPage('ProjectInfo')"
-          v-hasPermi="['system:projectInfo:list']"
+          v-hasPermi="['project:projectInfo:list']"
         >项目管理</el-button>
         <el-button
           icon="el-icon-time"
           @click="toPage('Manhour')"
-          v-hasPermi="['system:manhour:list']"
+          v-hasPermi="['project:manhour:list']"
         >工时管理</el-button>
         
       </el-col>
     </el-row>
     <el-divider />
-    <el-row :gutter="20" >
+    <el-row :gutter="20" v-hasPermi="['financial:contract:list']">
       <el-col :span="24">
         <h1>服务指标</h1>
       </el-col>
@@ -113,7 +113,7 @@
       </el-col>
     </el-row>
     <el-divider />
-    <el-row :gutter="20">
+    <el-row :gutter="20" v-hasPermi="['financial:contract:list']">
       <el-col :span="15" class="card-box">
         <h1>利润变化趋势（单位：元）</h1>
         <el-card>
@@ -127,7 +127,7 @@
         <h1>1月利润结构分析（单位：元）</h1>
         <el-card>
           <div class="el-table el-table--enable-row-hover el-table--medium">
-            <div  style="height: 400px" />
+            <div id="rateStructure" style="height: 400px" />
           </div>
         </el-card>
       </el-col>
@@ -136,7 +136,7 @@
 </template>
 
 <script>
-import { listProjectCost } from "@/api/financial/projectCost";
+import { listProjectCost, listRate } from "@/api/financial/projectCost";
 import echarts from "echarts";
 import { getCache } from "@/api/monitor/cache";
 
@@ -171,7 +171,27 @@ export default {
         
       },
 
-       // 统计命令信息
+      //利润分析数据
+      rateDate: [],
+      //利润结构数据
+      rateStructureDate: {
+        //帐期总收入
+        generalIncome: 0.00,
+        //管理成本
+        managenmentCost: 0.00,
+        //人员成本
+        personnelCost: 0.00,
+        //采购支出
+        procurementCost: 0.00,
+        //其他支出
+        othersCost: 0.00,
+        //税前利润
+        preTax: 0.00,
+        
+      },
+
+
+      // 统计命令信息
       commandstats: null,
       // cache信息
       cache: [],
@@ -196,6 +216,7 @@ export default {
   mounted(){
     this.$nextTick(() => {
       this.showRate();
+      // this.showRateStructure();
     });
   },
   methods: {
@@ -213,14 +234,15 @@ export default {
     /** 查询所有项目成本列表 */
     getList() {
       listProjectCost(this.queryParams).then(response => {
-        this.accountProjects(response.rows);
+        this.projectCostList = response.rows;
         this.total = response.total;
+        this.accountProjects(this.projectCostList);
       });
       
     },
 
     accountProjects(rows) {
-      console.log(rows);
+      //console.log(rows);
       rows.forEach(projectCost => {
         // console.log("wwww");
         // console.log(projectCost);
@@ -240,12 +262,105 @@ export default {
       this.account.othersCost = (parseFloat(this.account.othersCost ) + 0.00).toFixed(2);
       this.account.preTax = (parseFloat(this.account.preTax ) + 0.00).toFixed(2);
     },
+
+    preChangeData(){
+      
+    },
+
+    preDataMonth(){
+      
+    },
+
+
     
     showRate(){
-      listProjectCost(this.queryParams).then(response => {
-        this.accountProjects(response.rows);
+      listRate().then(response => {
+        console.log("response");
+        console.log(response);
+        this.rateDate = response;
         this.total = response.total;
 
+
+        var invoiceList = response.invoiceList;
+        var FinWagesList = response.finWagesList;
+
+        var month = ['2021-07', '2021-08', '2021-09', '2021-10', '2021-11', '2021-12', '2022-01', '2022-02', '2022-03'];
+        var personnel_cost = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var general_income = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var procurement_cost = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var others_cost = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var pre_tax = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        
+        for(var one in invoiceList){
+
+          // console.log("one");
+          // console.log(invoiceList[one]);
+          var invoice = invoiceList[one];
+          // console.log("invoice");
+          // console.log(invoice);
+
+
+          //统计每个月的其他支出、采购支出、合同收入
+          for(var i=0; i<month.length; i++){
+            
+            if(invoice.invoiceDate != null && invoice.invoiceDate.substring(0,7) == month[i]){
+              console.log("substring:"+invoice.invoiceDate.substring(0,7));
+              console.log("invoice.invoiceFrom:"+invoice.invoiceFrom );
+              if(invoice.invoiceFrom == '2'){
+                console.log("2"+invoice.total);
+                others_cost[i] += invoice.total;
+              }else if(invoice.invoiceFrom == '3'){
+                console.log("3"+invoice.total);
+                procurement_cost[i] += invoice.total;
+              }else if(invoice.invoiceFrom == '4'){
+                console.log("4"+invoice.total);
+                general_income[i] += invoice.pricePlusArabic;
+              }
+            }
+
+            //获取最后一个月的其他支出、采购支出、合同收入
+            if(i==month.length-1){
+              this.rateStructureDate.generalIncome = general_income[i];
+              this.rateStructureDate.procurementCost = procurement_cost[i];
+              this.rateStructureDate.othersCost = others_cost[i];
+            }
+          }
+        }
+
+        //统计每个月的人员成本（工资）
+        for(var one in FinWagesList){
+          var finWage = FinWagesList[one];
+          for(var i=0; i<month.length; i++){
+            console.log("issuingDate");
+            console.log(finWage.issuingDate);
+            console.log("month");
+            console.log(month[i]);
+            if(finWage.issuingDate == month[i]){
+              console.log(finWage.finalWage);
+              personnel_cost[i] += finWage.finalWage;
+
+              //
+            }
+            //获取最后一个月的人员成本
+            if(i==month.length-1){
+              this.rateStructureDate.personnelCost = personnel_cost[i];
+            }
+          }
+        }
+
+        console.log('preTax');
+        console.log(this.account.preTax);
+          
+        console.log("personnel_cost");
+        console.log(personnel_cost);
+        console.log("general_income");
+        console.log(general_income);
+        console.log("procurement_cost");
+        console.log(procurement_cost);
+        console.log("others_cost");
+        console.log(others_cost);
+        console.log("pre_tax");
+        console.log(pre_tax);
         var chartDom = document.getElementById('rate');
         var myChart = echarts.init(chartDom);
         var option;
@@ -258,7 +373,7 @@ export default {
             trigger: 'axis'
           },
           legend: {
-            data: ['收入', '成本', '利润', '费用']
+            data: ['账期总收入', '人员成本', '采购支出', '其他支出', '税前利润']
           },
           grid: {
             left: '3%',
@@ -281,42 +396,107 @@ export default {
           },
           series: [
             {
-                name: '收入',
+                name: '账期总收入',
                 type: 'line',
-                stack: '总量',
-                data: [120, 132, 101, 134, 90, 230, 210]
+                stack: 'general_income',
+                data: general_income
             },
             {
-                name: '成本',
+                name: '人员成本',
                 type: 'line',
-                stack: '总量',
-                data: [220, 182, 191, 234, 290, 330, 310]
+                stack: 'personnel_cost',
+                data: personnel_cost
             },
             {
-                name: '利润',
+                name: '采购支出',
                 type: 'line',
-                stack: '总量',
-                data: [150, 232, 201, 154, 190, 330, 410]
+                stack: 'procurement_cost',
+                data: procurement_cost
             },
             {
-                name: '费用',
+                name: '其他支出',
                 type: 'line',
-                stack: '总量',
-                data: [320, 332, 301, 334, 390, 330, 320]
+                stack: 'others_cost',
+                data: others_cost
+            },
+            {
+                name: '税前利润',
+                type: 'line',
+                stack: 'pre_tax',
+                data: pre_tax
             },
           ]
         };
-
         option && myChart.setOption(option);
+        this.showRateStructure();
       });
+    },
+
+
+    showRateStructure(){
+      // listRateStuMonth().then(response => {
+
+
+
+      // })
 
       
+
+
+
+
+
+
+      var chartDom = document.getElementById('rateStructure');
+      var myChart = echarts.init(chartDom);
+      var option;
+      console.log('preTax');
+      console.log(this.account.preTax);
+
+      option = {
+        title: {
+            text: '',
+            // subtext: '纯属虚构',
+            left: 'center'
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b} : {c} ({d}%)'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left',
+            data: ['账期总收入', '人员成本', '采购支出', '其他支出', '税前利润']
+        },
+        series: [
+          {
+            name: '访问来源',
+            type: 'pie',
+            radius: '55%',
+            center: ['50%', '50%'],
+            data: [
+              {value: this.rateStructureDate.generalIncome, name: '账期总收入'},
+              {value: this.rateStructureDate.personnelCost, name: '人员成本'},
+              {value: this.rateStructureDate.procurementCost, name: '采购支出'},
+              {value: this.rateStructureDate.othersCost, name: '其他支出'},
+              {value: this.rateStructureDate.preTax, name: '税前利润'}
+            ],
+            emphasis: {
+              itemStyle: {
+                  shadowBlur: 10,
+                  shadowOffsetX: 0,
+                  shadowColor: 'rgba(0, 0, 0, 0.5)'
+              }
+            }
+          }
+        ]
+      };
+      option && myChart.setOption(option);
+
+
+
+
     }
-
-
-
-
-
   },
 };
 

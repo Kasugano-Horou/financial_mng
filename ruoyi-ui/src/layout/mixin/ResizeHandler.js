@@ -12,7 +12,7 @@ export default {
     }
   },
   beforeMount() {
-    window.addEventListener('resize', this.$_resizeHandler)
+    window.addEventListener('resize', this.$_resizeHandler,{passive: false})
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.$_resizeHandler)

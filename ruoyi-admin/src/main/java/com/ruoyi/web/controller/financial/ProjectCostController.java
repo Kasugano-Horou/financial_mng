@@ -45,6 +45,18 @@ public class ProjectCostController extends BaseController
         return toAjax(projectCostService.accountProjectCostByProjectIds(projectIds));
     }
 
+    /**
+     * 获取利润分析数据
+     */
+    @PreAuthorize("@ss.hasPermi('financial:projectCost:account')")
+    @Log(title = "项目成本", businessType = BusinessType.OTHER)
+    @GetMapping("/rate")
+    public AjaxResult rate()
+    {
+        AjaxResult ajaxResult = projectCostService.selectRate();
+        return ajaxResult;
+    }
+
 
     /**
      * 查询项目成本列表

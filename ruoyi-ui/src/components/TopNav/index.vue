@@ -107,7 +107,7 @@ export default {
     },
   },
   beforeMount() {
-    window.addEventListener('resize', this.setVisibleNumber)
+    window.addEventListener('resize', this.setVisibleNumber,{passive: false})
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.setVisibleNumber)

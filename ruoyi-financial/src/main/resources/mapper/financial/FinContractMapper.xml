@@ -107,10 +107,14 @@
 		where c.contract_number = #{contractNumber}
 	</select>
 
+	<select id="checkFnContractNumberUnique" parameterType="String" resultType="int">
+		select count(1) from fin_contract where contract_number = #{contractNumber} limit 1
+	</select>
+
 	<insert id="insertFinContract" parameterType="FinContract">
 		insert into fin_contract
 		<trim prefix="(" suffix=")" suffixOverrides=",">
-			<if test="contractId != null and contractId !=''">contract_id,</if>
+<!--			<if test="contractId != null and contractId !=''">contract_id,</if>-->
 			<if test="contractName != null and contractName != ''">contract_name,</if>
 			<if test="contractNumber != null and contractNumber != ''">contract_number,</if>
 			<if test="contractDate != null">contract_date,</if>
@@ -175,7 +179,7 @@
 			<if test="updateBy != null">update_by = #{updateBy},</if>
 			update_time = sysdate()
 		</trim>
-		where contract_id = #{contractId}
+		where contract_id = #{contractId} or contract_number = #{contractNumber}
 	</update>
 
 	<update id="updateFinContractStatus" parameterType="FinContract">

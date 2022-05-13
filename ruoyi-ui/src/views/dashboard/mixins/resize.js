@@ -37,7 +37,7 @@ export default {
       this.$_resizeHandler = debounce(() => {
         this.resize()
       }, 100)
-      window.addEventListener('resize', this.$_resizeHandler)
+      window.addEventListener('resize', this.$_resizeHandler,{passive: false})
 
       this.$_sidebarElm = document.getElementsByClassName('sidebar-container')[0]
       this.$_sidebarElm && this.$_sidebarElm.addEventListener('transitionend', this.$_sidebarResizeHandler)

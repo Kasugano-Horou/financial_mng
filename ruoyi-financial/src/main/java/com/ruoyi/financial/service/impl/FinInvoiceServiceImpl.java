@@ -67,6 +67,18 @@ public class FinInvoiceServiceImpl implements IFinInvoiceService
         return finInvoiceList;
     }
 
+//    /**
+//     * 查询同一来源所有发票信息
+//     *
+//     * @param invoiceFrom 发票来源
+//     * @return 发票
+//     */
+//    @Override
+//    public List<FinInvoice> selectFinInvoiceByInvoiceFrom(String invoiceFrom)
+//    {
+//        return finInvoiceMapper.selectFinInvoiceByInvoiceFrom(invoiceFrom);
+//    }
+
     /**
      * 新增发票
      * 

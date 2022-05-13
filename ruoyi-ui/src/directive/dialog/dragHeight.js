@@ -28,7 +28,7 @@ export default {
                     document.onmousemove = null;
                     document.onmouseup = null;
                 };
-            }, false);
+            },{passive: false});
         dragDom.appendChild(lineEl);
     }
 }

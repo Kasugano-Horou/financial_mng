@@ -261,7 +261,7 @@ export default {
     handleGenTable(row) {
       const tableNames = row.tableName || this.tableNames;
       if (tableNames == "") {
-        this.msgError("请选择要生成的数据");
+        this.$modal.msgError("请选择要生成的数据");
         return;
       }
       if(row.genType === "1") {

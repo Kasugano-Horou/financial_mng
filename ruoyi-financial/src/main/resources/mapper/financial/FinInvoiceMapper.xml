@@ -91,6 +91,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where i.invoice_id = #{invoiceId}
     </select>
 
+<!--    <select id="selectFinInvoiceByInvoiceFrom" parameterType="String" resultMap="FinInvoiceResult">-->
+<!--        <include refid="selectFinInvoiceVo"/>-->
+<!--        where i.invoice_from = #{invoiceFrom}-->
+<!--    </select>-->
+
     <insert id="insertFinInvoiceFile">
         insert into sys_invoice_file(invoice_id, file_id) values (#{invoiceId}, #{fileId})
     </insert>

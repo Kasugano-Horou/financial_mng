@@ -198,7 +198,7 @@ export default {
             }
           });
         } else {
-          this.msgError("表单校验未通过，请重新检查提交内容");
+          this.$modal.msgError("表单校验未通过，请重新检查提交内容");
         }
       });
     },

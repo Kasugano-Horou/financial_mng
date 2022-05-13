@@ -2,7 +2,9 @@ package com.ruoyi.web.controller.financial;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +66,7 @@ public class FinContractController extends BaseController
         util.exportExcel(response, list, "合同管理数据");
     }
 
-    @Log(title = "用户管理", businessType = BusinessType.IMPORT)
+    @Log(title = "合同管理", businessType = BusinessType.IMPORT)
     @PreAuthorize("@ss.hasPermi('financial:contract:import')")
     @PostMapping("/importData")
     public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception
@@ -80,7 +82,7 @@ public class FinContractController extends BaseController
     public void importTemplate(HttpServletResponse response)
     {
         ExcelUtil<FinContract> util = new ExcelUtil<FinContract>(FinContract.class);
-        util.importTemplateExcel(response, "用户数据");
+        util.importTemplateExcel(response, "合同数据");
     }
 
     /**
@@ -101,6 +103,11 @@ public class FinContractController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody FinContract finContract)
     {
+        if (UserConstants.NOT_UNIQUE.equals(finContractService.checkFnContractNumberUnique(finContract)))
+        {
+            return AjaxResult.error("新增角色'" + finContract.getContractNumber() + "'失败，合同编号已存在");
+        }
+        finContract.setCreateBy(getUsername());
         return toAjax(finContractService.insertFinContract(finContract));
     }
 
@@ -129,12 +136,29 @@ public class FinContractController extends BaseController
     /**
      * 状态修改
      */
-    @PreAuthorize("@ss.hasPermi('financial:contract:edit')")
-    @Log(title = "合同管理", businessType = BusinessType.UPDATE)
+    //@PreAuthorize("@ss.hasPermi('financial:contract:edit')")
+    //@Log(title = "合同管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
-    public AjaxResult changeStatus(@RequestBody FinContract contract)
+    public AjaxResult changeStatus(@RequestBody FinContract finContract)
     {
-        return null;
+        System.out.println("changeStatus changeStatus");
+        System.out.println(finContract);
+        //finContract.setStatus("3");
+        return toAjax(finContractService.updateFinContract(finContract));
+    }
+
+    /**
+     * 状态修改
+     */
+    //@PreAuthorize("@ss.hasPermi('financial:contract:edit')")
+    //@Log(title = "合同管理", businessType = BusinessType.UPDATE)
+    @GetMapping("/test")
+    public String test()
+    {
+        System.out.println("changeStatus changeStatus");
+        System.out.println();
+        //finContract.setStatus("3");
+        return "wwww";
     }
 
 

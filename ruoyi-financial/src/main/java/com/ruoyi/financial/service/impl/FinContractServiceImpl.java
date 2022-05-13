@@ -2,6 +2,8 @@ package com.ruoyi.financial.service.impl;
 
 
 import com.ruoyi.common.annotation.DataScope;
+import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
@@ -63,6 +65,9 @@ public class FinContractServiceImpl implements IFinContractService
     @Override
     public List<FinContract> selectFinContractList(FinContract finContract)
     {
+        System.out.println("finContract.getContractDate()");
+        System.out.println(finContract);
+        System.out.println(finContract.getContractDate());
         return finContractMapper.selectFinContractList(finContract);
     }
 
@@ -76,6 +81,23 @@ public class FinContractServiceImpl implements IFinContractService
     public FinContract selectFinContractByContractNumber(String contractNumber)
     {
         return finContractMapper.selectFinContractByContractNumber(contractNumber);
+    }
+
+    /**
+     * 校验合同编号是否唯一
+     *
+     * @param finContract 合同信息
+     * @return 结果
+     */
+    @Override
+    public String checkFnContractNumberUnique(FinContract finContract)
+    {
+        int count = finContractMapper.checkFnContractNumberUnique(finContract);
+        if (count > 0)
+        {
+            return UserConstants.NOT_UNIQUE;
+        }
+        return UserConstants.UNIQUE;
     }
 
     /**
@@ -164,6 +186,9 @@ public class FinContractServiceImpl implements IFinContractService
             {
                 // 验证是否存在这个合同
                 FinContract f = finContractMapper.selectFinContractByContractNumber(finContract.getContractNumber());
+                System.out.println("fffff");
+                System.out.println(finContract.getContractNumber());
+
                 if (StringUtils.isNull(f))
                 {
                     BeanValidators.validateWithException(validator, finContract);
@@ -174,22 +199,25 @@ public class FinContractServiceImpl implements IFinContractService
                 }
                 else if (isUpdateSupport)
                 {
+                    System.out.println("fffffffffffff");
+                    System.out.println(f.getContractNumber());
+                    System.out.println(f);
                     BeanValidators.validateWithException(validator, finContract);
                     finContract.setUpdateBy(operName);
                     this.updateFinContract(finContract);
                     successNum++;
-                    successMsg.append("<br/>" + successNum + "、账号 " + finContract.getContractName() + " 更新成功");
+                    successMsg.append("<br/>" + successNum + "、合同 " + finContract.getContractName() + " 更新成功");
                 }
                 else
                 {
                     failureNum++;
-                    failureMsg.append("<br/>" + failureNum + "、账号 " + finContract.getContractName() + " 已存在");
+                    failureMsg.append("<br/>" + failureNum + "、合同 " + finContract.getContractName() + " 已存在");
                 }
             }
             catch (Exception e)
             {
                 failureNum++;
-                String msg = "<br/>" + failureNum + "、账号 " + finContract.getContractName() + " 导入失败：";
+                String msg = "<br/>" + failureNum + "、合同 " + finContract.getContractName() + " 导入失败：";
                 failureMsg.append(msg + e.getMessage());
                 log.error(msg, e);
             }

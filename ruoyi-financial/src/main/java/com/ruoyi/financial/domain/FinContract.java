@@ -25,7 +25,7 @@ public class FinContract extends BaseEntity
     private static final long serialVersionUID = 1L;
 
     /** 合同编号 */
-    @Excel(name = "合同ID", cellType = ColumnType.NUMERIC, prompt = "合同ID")
+    @Excel(name = "合同ID", cellType = ColumnType.NUMERIC, prompt = "合同ID", type = Type.EXPORT)
     private Long contractId;
 
     /** 合同名称 */

@@ -23,6 +23,7 @@ import com.ruoyi.flowable.factory.FlowServiceFactory;
 import com.ruoyi.flowable.flow.CustomProcessDiagramGenerator;
 import com.ruoyi.flowable.flow.FindNextNodeUtil;
 import com.ruoyi.flowable.flow.FlowableUtils;
+import com.ruoyi.flowable.listener.TaskBusinessCallListener;
 import com.ruoyi.flowable.service.IFlowTaskService;
 import com.ruoyi.flowable.service.ISysDeployFormService;
 import com.ruoyi.system.service.ISysRoleService;
@@ -84,6 +85,8 @@ public class FlowTaskServiceImpl extends FlowServiceFactory implements IFlowTask
     @Resource
     private ISysDeployFormService sysInstanceFormService;
 
+    private  TaskBusinessCallListener taskBusinessCallListener;
+
     /**
      * 完成任务
      */
@@ -91,6 +94,39 @@ public class FlowTaskServiceImpl extends FlowServiceFactory implements IFlowTask
     @Override
     public com.yuweix.assist4j.core.Response<Integer, Void> complete(String taskId, String procInsId, String comment, Map<String, Object> variables) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+
+        String processInstanceId = task.getProcessInstanceId();
+        Map<String, Object> paramMap = new HashMap<>();
+        Map<String, Object> processParamMap = runtimeService.getVariables(processInstanceId);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+//            paramMap.put("businessKey", processInstance.getBusinessKey());
+        //paramMap.put("", processInstance.getBusinessKey());
+        System.out.println("processInstance:" + processInstance);
+        System.out.println("processParamMap:" + processParamMap);
+        System.out.println("processParamMap.get(contractId):" + processParamMap.get("contractId"));
+        String restUrlStr = null, paramsStr = null, formKeyNameStr = null;
+//        if (restUrl != null) {
+//            restUrlStr = restUrl.getExpressionText();
+//        }
+//        if (params != null) {
+//            paramsStr = params.getExpressionText();
+//        }
+//        if (formKeyName != null) {
+//            formKeyNameStr = formKeyName.getExpressionText();
+//        }
+//        System.out.println("restUrlStr::"+restUrlStr+",,,paramsStr::"+paramsStr+",,,formKeyName"+formKeyNameStr);
+        //执行回调
+//        //TODO 临时处理
+//        restUrlStr = "http://localhost:8080/financial/contract/changeStatus";
+//        paramsStr = "status:3;contractId:1";
+
+        //taskBusinessCallListener.callBack(processInstanceId, restUrlStr, paramsStr, formKeyNameStr);
+
+
+
+
+
+
         if (Objects.isNull(task)) {
             return new com.yuweix.assist4j.core.Response<>(HttpStatus.ERROR, "任务不存在");
         }
@@ -102,6 +138,7 @@ public class FlowTaskServiceImpl extends FlowServiceFactory implements IFlowTask
             Long userId = SecurityUtils.getLoginUser().getUser().getUserId();
             taskService.setAssignee(taskId, userId.toString());
             taskService.complete(taskId, variables);
+
         }
         return new com.yuweix.assist4j.core.Response<>(HttpStatus.SUCCESS, "操作成功");
     }
