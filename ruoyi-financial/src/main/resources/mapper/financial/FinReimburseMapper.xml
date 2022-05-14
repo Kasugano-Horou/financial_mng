@@ -66,7 +66,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             left join sys_dept d on d.dept_id = r.dept_id
             left join sys_emp e on e.emp_id = r.hand_by
             left join pro_project p on p.project_id = r.project_id
-            left join sys_invoice_file sif on sif.invoice_id = r.invoice_id
+            left join (select a.* from sys_invoice_file a where file_id = ( select MAX(file_id) from sys_invoice_file where invoice_id = a.invoice_id)) sif on sif.invoice_id = r.invoice_id
             left join sys_file_info sfi on sif.file_id = sfi.file_id
 
     </sql>

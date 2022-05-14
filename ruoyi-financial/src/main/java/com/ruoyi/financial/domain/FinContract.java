@@ -6,6 +6,7 @@ import javax.validation.constraints.*;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.core.domain.entity.SysDept;
+import com.ruoyi.common.core.domain.entity.SysFileInfo;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
@@ -101,6 +102,8 @@ public class FinContract extends BaseEntity
     })
     private SysDept dept;
 
+    /** 文件对象 */
+    private SysFileInfo sysFileInfo;
 
     public FinContract() { }    public FinContract(Long contractId) { this.contractId=contractId; }
     public Long getContractId() { return contractId; }
@@ -148,6 +151,10 @@ public class FinContract extends BaseEntity
     }
     public SysDept getDept() { return dept; }
     public void setDept(SysDept dept) { this.dept = dept; }
+    public void setSysFileInfo(SysFileInfo sysFileInfo) {
+        this.sysFileInfo = sysFileInfo;
+    }
+    public SysFileInfo getSysFileInfo() { return this.sysFileInfo; }
 
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -174,6 +181,7 @@ public class FinContract extends BaseEntity
         .append("updateTime", getUpdateTime())
         .append("remark", getRemark())
         .append("dept", getDept())
+        .append("sysFileInfo", getSysFileInfo())
         .toString();
     }
 }

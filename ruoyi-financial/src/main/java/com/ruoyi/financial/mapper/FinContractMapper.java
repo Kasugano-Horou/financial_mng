@@ -1,6 +1,8 @@
 package com.ruoyi.financial.mapper;
 
 import com.ruoyi.financial.domain.FinContract;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -87,4 +89,13 @@ public interface FinContractMapper {
      * @return 结果
      */
     public int deleteFinContractByContractIds(Long[] contractIds);
+
+    /**
+     * 添加合同文件
+     *
+     * @param contractId 合同主键
+     * @param fileId 文件主键
+     * @retyrn
+     */
+    public int insertFinContractFile(@Param("contractId") Long contractId, @Param("fileId")  Long fileId);
 }

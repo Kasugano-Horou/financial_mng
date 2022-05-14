@@ -93,4 +93,13 @@ public interface IFinContractService
      * @return 结果
      */
     public String importFinContract(List<FinContract> finContractList, Boolean isUpdateSupport, String operName);
+
+    /**
+     * 合同文件上传
+     *
+     * @param contractId 合同主键
+     * @param fileName 文件名字
+     * @return 结果
+     */
+    public int addContractFile(Long contractId, String fileName);
 }

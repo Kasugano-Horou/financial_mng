@@ -121,7 +121,7 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="reimburseList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="reimburseList" @selection-change="handleSelectionChange" @select="handleSelection">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="报销单号" align="center" prop="reimburseNumber" />
       <el-table-column label="报销部门" align="center" prop="dept.deptName" />
@@ -161,9 +161,9 @@
           <el-button
             size="mini"
             type="text"
-            icon="el-icon-edit"
+            icon="el-icon-upload2"
             @click="handleUpload(scope.row)"
-            v-hasPermi="['financial:reimburse:edit']"
+            v-hasPermi="['financial:reimburse:upload']"
           >上传发票</el-button>
           <el-button
             size="mini"
@@ -261,34 +261,34 @@
 
     <!-- 上传发票对话框 -->
     <el-dialog :title="uploadTitle" :visible.sync="uploadOpen" width="500px" append-to-body>
-        <el-row>
-          <el-col :span="24">
-              <el-upload
-                ref="upload"
-                :limit="1"
-                accept=".jpg, .png"
-                :data="upload.uploadData"
-                :action="upload.url"
-                :headers="upload.headers"
-                :file-list="upload.fileList"
-                :on-progress="handleFileUploadProgress"
-                :on-success="handleFileSuccess"
-                :auto-upload="false">
-                <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-                <el-button style="margin-left: 10px;" size="small" type="success" :loading="upload.isUploading" @click="submitUpload">确认上传</el-button>
-                <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-              </el-upload>
+      <el-row>
+        <el-col :span="24">
+            <el-upload
+              ref="upload"
+              :limit="1"
+              accept=".jpg, .png"
+              :data="upload.uploadData"
+              :action="upload.url"
+              :headers="upload.headers"
+              :file-list="upload.fileList"
+              :on-progress="handleFileUploadProgress"
+              :on-success="handleFileSuccess"
+              :auto-upload="false">
+              <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+              <el-button style="margin-left: 10px;" size="small" type="success" :loading="upload.isUploading" @click="submitUpload">确认上传</el-button>
+              <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+            </el-upload>
 
-              <!-- <el-button
-                size="mini"
-                type="text"
-                icon="el-icon-edit"
-                @click="handleDownload()"
-              >下载</el-button> -->
-              <!-- <el-input v-model="form.annex" placeholder="请输入附件" /> -->
+            <!-- <el-button
+              size="mini"
+              type="text"
+              icon="el-icon-edit"
+              @click="handleDownload()"
+            >下载</el-button> -->
+            <!-- <el-input v-model="form.annex" placeholder="请输入附件" /> -->
 
-          </el-col>
-        </el-row>
+        </el-col>
+      </el-row>
 
     </el-dialog>
 
@@ -334,6 +334,8 @@ export default {
       processLoading: true,
       // 选中数组
       ids: [],
+      // 最后选中数据
+      selection: undefined,
       // 非单个禁用
       single: true,
       // 非多个禁用
@@ -359,9 +361,9 @@ export default {
         // 是否禁用上传
         isUploading: false,
               // 上传的附加数据
-      uploadData:{
-        reimburseId: undefined,
-      },
+        uploadData:{
+          reimburseId: undefined,
+        },
         // 设置上传的请求头部
         headers: { Authorization: "Bearer " + getToken() },
         // 上传的地址
@@ -497,10 +499,16 @@ export default {
       this.handleQuery();
     },
     // 多选框选中数据
-    handleSelectionChange(selection) {
+    handleSelectionChange(selection, row) {
       this.ids = selection.map(item => item.reimburseId)
       this.single = selection.length!==1
       this.multiple = !selection.length
+    },
+    // 最后选中数据
+    handleSelection(selection, row) {
+      console.log('rowrow');
+      console.log(row);
+      this.selection = row
     },
     /** 新增按钮操作 */
     handleAdd() {
@@ -604,13 +612,19 @@ export default {
       a.setAttribute('href', url)
       a.click()
     },
+
     // 提交审批
     handleApproval(row) {
-      this.approval.reimburseId = row.reimburseId || this.ids;
-      this.approval.open = true;
-      this.approval.title = "发起流程";
-      this.listDefinition();
-
+      if(this.selection.status == '2'){
+        this.approval.reimburseId = row.reimburseId || this.ids;
+        this.approval.open = true;
+        this.approval.title = "发起流程";
+        this.listDefinition();
+      }else if(this.selection.status == '1'){
+        this.$modal.msgWarning("请先上传发票！");
+      }else{
+        this.$modal.msgWarning("此报销信息处于不能提交审核的状态！");
+      }
     },
     //打开流程列表
     listDefinition() {

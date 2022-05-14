@@ -28,6 +28,7 @@
 		<result property="updateBy"     column="update_by"    />
 		<result property="updateTime"   column="update_time"  />
 		<association property="dept"    column="dept_id" javaType="SysDept" resultMap="deptResult" />
+		<association property="sysFileInfo"    column="file_id" javaType="SysFileInfo" resultMap="fileInfoResult" />
 	</resultMap>
 
 	<resultMap id="deptResult" type="SysDept">
@@ -39,19 +40,25 @@
 		<result property="status"   column="dept_status" />
 	</resultMap>
 
+	<resultMap id="fileInfoResult" type="SysFileInfo">
+		<id     property="fileId"   column="file_id"     />
+		<result property="fileName" column="file_name"   />
+		<result property="filePath"   column="file_path"      />
+	</resultMap>
+
 
 	<sql id="selectFinContractVo">
 		select c.contract_id, c.contract_name, c.contract_number, c.contract_date, c.contract_start, c.contract_end, c.contract_type, c.debtors, c.receivable, c.principal, c.dept_id, c.opposite_party_unit, c.file_address, c.status, c.contract_location, c.introduction, c.remark, c.del_flag, c.create_by, c.create_time, c.update_by, c.update_time,
-			   d.dept_id, d.parent_id, d.dept_name, d.order_num, d.leader, d.status as dept_status
+			   d.dept_id, d.parent_id, d.dept_name, d.order_num, d.leader, d.status as dept_status,
+			   sfi.file_name, sfi.file_path
 		from fin_contract c
 			left join sys_dept d on c.dept_id = d.dept_id
+			left join (select a.* from sys_contract_file a where file_id = ( select MAX(file_id) from sys_contract_file where contract_id = a.contract_id)) scf on scf.contract_id = c.contract_id
+			left join sys_file_info sfi on scf.file_id = sfi.file_id
 	</sql>
 
 	<select id="selectFinContractList" parameterType="FinContract" resultMap="FinContractResult">
-		select c.contract_id, c.contract_name, c.contract_number, c.contract_date, c.contract_start, c.contract_end, c.contract_type, c.debtors, c.receivable, c.principal, c.dept_id, c.opposite_party_unit, c.file_address, c.status, c.contract_location, c.introduction, c.remark, c.del_flag, c.create_by, c.create_time, c.update_by, c.update_time,
-			d.dept_name, d.leader
-		from fin_contract c
-		left join sys_dept d on c.dept_id = d.dept_id
+		<include refid="selectFinContractVo"/>
 		where c.del_flag = '0'
 		<if test="contractId != null and contractId != 0">
 			AND c.contract_id = #{contractId}
@@ -110,6 +117,10 @@
 	<select id="checkFnContractNumberUnique" parameterType="String" resultType="int">
 		select count(1) from fin_contract where contract_number = #{contractNumber} limit 1
 	</select>
+
+	<insert id="insertFinContractFile">
+		insert into sys_contract_file(contract_id, file_id) values (#{contractId}, #{fileId})
+	</insert>
 
 	<insert id="insertFinContract" parameterType="FinContract">
 		insert into fin_contract

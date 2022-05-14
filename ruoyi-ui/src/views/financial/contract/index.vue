@@ -206,6 +206,28 @@
             <el-button
               type="primary"
               plain
+              icon="el-icon-upload2"
+              size="mini"
+              :disabled="single"
+              @click="handleFileUpload"
+              v-hasPermi="['financial:reimburse:upload']"
+            >上传合同文件</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button
+              type="primary"
+              plain
+              icon="el-icon-download"
+              size="mini"
+              :disabled="single"
+              @click="handleDownload"
+              v-hasPermi="['financial:reimburse:download']"
+            >下载合同文件</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button
+              type="primary"
+              plain
               icon="el-icon-check"
               size="mini"
               :disabled="single"
@@ -220,10 +242,10 @@
           ></right-toolbar>
         </el-row>
 
-        <el-table v-loading="loading" :data="contractList" @selection-change="handleSelectionChange">
+        <el-table v-loading="loading" :data="contractList" @selection-change="handleSelectionChange" @select="handleSelection">
           <el-table-column type="selection" width="55" align="center" />
           <el-table-column label="合同名称" align="center" prop="contractName" width="280" />
-          <el-table-column label="合同编号" align="center" prop="contractNumber" width="120" />
+          <el-table-column label="合同编号" align="center" prop="contractNumber" width="160" />
           <el-table-column label="合同状态" align="center" prop="status" width="120">
             <template slot-scope="scope">
               <dict-tag
@@ -483,8 +505,8 @@
         :headers="upload.headers"
         :action="upload.url + '?updateSupport=' + upload.updateSupport"
         :disabled="upload.isUploading"
-        :on-progress="handleFileUploadProgress"
-        :on-success="handleFileSuccess"
+        :on-progress="handleUploadProgress"
+        :on-success="handleSuccess"
         :auto-upload="false"
         drag
       >
@@ -499,10 +521,38 @@
         </div>
       </el-upload>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitFileForm">确 定</el-button>
+        <el-button type="primary" @click="submitImportForm">确 定</el-button>
         <el-button @click="upload.open = false">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 上传合同对话框 -->
+    <el-dialog :title="fileUpload.title" :visible.sync="fileUpload.open" width="400px" append-to-body>
+      <el-upload
+        ref="upload"
+        :limit="1"
+        accept=".docx, .doc, .zip, .rar"
+        :headers="fileUpload.headers"
+        :action="fileUpload.url + '?contractId=' + fileUpload.contractId"
+        :disabled="fileUpload.isUploading"
+        :on-progress="handleFileUploadProgress"
+        :on-success="handleFileSuccess"
+        :auto-upload="false"
+        drag
+      >
+        <i class="el-icon-upload"></i>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        <div class="el-upload__tip text-center" slot="tip">
+          <span>仅允许导入docx、doc、zip、rar格式文件。</span>
+        </div>
+      </el-upload>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitFileUpload">确 定</el-button>
+        <el-button @click="fileUpload.open = false">取 消</el-button>
+      </div>
+    </el-dialog>
+
+    
 
     <!-- 发起流程 -->
     <el-dialog :title="approval.title" :visible.sync="approval.open" width="650px" append-to-body v-drag>
@@ -551,6 +601,8 @@ export default {
       processLoading: true,
       // 选中数组
       ids: [],
+      // 最后选中数据
+      selection: undefined,
       // 非单个禁用
       single: true,
       // 非多个禁用
@@ -569,6 +621,38 @@ export default {
       open: false,
       // 部门名称
       deptName: undefined,
+
+      // 合同数据导入参数
+      upload: {
+        // 是否显示弹出层（合同导入）
+        open: false,
+        // 弹出层标题（合同导入）
+        title: "",
+        // 是否禁用上传
+        isUploading: false,
+        // 是否更新已经存在的合同数据
+        updateSupport: 0,
+        // 设置上传的请求头部
+        headers: { Authorization: "Bearer " + getToken() },
+        // 上传的地址
+        url: process.env.VUE_APP_BASE_API + "/financial/contract/importData"
+      },
+
+      // 合同文件上传参数
+      fileUpload: {
+        // 弹出层标题(合同文件上传)
+        title: "",
+        // 是否显示弹出层
+        open: false,
+        // 是否禁用上传
+        isUploading: false,
+        // 上传的附加数据
+        contractId: undefined,
+        // 设置上传的请求头部
+        headers: { Authorization: "Bearer " + getToken() },
+        // 上传的地址
+        url: process.env.VUE_APP_BASE_API + "/financial/contract/upload",
+      },
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -595,21 +679,7 @@ export default {
         children: "children",
         label: "label"
       },
-      // 合同导入参数
-      upload: {
-        // 是否显示弹出层（合同导入）
-        open: false,
-        // 弹出层标题（合同导入）
-        title: "",
-        // 是否禁用上传
-        isUploading: false,
-        // 是否更新已经存在的合同数据
-        updateSupport: 0,
-        // 设置上传的请求头部
-        headers: { Authorization: "Bearer " + getToken() },
-        // 上传的地址
-        url: process.env.VUE_APP_BASE_API + "/financial/contract/importData"
-      },
+     
       // 列信息
       columns: [
         { key: 0, label: `用户编号`, visible: true },
@@ -756,6 +826,10 @@ export default {
       this.single = selection.length !== 1;
       this.multiple = !selection.length;
     },
+    // 最后选中数据
+    handleSelection(selection, row) {
+      this.selection = row
+    },
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
@@ -817,6 +891,7 @@ export default {
         `contract_${new Date().getTime()}.xlsx`
       );
     },
+    /** ----------------------合同数据导入-------------------------- */
     /** 导入按钮操作 */
     handleImport() {
       this.upload.title = "合同导入";
@@ -828,11 +903,11 @@ export default {
       }, `contract_template_${new Date().getTime()}.xlsx`)
     },
     // 文件上传中处理
-    handleFileUploadProgress(event, file, fileList) {
+    handleUploadProgress(event, file, fileList) {
       this.upload.isUploading = true;
     },
     // 文件上传成功处理
-    handleFileSuccess(response, file, fileList) {
+    handleSuccess(response, file, fileList) {
       this.upload.open = false;
       this.upload.isUploading = false;
       this.$refs.upload.clearFiles();
@@ -840,16 +915,62 @@ export default {
       this.getList();
     },
     // 提交上传文件
-    submitFileForm() {
+    submitImportForm() {
       this.$refs.upload.submit();
     },
+    /** ----------------------合同文件上传-------------------------- */
+    /** 合同文件上传按钮操作 */
+    handleFileUpload(row) {
+      this.fileUpload.contractId = row.contractId || this.ids;
+      this.fileUpload.title = "合同导入";
+      this.fileUpload.open = true;
+      // console.log("fileUpload.contractId");
+      // console.log(this.fileUpload.contractId);
+            console.log("this.selection");
+      console.log(this.selection);
+    },
+    // 文件上传中处理
+    handleFileUploadProgress(event, file, fileList) {
+      this.fileUpload.isUploading = true;
+    },
+    // 文件上传成功处理
+    handleFileSuccess(response, file, fileList) {
+      this.fileUpload.open = false;
+      this.fileUpload.isUploading = false;
+      this.$refs.upload.clearFiles();
+      this.$alert(response.msg);
+      this.getList();
+    },
+    // 提交上传文件
+    submitFileUpload() {
+      this.$refs.upload.submit();
+    },
+    /** ----------------------合同文件下载-------------------------- */
+    handleDownload() {
+       if(this.selection.sysFileInfo != null){
+        var name = this.selection.sysFileInfo.fileName;
+        var url =  this.selection.sysFileInfo.filePath;
+        const a = document.createElement('a')
+        a.setAttribute('download', name)
+        a.setAttribute('target', '_blank')
+        a.setAttribute('href', 'http://localhost:8080'+url)
+        a.click()
+      }else{
+        this.$modal.msgWarning("此合同未上传合同文件！");
+      }
+      
+    },
+    /** ----------------------提交审批流程-------------------------- */
     // 提交审批
     handleApproval(row) {
-      this.approval.contractId = row.contractId || this.ids;
-      this.approval.open = true;
-      this.approval.title = "发起流程";
-      this.listDefinition();
-
+      if(this.selection.status == '0'){
+        this.approval.contractId = row.contractId || this.ids;
+        this.approval.open = true;
+        this.approval.title = "发起流程";
+        this.listDefinition();
+      }else{
+        this.$modal.msgWarning("此合同处于不能提交审核的状态！");
+      }
     },
     //打开流程列表
     listDefinition() {

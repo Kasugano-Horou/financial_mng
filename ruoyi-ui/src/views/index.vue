@@ -275,7 +275,7 @@ export default {
     
     showRate(){
       listRate().then(response => {
-        console.log("response");
+        console.log("listRateresponse");
         console.log(response);
         this.rateDate = response;
         this.total = response.total;
@@ -304,16 +304,16 @@ export default {
           for(var i=0; i<month.length; i++){
             
             if(invoice.invoiceDate != null && invoice.invoiceDate.substring(0,7) == month[i]){
-              console.log("substring:"+invoice.invoiceDate.substring(0,7));
-              console.log("invoice.invoiceFrom:"+invoice.invoiceFrom );
+              // console.log("substring:"+invoice.invoiceDate.substring(0,7));
+              // console.log("invoice.invoiceFrom:"+invoice.invoiceFrom );
               if(invoice.invoiceFrom == '2'){
-                console.log("2"+invoice.total);
+                // console.log("2"+invoice.total);
                 others_cost[i] += invoice.total;
               }else if(invoice.invoiceFrom == '3'){
-                console.log("3"+invoice.total);
+
                 procurement_cost[i] += invoice.total;
               }else if(invoice.invoiceFrom == '4'){
-                console.log("4"+invoice.total);
+
                 general_income[i] += invoice.pricePlusArabic;
               }
             }
@@ -331,12 +331,11 @@ export default {
         for(var one in FinWagesList){
           var finWage = FinWagesList[one];
           for(var i=0; i<month.length; i++){
-            console.log("issuingDate");
-            console.log(finWage.issuingDate);
-            console.log("month");
-            console.log(month[i]);
+            // console.log("issuingDate");
+            // console.log(finWage.issuingDate);
+            // console.log("month");
+            // console.log(month[i]);
             if(finWage.issuingDate == month[i]){
-              console.log(finWage.finalWage);
               personnel_cost[i] += finWage.finalWage;
 
               //
@@ -348,19 +347,19 @@ export default {
           }
         }
 
-        console.log('preTax');
-        console.log(this.account.preTax);
+        // console.log('preTax');
+        // console.log(this.account.preTax);
           
-        console.log("personnel_cost");
-        console.log(personnel_cost);
-        console.log("general_income");
-        console.log(general_income);
-        console.log("procurement_cost");
-        console.log(procurement_cost);
-        console.log("others_cost");
-        console.log(others_cost);
-        console.log("pre_tax");
-        console.log(pre_tax);
+        // console.log("personnel_cost");
+        // console.log(personnel_cost);
+        // console.log("general_income");
+        // console.log(general_income);
+        // console.log("procurement_cost");
+        // console.log(procurement_cost);
+        // console.log("others_cost");
+        // console.log(others_cost);
+        // console.log("pre_tax");
+        // console.log(pre_tax);
         var chartDom = document.getElementById('rate');
         var myChart = echarts.init(chartDom);
         var option;
@@ -440,18 +439,11 @@ export default {
 
       // })
 
-      
-
-
-
-
 
 
       var chartDom = document.getElementById('rateStructure');
       var myChart = echarts.init(chartDom);
       var option;
-      console.log('preTax');
-      console.log(this.account.preTax);
 
       option = {
         title: {

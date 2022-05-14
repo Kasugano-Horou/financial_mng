@@ -43,7 +43,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                sfi.file_name, sfi.file_path
         from fin_purchase pu
             left join pro_project p on p.project_id = pu.project_id
-            left join sys_invoice_file sif on sif.invoice_id = pu.invoice_id
+            left join (select a.* from sys_invoice_file a where file_id = ( select MAX(file_id) from sys_invoice_file where invoice_id = a.invoice_id)) sif on sif.invoice_id = pu.invoice_id
             left join sys_file_info sfi on sif.file_id = sfi.file_id
     </sql>
 

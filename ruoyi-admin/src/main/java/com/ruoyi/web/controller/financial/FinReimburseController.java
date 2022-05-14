@@ -121,7 +121,7 @@ public class FinReimburseController extends BaseController
     }
 
     /**
-     * 报销发票上传请求
+     * 报销发票上传
      */
     @Log(title = "报销发票", businessType = BusinessType.UPLOAD)
     @PostMapping("/upload")

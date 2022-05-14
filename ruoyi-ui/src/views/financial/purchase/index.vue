@@ -115,7 +115,7 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="purchaseList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="purchaseList" @selection-change="handleSelectionChange" @select="handleSelection">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="采购ID" align="center" prop="purchaseId" />
       <el-table-column label="项目名称" align="center" prop="project.projectName" />
@@ -156,9 +156,9 @@
           <el-button
             size="mini"
             type="text"
-            icon="el-icon-edit"
+            icon="el-icon-upload2"
             @click="handleUpload(scope.row)"
-            v-hasPermi="['financial:purchase:edit']"
+            v-hasPermi="['financial:purchase:upload']"
           >上传发票</el-button>
           <el-button
             size="mini"
@@ -204,7 +204,7 @@
               v-for="dict in dict.type.fin_purchase_type"
               :key="dict.value"
               :label="dict.label"
-:value="dict.value"
+              :value="dict.value"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -220,7 +220,7 @@
               v-for="dict in dict.type.fin_purchase_status"
               :key="dict.value"
               :label="dict.label"
-:value="dict.value"
+              :value="dict.value"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -315,6 +315,8 @@ export default {
       processLoading: true,
       // 选中数组
       ids: [],
+      // 最后选中数据
+      selection: undefined,
       // 非单个禁用
       single: true,
       // 非多个禁用
@@ -458,6 +460,10 @@ export default {
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
+    // 最后选中数据
+    handleSelection(selection, row) {
+      this.selection = row
+    },
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
@@ -556,10 +562,17 @@ export default {
     // },
     // 提交审批
     handleApproval(row) {
-      this.approval.purchaseId = row.purchaseId || this.ids;
-      this.approval.open = true;
-      this.approval.title = "发起流程";
-      this.listDefinition();
+      if(this.selection.status == '2'){
+        this.approval.purchaseId = row.purchaseId || this.ids;
+        this.approval.open = true;
+        this.approval.title = "发起流程";
+        this.listDefinition();
+      }else if(this.selection.status == '1'){
+        this.$modal.msgWarning("请先上传发票！");
+      }else{
+        this.$modal.msgWarning("此采购信息处于不能提交审核的状态！");
+      }
+      
 
     },
     //打开流程列表

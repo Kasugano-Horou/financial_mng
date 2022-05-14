@@ -3,6 +3,7 @@ package com.ruoyi.financial.service.impl;
 
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.domain.entity.SysFileInfo;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.exception.ServiceException;
@@ -11,6 +12,10 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.bean.BeanValidators;
 import com.ruoyi.financial.domain.FinContract;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.financial.domain.FinInvoice;
+import com.ruoyi.financial.domain.FinReimburse;
+import com.ruoyi.framework.config.ServerConfig;
+import com.ruoyi.system.mapper.SysFileInfoMapper;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.impl.SysUserServiceImpl;
 import org.slf4j.Logger;
@@ -21,6 +26,7 @@ import com.ruoyi.financial.mapper.FinContractMapper;
 import com.ruoyi.financial.service.IFinContractService;
 
 import javax.validation.Validator;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
@@ -36,9 +42,14 @@ public class FinContractServiceImpl implements IFinContractService
 
     @Autowired
     private FinContractMapper finContractMapper;
-
     @Autowired
     private ISysConfigService configService;
+    @Autowired
+    private SysFileInfoMapper sysFileInfoMapper;
+    @Autowired
+    private ServerConfig serverConfig;
+
+
 
     @Autowired
     protected Validator validator;
@@ -65,8 +76,8 @@ public class FinContractServiceImpl implements IFinContractService
     @Override
     public List<FinContract> selectFinContractList(FinContract finContract)
     {
-        System.out.println("finContract.getContractDate()");
-        System.out.println(finContract);
+//        System.out.println("finContract.getContractDate()");
+//        System.out.println(finContract);
         System.out.println(finContract.getContractDate());
         return finContractMapper.selectFinContractList(finContract);
     }
@@ -232,5 +243,34 @@ public class FinContractServiceImpl implements IFinContractService
             successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
         }
         return successMsg.toString();
+    }
+
+    /**
+     * 合同文件上传
+     *
+     * @param contractId 合同主键
+     * @param fileName 文件名字
+     * @return 结果
+     */
+    public int addContractFile(Long contractId, String fileName)
+    {
+        String realName = fileName.substring(fileName.lastIndexOf("/") + 1);
+        String filePath = null;
+        try {
+            filePath = fileName.substring(0, fileName.lastIndexOf("/") + 1) + java.net.URLEncoder.encode(realName, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        //文件更新到sys_file_info
+        SysFileInfo sysFileInfo = new SysFileInfo();
+        sysFileInfo.setFileName(realName);
+        sysFileInfo.setFilePath(filePath);
+        sysFileInfoMapper.insertSysFileInfo(sysFileInfo);
+        System.out.println("nameeeeeesysFileInfo.getFileName():"+sysFileInfo.getFileName());
+        System.out.println("rullllllllllllsysFilePath.getFilePath():"+sysFileInfo.getFilePath());
+
+        //更新合同-文件表
+        return finContractMapper.insertFinContractFile(contractId, sysFileInfo.getFileId());
+
     }
 }

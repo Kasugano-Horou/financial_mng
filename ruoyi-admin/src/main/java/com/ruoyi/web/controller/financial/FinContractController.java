@@ -2,10 +2,14 @@ package com.ruoyi.web.controller.financial;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.file.FileUploadUtils;
+import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.financial.domain.FinReimburse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -161,5 +165,44 @@ public class FinContractController extends BaseController
         return "wwww";
     }
 
+    /**
+     * 合同文件上传
+     */
+    @Log(title = "合同文件上传", businessType = BusinessType.UPLOAD)
+    @PostMapping("/upload")
+    public AjaxResult uploadInvoice(MultipartFile file, Long contractId) throws Exception
+    {
+        try
+        {
+            System.out.println("contractId:" + contractId);
+            FinContract finContract = finContractService.selectFinContractByContractId(contractId);
+            if(finContract != null ){
+                if(Integer.parseInt(finContract.getStatus()) >= 2 ){
+                    return AjaxResult.error("合同:("+finContract.getContractName()+")所在状态不能上传合同文件");
+                }
+            }
+            // 上传文件路径
+            String filePath = RuoYiConfig.getContractPath();
+            // 上传并返回新文件名称
+            String fileName = FileUploadUtils.upload(filePath, file);
+            //添加合同文件信息到数据库
+            int a = finContractService.addContractFile(contractId, fileName);
 
+            AjaxResult ajax;
+            if(a>0){
+                ajax = AjaxResult.success();
+            }else {
+                ajax = AjaxResult.error();
+            }
+
+            ajax.put("fileName", fileName);
+            ajax.put("newFileName", FileUtils.getName(fileName));
+            ajax.put("originalFilename", file.getOriginalFilename());
+            return ajax;
+        }
+        catch (Exception e)
+        {
+            return AjaxResult.error(e.getMessage());
+        }
+    }
 }
