@@ -79,6 +79,6 @@
     </tr>
 	<tr>
         <td><img src="https://raw.githubusercontent.com/Kasugano-Horou/financial_mng/master/picture/%E8%8F%9C%E5%8D%95.png"/></td>
-        <td><img src=""/></td>
+        <td><img src="https://raw.githubusercontent.com/Kasugano-Horou/financial_mng/master/picture/%E5%AD%97%E5%85%B8.png"/></td>
     </tr>
 </table>
