@@ -84,6 +84,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="drawer != null  and drawer != ''"> and i.drawer = #{drawer}</if>
             <if test="status != null  and status != ''"> and i.status = #{status}</if>
         </where>
+        order by i.invoice_date desc
     </select>
     
     <select id="selectFinInvoiceByInvoiceId" parameterType="Long" resultMap="FinInvoiceResult">

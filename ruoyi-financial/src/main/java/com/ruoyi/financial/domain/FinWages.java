@@ -22,6 +22,9 @@ public class FinWages extends BaseEntity
     /** 工资ID */
     private Long wageId;
 
+    /** 员工ID */
+    private Long empId;
+
     /** 员工工号 */
     @Excel(name = "员工工号")
     private String empCode;
@@ -67,7 +70,7 @@ public class FinWages extends BaseEntity
     @Excel(name = "实发工资")
     private BigDecimal finalWage;
 
-    private SysEmp sysEmp;
+    private SysEmp emp;
 
     public void setWageId(Long wageId) 
     {
@@ -77,7 +80,9 @@ public class FinWages extends BaseEntity
     {
         return wageId;
     }
-    public void setEmpCode(String empCode) 
+    public void setEmpId(Long empId) { this.empId = empId; }
+    public Long getEmpId() { return empId; }
+    public void setEmpCode(String empCode)
     {
         this.empCode = empCode;
     }
@@ -165,13 +170,14 @@ public class FinWages extends BaseEntity
     {
         return finalWage;
     }
-    public void setSysEmp(SysEmp sysEmp) {this.sysEmp = sysEmp;}
-    public SysEmp getSysEmp(){ return sysEmp;}
+    public void setEmp(SysEmp sysEmp) {this.emp = sysEmp;}
+    public SysEmp getEmp(){ return emp;}
 
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("wageId", getWageId())
+            .append("empId", getEmpId())
             .append("empCode", getEmpCode())
             .append("empName", getEmpName())
             .append("issuingDate", getIssuingDate())
@@ -188,7 +194,7 @@ public class FinWages extends BaseEntity
             .append("updateBy", getUpdateBy())
             .append("updateTime", getUpdateTime())
             .append("remark", getRemark())
-            .append("sysEmp", getSysEmp())
+            .append("emp", getEmp())
             .toString();
     }
 }

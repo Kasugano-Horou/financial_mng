@@ -204,7 +204,9 @@ export default {
       this.$router.push({path: '/flowable/task/start',
         query: {
           deployId: def.deploymentId,
-          procDefId: def.id
+          procDefId: def.id,
+
+          formData:{}
         }
       });
     },

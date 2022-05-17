@@ -3,6 +3,8 @@ package com.ruoyi.financial.service.impl;
 
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.domain.TreeSelect;
+import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.domain.entity.SysFileInfo;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
@@ -28,6 +30,7 @@ import com.ruoyi.financial.service.IFinContractService;
 import javax.validation.Validator;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 合同管理Service业务层处理
@@ -61,7 +64,6 @@ public class FinContractServiceImpl implements IFinContractService
      * @return 合同管理
      */
     @Override
-    @DataScope(deptAlias = "d", userAlias = "u")
     public FinContract selectFinContractByContractId(Long contractId)
     {
         return finContractMapper.selectFinContractByContractId(contractId);
@@ -74,6 +76,7 @@ public class FinContractServiceImpl implements IFinContractService
      * @return 合同管理
      */
     @Override
+    @DataScope(deptAlias = "d", userAlias = "u")
     public List<FinContract> selectFinContractList(FinContract finContract)
     {
 //        System.out.println("finContract.getContractDate()");

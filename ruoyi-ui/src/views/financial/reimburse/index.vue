@@ -124,17 +124,16 @@
     <el-table v-loading="loading" :data="reimburseList" @selection-change="handleSelectionChange" @select="handleSelection">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="报销单号" align="center" prop="reimburseNumber" />
-      <el-table-column label="报销部门" align="center" prop="dept.deptName" />
-      <el-table-column label="经手人"  align="center" prop="emp.empName" />
-      <el-table-column label="项目编号" align="center" prop="project.projectId" />
-      <el-table-column label="项目名称" align="center" prop="project.projectName" />
-      <el-table-column label="报销金额" align="center" prop="amount" />
-      <el-table-column label="报销类型" align="center" prop="reimburseType">
+      <el-table-column label="报销部门" align="center" prop="dept.deptName" width="100"/>
+      <el-table-column label="经手人"  align="center" prop="emp.empName" width="80"/>
+      <el-table-column label="项目名称" align="center" prop="project.projectName" width="280"/>
+      <el-table-column label="报销金额" align="center" prop="amount" width="90"/>
+      <el-table-column label="报销类型" align="center" prop="reimburseType" width="120">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.fin_reimburse_type" :value="scope.row.reimburseType"/>
         </template>
       </el-table-column>
-      <el-table-column label="报销状态" align="center" prop="status">
+      <el-table-column label="报销状态" align="center" prop="status" width="120">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.fin_reimburse_status" :value="scope.row.status"/>
         </template>
@@ -192,7 +191,7 @@
     />
 
     <!-- 添加或修改报销对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
           <el-col :span="12">
@@ -209,12 +208,27 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="经手人" prop="handBy">
-              <el-input v-model="form.handBy" placeholder="请输入经手人" />
+              <el-select v-model="form.handBy" placeholder="请选择经手人" filterable style = 'width: 200px'>
+                <el-option
+                  v-for="emp in empList"
+                  :key="emp.empId"
+                  :label="emp.empName"
+                  :value="emp.empId"
+                ></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="项目编号" prop="projectId">
-              <el-input v-model="form.projectId" placeholder="请输入项目编号" />
+            <el-form-item label="项目" prop="projectId" >
+              <el-select v-model="form.projectId" placeholder="请选择项目" filterable style='width:300px'>
+                <el-option
+                  v-for="project in projectList"
+                  :key="project.projectId"
+                  :label="project.projectName"
+                  :value="project.projectId"
+                  
+                ></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -322,6 +336,9 @@ import { getToken } from "@/utils/auth";
 import { parseStrEmpty } from "@/utils/ruoyi";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import {listDefinition} from "@/api/flowable/definition";
+import { listProject } from "@/api/project/projectInfo";
+import { listEmp } from "@/api/system/emp";
+
 
 export default {
   name: "Reimburse",
@@ -332,6 +349,8 @@ export default {
       // 遮罩层
       loading: true,
       processLoading: true,
+      // 项目列表选择
+      projectList: undefined,
       // 选中数组
       ids: [],
       // 最后选中数据
@@ -348,6 +367,8 @@ export default {
       reimburseList: [],
       // 部门树选项
       deptOptions: undefined,
+      // 员工表格数据
+      empList: null,
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -436,6 +457,8 @@ export default {
   created() {
     this.getList();
     this.getTreeselect();
+    this.getProjectList();
+    this.getEmpList();
   },
   methods: {
     /** 查询报销列表 */
@@ -458,6 +481,18 @@ export default {
     getTreeselect() {
       treeselect().then(response => {
         this.deptOptions = response.data;
+      });
+    },
+    /** 查询项目列表 */
+    getProjectList() {
+      listProject().then(response => {
+        this.projectList = response.rows;
+      });
+    },
+    /** 查询员工列表 */
+    getEmpList() {
+      listEmp().then(response => {
+        this.empList = response.rows;
       });
     },
     // 取消按钮

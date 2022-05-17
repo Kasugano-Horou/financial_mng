@@ -112,7 +112,7 @@
     <el-table v-loading="loading" :data="projectList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="项目编号" align="center" prop="projectNumber" />
-      <el-table-column label="项目名称" align="center" prop="projectName" />
+      <el-table-column label="项目名称" align="center" prop="projectName" width="240px"/>
       <el-table-column label="合同id" align="center" prop="contractId" />
       <el-table-column label="项目类型" align="center" prop="projectType">
         <template slot-scope="scope">
@@ -157,15 +157,22 @@
 
     <!-- 添加或修改项目对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+      <el-form ref="form" :model="form" :rules="rules" label-width="90px">
         <el-form-item label="项目编号" prop="projectNumber">
           <el-input v-model="form.projectNumber" placeholder="请输入项目编号" />
         </el-form-item>
         <el-form-item label="项目名称" prop="projectName">
           <el-input v-model="form.projectName" placeholder="请输入项目名称" />
         </el-form-item>
-        <el-form-item label="合同id" prop="contractId">
-          <el-input v-model="form.contractId" placeholder="请输入合同id" />
+        <el-form-item label="合同" prop="contractId">
+          <el-select v-model="form.contractId" placeholder="请选择合同" filterable style = 'width: 300px'>
+            <el-option
+              v-for="contract in contractList"
+              :key="contract.contractId"
+              :label="contract.contractName"
+              :value="contract.contractId"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="项目类型" prop="projectType">
           <el-select v-model="form.projectType" placeholder="请选择项目类型">
@@ -173,7 +180,7 @@
               v-for="dict in dict.type.pro_project_type"
               :key="dict.value"
               :label="dict.label"
-:value="dict.value"
+              :value="dict.value"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -197,6 +204,7 @@
 
 <script>
 import { listProject, getProject, delProject, addProject, updateProject } from "@/api/project/projectInfo";
+import { listContract } from "@/api/financial/contract";
 
 export default {
   name: "ProjectInfo",
@@ -217,6 +225,8 @@ export default {
       total: 0,
       // 项目表格数据
       projectList: [],
+      // 合同表格数据
+      contractList: undefined,
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -251,6 +261,7 @@ export default {
   },
   created() {
     this.getList();
+    this.getContractList();
   },
   methods: {
     /** 查询项目列表 */
@@ -260,6 +271,12 @@ export default {
         this.projectList = response.rows;
         this.total = response.total;
         this.loading = false;
+      });
+    },
+    /** 查询合同列表 */
+    getContractList() {
+      listContract({status:'4'}).then(response => {
+        this.contractList = response.rows;
       });
     },
     // 取消按钮

@@ -84,6 +84,7 @@ public class FinPurchaseController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody FinPurchase finPurchase)
     {
+        finPurchase.setCreateBy(getUsername());
         return toAjax(finPurchaseService.insertFinPurchase(finPurchase));
     }
 
@@ -107,6 +108,19 @@ public class FinPurchaseController extends BaseController
     public AjaxResult remove(@PathVariable Long[] purchaseIds)
     {
         return toAjax(finPurchaseService.deleteFinPurchaseByPurchaseIds(purchaseIds));
+    }
+
+    /**
+     * 状态修改
+     */
+    //@PreAuthorize("@ss.hasPermi('financial:purchase:edit')")
+    //@Log(title = "采购管理", businessType = BusinessType.UPDATE)
+    @PutMapping("/changeStatus")
+    public AjaxResult changeStatus(@RequestBody FinPurchase finPurchase)
+    {
+        System.out.println("FinPurchase changeStatus");
+        System.out.println(finPurchase);
+        return toAjax(finPurchaseService.updateFinPurchase(finPurchase));
     }
 
     /**

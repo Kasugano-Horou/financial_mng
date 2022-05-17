@@ -1,12 +1,18 @@
 package com.ruoyi.financial.service.impl;
 
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.ruoyi.common.core.domain.entity.SysFileInfo;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.OptionalUtil;
+import com.ruoyi.financial.domain.FinContract;
 import com.ruoyi.financial.domain.FinInvoice;
+import com.ruoyi.financial.domain.FinPurchase;
+import com.ruoyi.financial.mapper.FinContractMapper;
 import com.ruoyi.framework.config.ServerConfig;
+import com.ruoyi.system.mapper.SysFileInfoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.financial.mapper.FinInvoiceMapper;
@@ -25,7 +31,12 @@ public class FinInvoiceServiceImpl implements IFinInvoiceService
     @Autowired
     private FinInvoiceMapper finInvoiceMapper;
     @Autowired
+    private FinContractMapper finContractMapper;
+    @Autowired
+    private SysFileInfoMapper sysFileInfoMapper;
+    @Autowired
     private ServerConfig serverConfig;
+
 
     /**
      * 查询发票
@@ -101,7 +112,11 @@ public class FinInvoiceServiceImpl implements IFinInvoiceService
     @Override
     public int updateFinInvoice(FinInvoice finInvoice)
     {
-        finInvoice.setUpdateTime(DateUtils.getNowDate());
+
+        FinInvoice finInvoice1 = finInvoiceMapper.selectFinInvoiceByInvoiceId(finInvoice.getInvoiceId());
+        if(finInvoice.getStatus().equals("3") && finInvoice1.getInvoiceFrom().equals("4")){
+            finContractMapper.updateFinContractReceivable(finInvoice1.getProjectId(),finInvoice1.getTotal());
+        }
         return finInvoiceMapper.updateFinInvoice(finInvoice);
     }
 
@@ -136,9 +151,42 @@ public class FinInvoiceServiceImpl implements IFinInvoiceService
      * @param fileId 文件主键
      * @retyrn
      */
+    @Override
     public int insertFinInvoiceFile(Long invoiceId, Long fileId)
     {
         return finInvoiceMapper.insertFinInvoiceFile(invoiceId, fileId);
 
+    }
+
+    /**
+     * 上传采购发票信息
+     *
+     * @param finInvoice 发票信息
+     * @param fileName 文件名字
+     * @return 结果
+     */
+    @Override
+    public int addInvoice(FinInvoice finInvoice, String fileName){
+        String realName = fileName.substring(fileName.lastIndexOf("/") + 1);
+        String filePath = null;
+        try {
+            filePath = fileName.substring(0, fileName.lastIndexOf("/") + 1) + java.net.URLEncoder.encode(realName, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        //文件更新到sys_file_info
+        SysFileInfo sysFileInfo = new SysFileInfo();
+        sysFileInfo.setFileName(realName);
+        sysFileInfo.setFilePath(filePath);
+        sysFileInfoMapper.insertSysFileInfo(sysFileInfo);
+        System.out.println("nameeeeeesysFileInfo.getFileName():"+sysFileInfo.getFileName());
+        System.out.println("rullllllllllllsysFilePath.getFilePath():"+sysFileInfo.getFilePath());
+
+        //更新发票-文件表
+        finInvoiceMapper.insertFinInvoiceFile(finInvoice.getInvoiceId(), sysFileInfo.getFileId());
+
+        //更新发票信息
+        finInvoice.setStatus("2");
+        return finInvoiceMapper.updateFinInvoice(finInvoice);
     }
 }

@@ -102,6 +102,7 @@
 		</if>
 		<!-- 数据范围过滤 -->
 		${params.dataScope}
+		order by c.contract_date desc
 	</select>
 
 	<select id="selectFinContractByContractId" parameterType="Long" resultMap="FinContractResult">
@@ -195,6 +196,13 @@
 
 	<update id="updateFinContractStatus" parameterType="FinContract">
 		update fin_contract set status = #{status} where contract_id = #{contractId}
+	</update>
+
+	<update id="updateFinContractReceivable" >
+		update fin_contract c
+			left join pro_project p on p.contract_id = c.contract_id
+		set c.receivable = c.receivable + #{money}
+		where p.project_id = #{projectId}
 	</update>
 
 

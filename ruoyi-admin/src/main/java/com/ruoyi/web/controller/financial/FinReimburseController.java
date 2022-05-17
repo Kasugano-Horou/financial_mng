@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.common.utils.file.FileUtils;
+import com.ruoyi.financial.domain.FinContract;
 import com.ruoyi.financial.domain.FinInvoice;
 import com.ruoyi.financial.service.IFinInvoiceService;
 import com.ruoyi.framework.config.ServerConfig;
@@ -95,6 +96,7 @@ public class FinReimburseController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody FinReimburse finReimburse)
     {
+        finReimburse.setCreateBy(getUsername());
         return toAjax(finReimburseService.insertFinReimburse(finReimburse));
     }
 
@@ -121,11 +123,24 @@ public class FinReimburseController extends BaseController
     }
 
     /**
+     * 状态修改
+     */
+    //@PreAuthorize("@ss.hasPermi('financial:reimburse:edit')")
+    //@Log(title = "报销管理", businessType = BusinessType.UPDATE)
+    @PutMapping("/changeStatus")
+    public AjaxResult changeStatus(@RequestBody FinReimburse finReimburse)
+    {
+        System.out.println("FinReimburse changeStatus");
+        System.out.println(finReimburse);
+        return toAjax(finReimburseService.updateFinReimburse(finReimburse));
+    }
+
+    /**
      * 报销发票上传
      */
     @Log(title = "报销发票", businessType = BusinessType.UPLOAD)
     @PostMapping("/upload")
-    public AjaxResult uploadInvoice(MultipartFile file, @PathVariable("reimburseId") Long reimburseId) throws Exception
+    public AjaxResult uploadInvoice(MultipartFile file, @Param("reimburseId") Long reimburseId) throws Exception
     {
         try
         {

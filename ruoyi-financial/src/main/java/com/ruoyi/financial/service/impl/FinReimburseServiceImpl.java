@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.core.domain.entity.SysFileInfo;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.OptionalUtil;
@@ -58,6 +59,7 @@ public class FinReimburseServiceImpl implements IFinReimburseService
      * @return 报销
      */
     @Override
+    @DataScope(deptAlias = "d", userAlias = "u")
     public List<FinReimburse> selectFinReimburseList(FinReimburse finReimburse)
     {
         List<FinReimburse> finReimburseList = finReimburseMapper.selectFinReimburseList(finReimburse);
@@ -156,6 +158,7 @@ public class FinReimburseServiceImpl implements IFinReimburseService
         //新增发票信息
         FinInvoice finInvoice = new FinInvoice();
         finInvoice.setInvoiceFrom("2");
+        finInvoice.setStatus("3");
         finInvoiceMapper.insertFinInvoice(finInvoice);
 
         //更新发票-文件表

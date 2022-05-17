@@ -6,7 +6,9 @@ import javax.servlet.http.HttpServletResponse;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.common.utils.file.FileUtils;
+import com.ruoyi.financial.domain.FinPurchase;
 import com.ruoyi.framework.config.ServerConfig;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -112,5 +114,37 @@ public class FinInvoiceController extends BaseController
         return toAjax(finInvoiceService.deleteFinInvoiceByInvoiceIds(invoiceIds));
     }
 
+    /**
+     * 发票图片上传请求
+     */
+    @Log(title = "发票管理", businessType = BusinessType.UPLOAD)
+    @PostMapping("/upload")
+    public AjaxResult uploadInvoice(MultipartFile file, @Param("invoiceId") Long invoiceId) throws Exception
+    {
+        try
+        {
+            FinInvoice finInvoice = finInvoiceService.selectFinInvoiceByInvoiceId(invoiceId);
+            if(finInvoice != null ){
+                if(Integer.parseInt(finInvoice.getStatus()) > 2 ){
+                    return AjaxResult.error("发票ID:("+finInvoice.getInvoiceCode()+")所在状态不能上传发票");
+                }
+            }
+            // 上传文件路径
+            String filePath = RuoYiConfig.getInvoicePath();
+            // 上传并返回新文件名称
+            String fileName = FileUploadUtils.upload(filePath, file);
+            //添加发票文件信息到数据库
+            finInvoiceService.addInvoice(finInvoice, fileName);
+            AjaxResult ajax = AjaxResult.success();
+            ajax.put("fileName", fileName);
+            ajax.put("newFileName", FileUtils.getName(fileName));
+            ajax.put("originalFilename", file.getOriginalFilename());
+            return ajax;
+        }
+        catch (Exception e)
+        {
+            return AjaxResult.error(e.getMessage());
+        }
+    }
 
 }

@@ -116,6 +116,7 @@ public class SysEmpController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody SysEmp sysEmp)
     {
+        sysEmp.setCreateBy(getUsername());
         return toAjax(sysEmpService.insertEmp(sysEmp));
     }
 

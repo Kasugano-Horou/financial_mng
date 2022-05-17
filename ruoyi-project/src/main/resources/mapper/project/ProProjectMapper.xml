@@ -37,6 +37,7 @@
             <if test="parta != null  and parta != ''"> and parta like concat('%', #{parta}, '%')</if>
             <if test="leader != null  and leader != ''"> and leader like concat('%', #{leader}, '%')</if>
         </where>
+        order by create_time desc
     </select>
 
     <select id="selectProProjectTableData" parameterType="ProProject" resultMap="ProProjectResult">

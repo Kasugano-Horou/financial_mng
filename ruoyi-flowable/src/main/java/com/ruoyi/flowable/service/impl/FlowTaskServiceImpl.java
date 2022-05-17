@@ -101,6 +101,8 @@ public class FlowTaskServiceImpl extends FlowServiceFactory implements IFlowTask
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 //            paramMap.put("businessKey", processInstance.getBusinessKey());
         //paramMap.put("", processInstance.getBusinessKey());
+
+        System.out.println("variables:" + variables);
         System.out.println("processInstance:" + processInstance);
         System.out.println("processParamMap:" + processParamMap);
         System.out.println("processParamMap.get(contractId):" + processParamMap.get("contractId"));
@@ -138,6 +140,7 @@ public class FlowTaskServiceImpl extends FlowServiceFactory implements IFlowTask
             Long userId = SecurityUtils.getLoginUser().getUser().getUserId();
             taskService.setAssignee(taskId, userId.toString());
             taskService.complete(taskId, variables);
+
 
         }
         return new com.yuweix.assist4j.core.Response<>(HttpStatus.SUCCESS, "操作成功");

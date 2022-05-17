@@ -11,21 +11,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.apache.http.impl.client.*;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Scope
-@Component(value = "taskBusinessCallListener")
-public class TaskBusinessCallListener implements TaskListener {// extends BusinessCallListener
+@Component(value = "taskBusinessCallListenerCreate")
+public class TaskBusinessCallListenerCreate implements TaskListener {// extends BusinessCallListener
 
-    private static final Logger log = LoggerFactory.getLogger(TaskBusinessCallListener.class);
+    private static final Logger log = LoggerFactory.getLogger(TaskBusinessCallListenerCreate.class);
 
     /**
      * rest接口
@@ -76,26 +77,17 @@ public class TaskBusinessCallListener implements TaskListener {// extends Busine
             //paramMap.put("", processInstance.getBusinessKey());
             System.out.println("processInstance:" + processInstance);
             System.out.println("processParamMap:" + processParamMap);
-            System.out.println("processParamMap.get(contractId):" + processParamMap.get("contractId"));
+//            System.out.println("processParamMap.get(contractId):" + processParamMap.get("contractId"));
             if(processParamMap.containsKey(formKeyName)){
                 String formId = processParamMap.get(formKeyName).toString();
                 if(formId != null) {
                     paramMap.put(formKeyName,formId);
                 }
-                System.out.println("processParamMap.get(contractId):" + formId);
+                System.out.println("processParamMap.get(fromId):" + formId);
             }
             if(params != null) {
                 this.setParams(params, paramMap);
             }
-            if(processParamMap.containsKey("pass")){
-                String pass = processParamMap.get("pass").toString();
-                if("true".equals(pass)){
-                    paramMap.put("status","4");
-                }else {
-                    paramMap.put("status","5");
-                }
-            }
-
 
             System.out.println("5开始调用业务系统接口" + restUrl + ",业务参数:" + paramsJson);
             paramsJson = JSON.toJSONString(paramMap);

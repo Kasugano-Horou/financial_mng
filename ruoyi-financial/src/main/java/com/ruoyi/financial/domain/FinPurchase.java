@@ -3,6 +3,7 @@ package com.ruoyi.financial.domain;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.annotation.Excels;
+import com.ruoyi.common.core.domain.entity.SysEmp;
 import com.ruoyi.common.core.domain.entity.SysFileInfo;
 import com.ruoyi.project.domain.ProProject;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -42,7 +43,7 @@ public class FinPurchase extends BaseEntity
 
     /** 采购员 */
     @Excel(name = "采购员")
-    private String purchaser;
+    private Long purchaser;
 
     /** 供应商 */
     @Excel(name = "供应商")
@@ -59,6 +60,13 @@ public class FinPurchase extends BaseEntity
 
     /** 删除标志（0代表存在 2代表删除） */
     private String delFlag;
+
+    /** 员工对象 */
+    @Excels({
+            @Excel(name = "员工姓名", targetAttr = "empName", type = Type.EXPORT),
+            @Excel(name = "员工编号", targetAttr = "empCode", type = Type.EXPORT)
+    })
+    private SysEmp emp;
 
     /** 项目 */
     @Excels({
@@ -110,11 +118,11 @@ public class FinPurchase extends BaseEntity
     {
         return purchaseType;
     }
-    public void setPurchaser(String purchaser) 
+    public void setPurchaser(Long purchaser)
     {
         this.purchaser = purchaser;
     }
-    public String getPurchaser() 
+    public Long getPurchaser()
     {
         return purchaser;
     }
@@ -150,6 +158,8 @@ public class FinPurchase extends BaseEntity
     {
         return delFlag;
     }
+    public void setEmp(SysEmp emp) { this.emp = emp; }
+    public SysEmp getEmp() { return emp; }
     public void setProject(ProProject project) { this.project = project; }
     public ProProject getProject() { return project; }
     public void setSysFileInfo(SysFileInfo sysFileInfo) {
@@ -176,6 +186,7 @@ public class FinPurchase extends BaseEntity
             .append("updateBy", getUpdateBy())
             .append("updateTime", getUpdateTime())
             .append("remark", getRemark())
+            .append("emp", getEmp())
             .append("project", getProject())
             .append("sysFileInfo", getSysFileInfo())
             .toString();

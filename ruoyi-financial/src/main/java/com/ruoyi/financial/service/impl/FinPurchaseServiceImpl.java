@@ -43,7 +43,6 @@ public class FinPurchaseServiceImpl implements IFinPurchaseService
      * @return 采购订单
      */
     @Override
-    @DataScope(deptAlias = "d", userAlias = "u")
     public FinPurchase selectFinPurchaseByPurchaseId(Long purchaseId)
     {
         
@@ -155,6 +154,7 @@ public class FinPurchaseServiceImpl implements IFinPurchaseService
         //新增发票信息
         FinInvoice finInvoice = new FinInvoice();
         finInvoice.setInvoiceFrom("3");
+        finInvoice.setStatus("3");
         finInvoiceMapper.insertFinInvoice(finInvoice);
 
         //更新发票-文件表

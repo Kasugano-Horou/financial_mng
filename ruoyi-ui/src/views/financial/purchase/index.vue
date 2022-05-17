@@ -117,17 +117,16 @@
 
     <el-table v-loading="loading" :data="purchaseList" @selection-change="handleSelectionChange" @select="handleSelection">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="采购ID" align="center" prop="purchaseId" />
-      <el-table-column label="项目名称" align="center" prop="project.projectName" />
-      <el-table-column label="采购主题" align="center" prop="purchaseName" />
-      <el-table-column label="采购类别" align="center" prop="purchaseType">
+      <el-table-column label="项目名称" align="center" prop="project.projectName" width="280"/>
+      <el-table-column label="采购主题" align="center" prop="purchaseName" width="90"/>
+      <el-table-column label="采购类别" align="center" prop="purchaseType" width="130">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.fin_purchase_type" :value="scope.row.purchaseType"/>
         </template>
       </el-table-column>
-      <el-table-column label="采购员" align="center" prop="purchaser" />
-      <el-table-column label="供应商" align="center" prop="supplier" />
-      <el-table-column label="状态" align="center" prop="status">
+      <el-table-column label="采购员" align="center" prop="emp.empName" width="90"/>
+      <el-table-column label="供应商" align="center" prop="supplier" width="200"/>
+      <el-table-column label="状态" align="center" prop="status" width="120">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.fin_purchase_status" :value="scope.row.status"/>
         </template>
@@ -189,11 +188,15 @@
     <!-- 添加或修改采购订单对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="项目ID" prop="projectId">
-          <el-input v-model="form.projectId" placeholder="请输入项目ID" />
-        </el-form-item>
-        <el-form-item label="发票ID" prop="invoiceId">
-          <el-input v-model="form.invoiceId" placeholder="请输入发票ID" />
+        <el-form-item label="项目" prop="projectId">
+          <el-select v-model="form.projectId" placeholder="请选择项目" filterable>
+            <el-option
+              v-for="project in projectList"
+              :key="project.projectId"
+              :label="project.projectName"
+              :value="project.projectId"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="采购主题" prop="purchaseName">
           <el-input v-model="form.purchaseName" placeholder="请输入采购主题" />
@@ -209,20 +212,17 @@
           </el-select>
         </el-form-item>
         <el-form-item label="采购员" prop="purchaser">
-          <el-input v-model="form.purchaser" placeholder="请输入采购员" />
+          <el-select v-model="form.purchaser" placeholder="请选择采购员" filterable style = 'width: 200px'>
+            <el-option
+              v-for="emp in empList"
+              :key="emp.empId"
+              :label="emp.empName"
+              :value="emp.empId"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="供应商" prop="supplier">
           <el-input v-model="form.supplier" placeholder="请输入供应商" />
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-select v-model="form.status" placeholder="请选择状态">
-            <el-option
-              v-for="dict in dict.type.fin_purchase_status"
-              :key="dict.value"
-              :label="dict.label"
-              :value="dict.value"
-            ></el-option>
-          </el-select>
         </el-form-item>
         <el-form-item label="采购日期" prop="purchaseDate">
           <el-date-picker clearable size="small"
@@ -231,9 +231,6 @@
             value-format="yyyy-MM-dd"
             placeholder="请选择采购日期">
           </el-date-picker>
-        </el-form-item>
-        <el-form-item label="删除标志" prop="delFlag">
-          <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -304,6 +301,8 @@
 import { listPurchase, getPurchase, delPurchase, addPurchase, updatePurchase } from "@/api/financial/purchase";
 import { getToken } from "@/utils/auth";
 import {listDefinition} from "@/api/flowable/definition";
+import { listProject } from "@/api/project/projectInfo";
+import { listEmp } from "@/api/system/emp";
 
 export default {
   name: "Purchase",
@@ -327,6 +326,10 @@ export default {
       total: 0,
       // 采购订单表格数据
       purchaseList: [],
+      // 项目列表选择
+      projectList: undefined,
+      // 员工表格数据
+      empList: undefined,
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -343,9 +346,9 @@ export default {
         // 是否禁用上传
         isUploading: false,
               // 上传的附加数据
-      uploadData:{
-        purchaseId: undefined,
-      },
+        uploadData:{
+          purchaseId: undefined,
+        },
         // 设置上传的请求头部
         headers: { Authorization: "Bearer " + getToken() },
         // 上传的地址
@@ -401,6 +404,8 @@ export default {
   },
   created() {
     this.getList();
+    this.getProjectList();
+    this.getEmpList();
   },
   methods: {
     /** 查询采购订单列表 */
@@ -412,9 +417,23 @@ export default {
         this.queryParams.params["endPurchaseDate"] = this.daterangePurchaseDate[1];
       }
       listPurchase(this.queryParams).then(response => {
+        console.log("purchaseData");
+        console.log(response.rows);
         this.purchaseList = response.rows;
         this.total = response.total;
         this.loading = false;
+      });
+    },
+    /** 查询项目列表 */
+    getProjectList() {
+      listProject().then(response => {
+        this.projectList = response.rows;
+      });
+    },
+    /** 查询员工列表 */
+    getEmpList() {
+      listEmp().then(response => {
+        this.empList = response.rows;
       });
     },
     // 取消按钮

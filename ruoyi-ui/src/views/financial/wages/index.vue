@@ -128,14 +128,18 @@
 
     <!-- 添加或修改工资对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="员工工号" prop="empCode">
-          <el-input v-model="form.empCode" placeholder="请输入员工工号" />
+      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
+        <el-form-item label="员工" prop="empId">
+          <el-select v-model="form.empId" placeholder="请选择员工" @change="getEmpData" filterable style = 'width: 300px'>
+            <el-option
+              v-for="emp in empList"
+              :key="emp.empId"
+              :label="emp.empName"
+              :value="emp.empId"
+            ></el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="员工姓名" prop="empName">
-          <el-input v-model="form.empName" placeholder="请输入员工姓名" />
-        </el-form-item>
-        <el-form-item label="年月" prop="issuingDate">
+        <el-form-item label="工资年月" prop="issuingDate">
           <el-date-picker clearable size="small"
             v-model="form.issuingDate"
             type="month"
@@ -181,6 +185,7 @@
 
 <script>
 import { listWages, getWages, delWages, addWages, updateWages } from "@/api/financial/wages";
+import { listEmp, getEmp } from "@/api/system/emp";
 
 export default {
   name: "Wages",
@@ -200,6 +205,8 @@ export default {
       total: 0,
       // 工资表格数据
       wagesList: [],
+      // 员工表格数据
+      empList: null,
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -208,6 +215,8 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
+        wageId: null,
+        empId: null,
         empCode: null,
         empName: null,
         issuingDate: null,
@@ -256,6 +265,7 @@ export default {
   created() {
     this.queryParams.issuingDate = this.dateFormat("yyyy-MM");
     this.getList();
+    this.getEmpList();
   },
   methods: {
     /** 查询工资列表 */
@@ -265,6 +275,20 @@ export default {
         this.wagesList = response.rows;
         this.total = response.total;
         this.loading = false;
+      });
+    },
+    /** 查询员工列表 */
+    getEmpList() {
+      listEmp().then(response => {
+        this.empList = response.rows;
+      });
+    },
+    // 员工选择点击事件
+    getEmpData(item) {
+      console.log(item);
+      getEmp(item).then(response => {
+        this.form = response.data;
+        this.form.houseFund = response.data.houseWages;
       });
     },
     // 取消按钮

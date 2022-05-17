@@ -3,6 +3,7 @@ package com.ruoyi.financial.mapper;
 import com.ruoyi.financial.domain.FinContract;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -89,6 +90,15 @@ public interface FinContractMapper {
      * @return 结果
      */
     public int deleteFinContractByContractIds(Long[] contractIds);
+
+    /**
+     * 更新合同应收款
+     *
+     * @param projectId 项目ID
+     * @param money 新增金额
+     * @return 结果
+     */
+    public int updateFinContractReceivable(@Param("projectId") Long projectId, @Param("money") BigDecimal money);
 
     /**
      * 添加合同文件

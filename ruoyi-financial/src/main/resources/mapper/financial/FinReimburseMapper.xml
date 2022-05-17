@@ -59,7 +59,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <sql id="selectFinReimburseVo">
         select r.reimburse_id, r.reimburse_number, r.dept_id, r.hand_by, r.project_id, r.invoice_id, r.amount, r.reimburse_type, r.annex, r.details, r.status, r.flow_id, r.del_flag, r.create_by, r.create_time, r.update_by, r.update_time, r.remark,
             d.dept_name, d.leader as dept_leader, d.status as dept_status,
-            e.emp_name, e.emp_code, e.status as emp_status,
+            e.emp_id, e.emp_name, e.emp_code, e.status as emp_status,
             p.project_name, p.leader as project_leader, p.status as project_status,
             sfi.file_name, sfi.file_path
         from fin_reimburse r
@@ -68,6 +68,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             left join pro_project p on p.project_id = r.project_id
             left join (select a.* from sys_invoice_file a where file_id = ( select MAX(file_id) from sys_invoice_file where invoice_id = a.invoice_id)) sif on sif.invoice_id = r.invoice_id
             left join sys_file_info sfi on sif.file_id = sfi.file_id
+            left join sys_user u on u.user_name = r.create_by
 
     </sql>
 
@@ -88,7 +89,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="emp !=null and emp != ''">
                 <if test="emp.empName != null  and emp.empName != ''"> and e.emp_name like concat('%', #{emp.empName}, '%')</if>
             </if>
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
         </where>
+        order by r.create_time desc
     </select>
     
     <select id="selectFinReimburseByReimburseId" parameterType="Long" resultMap="FinReimburseResult">

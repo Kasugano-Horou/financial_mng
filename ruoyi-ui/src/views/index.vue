@@ -18,6 +18,11 @@
           余额表
         </el-button> -->
         <el-button
+          icon="el-icon-s-unfold"
+          @click="toPage('Todo')"
+          
+        >待办任务</el-button>
+        <el-button
           icon="el-icon-document"
           @click="toPage('Contract')"
           v-hasPermi="['financial:contract:list']"
@@ -70,13 +75,23 @@
           <el-col :span="4">
             <el-card class="box-card">
               <div slot="header" class="clearfix">
-                <span>人员成本</span>
+                <span>项目人员成本</span>
               </div>
               <div  class="text item">
                 {{ account.personnelCost }}
               </div>
             </el-card>
           </el-col>
+          <!-- <el-col :span="4">
+            <el-card class="box-card">
+              <div slot="header" class="clearfix">
+                <span>总发放工资</span>
+              </div>
+              <div  class="text item">
+                {{ account.totalWages }}
+              </div>
+            </el-card>
+          </el-col> -->
           <el-col :span="4">
             <el-card class="box-card">
               <div slot="header" class="clearfix">
@@ -100,7 +115,7 @@
           <el-col :span="4">
             <el-card class="box-card">
               <div slot="header" class="clearfix">
-                <span>税前利润</span>
+                <span>总计利润</span>
               </div>
               <div  class="text item">
                 {{ account.preTax }}
@@ -124,7 +139,7 @@
       </el-col>
 
       <el-col :span="9" class="card-box">
-        <h1>1月利润结构分析（单位：元）</h1>
+        <h1>20{{ month }}利润结构分析（单位：元）</h1>
         <el-card>
           <div class="el-table el-table--enable-row-hover el-table--medium">
             <div id="rateStructure" style="height: 400px" />
@@ -154,39 +169,58 @@ export default {
       
       // 项目成本表格数据
       projectCostList: [],
-      //统计
+      // 统计
       account: {
-        //帐期总收入
+        // 帐期总收入
         generalIncome: 0.00,
-        //管理成本
+        // 管理成本
         managenmentCost: 0.00,
-        //人员成本
+        // 人员成本
         personnelCost: 0.00,
-        //采购支出
+        // 总发放工资
+        totalWages: 0.00,
+        // 采购支出
         procurementCost: 0.00,
-        //其他支出
+        // 其他支出
         othersCost: 0.00,
-        //税前利润
+        // 总计利润
         preTax: 0.00,
         
       },
 
-      //利润分析数据
-      rateDate: [],
-      //利润结构数据
+
+      month:null,
+      // 利润分析数据
+      rateDate: {
+        month : ['2021-09', '2021-10', '2021-11', '2021-12', '2022-01', '2022-02', '2022-03', '2022-04', '2022-05'],
+        // var personnel_cost = [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        wages_cost : [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        general_income : [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        procurement_cost : [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        others_cost : [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        business_tax : [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        pre_tax : [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      },
+      // 利润结构数据
       rateStructureDate: {
-        //帐期总收入
+        // 帐期总收入
         generalIncome: 0.00,
-        //管理成本
+        // 管理成本
         managenmentCost: 0.00,
-        //人员成本
+        // 人员成本
         personnelCost: 0.00,
-        //采购支出
+        // 发放工资
+        wagesCost: 0.00,
+        // 采购支出
         procurementCost: 0.00,
-        //其他支出
+        // 其他支出
         othersCost: 0.00,
-        //税前利润
+        // 税
+        tax: 0.00,
+        // 总计利润
         preTax: 0.00,
+        // 总计利润绝对值
+        preTaxx: 0.00,
         
       },
 
@@ -242,7 +276,7 @@ export default {
     },
 
     accountProjects(rows) {
-      //console.log(rows);
+      // console.log(rows);
       rows.forEach(projectCost => {
         // console.log("wwww");
         // console.log(projectCost);
@@ -277,19 +311,18 @@ export default {
       listRate().then(response => {
         console.log("listRateresponse");
         console.log(response);
-        this.rateDate = response;
-        this.total = response.total;
-
 
         var invoiceList = response.invoiceList;
         var FinWagesList = response.finWagesList;
 
-        var month = ['2021-07', '2021-08', '2021-09', '2021-10', '2021-11', '2021-12', '2022-01', '2022-02', '2022-03'];
-        var personnel_cost = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-        var general_income = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-        var procurement_cost = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-        var others_cost = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-        var pre_tax = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        // var month = ['2021-09', '2021-10', '2021-11', '2021-12', '2022-01', '2022-02', '2022-03', '2022-04', '2022-05'];
+        // // var personnel_cost = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        // var wages_cost = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        // var general_income = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        // var procurement_cost = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        // var others_cost = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        // var business_tax = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        // var pre_tax = [0, 0, 0, 0, 0, 0, 0, 0, 0];
         
         for(var one in invoiceList){
 
@@ -301,65 +334,81 @@ export default {
 
 
           //统计每个月的其他支出、采购支出、合同收入
-          for(var i=0; i<month.length; i++){
+          for(var i=0; i<this.rateDate.month.length; i++){
             
-            if(invoice.invoiceDate != null && invoice.invoiceDate.substring(0,7) == month[i]){
+            if(invoice.invoiceDate != null && invoice.invoiceDate.substring(0,7) == this.rateDate.month[i]){
               // console.log("substring:"+invoice.invoiceDate.substring(0,7));
               // console.log("invoice.invoiceFrom:"+invoice.invoiceFrom );
               if(invoice.invoiceFrom == '2'){
                 // console.log("2"+invoice.total);
-                others_cost[i] += invoice.total;
+                this.rateDate.others_cost[i] += invoice.total;
               }else if(invoice.invoiceFrom == '3'){
-
-                procurement_cost[i] += invoice.total;
+                this.rateDate.procurement_cost[i] += invoice.total;
               }else if(invoice.invoiceFrom == '4'){
-
-                general_income[i] += invoice.pricePlusArabic;
+                this.rateDate.business_tax[i] += invoice.tax;
+                this.rateDate.general_income[i] += invoice.total;
               }
             }
 
             //获取最后一个月的其他支出、采购支出、合同收入
-            if(i==month.length-1){
-              this.rateStructureDate.generalIncome = general_income[i];
-              this.rateStructureDate.procurementCost = procurement_cost[i];
-              this.rateStructureDate.othersCost = others_cost[i];
+            if(i==this.rateDate.month.length-1){
+              this.rateStructureDate.generalIncome = this.rateDate.general_income[i];
+              this.rateStructureDate.procurementCost = this.rateDate.procurement_cost[i];
+              this.rateStructureDate.othersCost = this.rateDate.others_cost[i];
             }
           }
         }
 
-        //统计每个月的人员成本（工资）
+        //统计每个月的发放工资（工资）
         for(var one in FinWagesList){
           var finWage = FinWagesList[one];
-          for(var i=0; i<month.length; i++){
+          this.account.totalWages += finWage.finalWage;
+          for(var i=0; i<this.rateDate.month.length; i++){
             // console.log("issuingDate");
             // console.log(finWage.issuingDate);
             // console.log("month");
             // console.log(month[i]);
-            if(finWage.issuingDate == month[i]){
-              personnel_cost[i] += finWage.finalWage;
+            if(finWage.issuingDate == this.rateDate.month[i]){
+              this.rateDate.wages_cost[i] += finWage.finalWage;
 
               //
             }
-            //获取最后一个月的人员成本
-            if(i==month.length-1){
-              this.rateStructureDate.personnelCost = personnel_cost[i];
+            //获取最后一个月的发放工资
+            if(i==this.rateDate.month.length-1){
+              // this.rateStructureDate.personnelCost = personnel_cost[i];
+              this.rateStructureDate.wagesCost = this.rateDate.wages_cost[i];
             }
           }
         }
+        this.account.totalWages = (parseFloat(this.account.totalWages ) + 0.00).toFixed(2);
 
-        // console.log('preTax');
-        // console.log(this.account.preTax);
+        // 计算总计利润
+        for(var i=0; i<this.rateDate.month.length; i++){
+          this.rateDate.pre_tax[i] = this.rateDate.general_income[i] - this.rateDate.business_tax[i] - this.rateDate.procurement_cost[i] - this.rateDate.others_cost[i] - this.rateDate.wages_cost[i];
+          if(i == this.rateDate.month.length-1){
+            this.rateStructureDate.preTax = this.rateDate.pre_tax[i];
+          }
+        }
+        
+
+        console.log('preTax');
+        console.log(this.account.preTax);
           
-        // console.log("personnel_cost");
-        // console.log(personnel_cost);
-        // console.log("general_income");
-        // console.log(general_income);
-        // console.log("procurement_cost");
-        // console.log(procurement_cost);
-        // console.log("others_cost");
-        // console.log(others_cost);
-        // console.log("pre_tax");
-        // console.log(pre_tax);
+        console.log("wages_cost");
+        console.log(this.rateDate.wages_cost);
+        console.log("general_income");
+        console.log(this.rateDate.general_income);
+        console.log("procurement_cost");
+        console.log(this.rateDate.procurement_cost);
+        console.log("others_cost");
+        console.log(this.rateDate.others_cost);
+        console.log("tax");
+        console.log(this.rateDate.tax);
+        console.log("business_tax");
+        console.log(this.rateDate.business_tax);
+        console.log("this.account.totalWages");
+        console.log(this.account.totalWages);
+        
         var chartDom = document.getElementById('rate');
         var myChart = echarts.init(chartDom);
         var option;
@@ -372,7 +421,7 @@ export default {
             trigger: 'axis'
           },
           legend: {
-            data: ['账期总收入', '人员成本', '采购支出', '其他支出', '税前利润']
+            data: ['账期总收入', '发放工资', '采购支出', '其他支出', '总计税额', '总计利润']
           },
           grid: {
             left: '3%',
@@ -388,7 +437,7 @@ export default {
           xAxis: {
             type: 'category',
             boundaryGap: false,
-            data: ['21年07月', '21年08月', '21年09月', '21年10月', '21年11月', '21年12月', '22年01月', '22年02月', '22年03月']
+            data: ['21年09月', '21年10月', '21年11月', '21年12月', '22年01月', '22年02月', '22年03月', '22年04月', '22年05月']
           },
           yAxis: {
             type: 'value'
@@ -398,49 +447,59 @@ export default {
                 name: '账期总收入',
                 type: 'line',
                 stack: 'general_income',
-                data: general_income
+                data: this.rateDate.general_income
             },
             {
-                name: '人员成本',
+                name: '发放工资',
                 type: 'line',
-                stack: 'personnel_cost',
-                data: personnel_cost
+                stack: 'wages_cost',
+                data: this.rateDate.wages_cost
             },
             {
                 name: '采购支出',
                 type: 'line',
                 stack: 'procurement_cost',
-                data: procurement_cost
+                data: this.rateDate.procurement_cost
             },
             {
                 name: '其他支出',
                 type: 'line',
                 stack: 'others_cost',
-                data: others_cost
+                data: this.rateDate.others_cost
             },
             {
-                name: '税前利润',
+                name: '总计税额',
+                type: 'line',
+                stack: 'tax',
+                data: this.rateDate.business_tax
+            },
+            {
+                name: '总计利润',
                 type: 'line',
                 stack: 'pre_tax',
-                data: pre_tax
+                data: this.rateDate.pre_tax
             },
           ]
         };
+        myChart.on('click', this.showRateStructure);
         option && myChart.setOption(option);
-        this.showRateStructure();
+        this.showRateStructure({dataIndex:8,name:"2022-05"});
       });
     },
 
 
-    showRateStructure(){
+    showRateStructure(params){
       // listRateStuMonth().then(response => {
 
-
+      console.log(params);
 
       // })
+      var i = params.dataIndex;
+      this.month = params.name;
 
-
-
+     // 总计利润取绝对值
+     //this.rateStructureDate.preTaxx = this.rateStructureDate.preTax>0? this.rateStructureDate.preTax:0-this.rateStructureDate.preTax;
+     
       var chartDom = document.getElementById('rateStructure');
       var myChart = echarts.init(chartDom);
       var option;
@@ -458,20 +517,26 @@ export default {
         legend: {
             orient: 'vertical',
             left: 'left',
-            data: ['账期总收入', '人员成本', '采购支出', '其他支出', '税前利润']
+            data: ['账期总收入', '发放工资', '采购支出', '其他支出', '总计税额', '总计利润']
         },
         series: [
           {
-            name: '访问来源',
+            name: '当月利润结构',
             type: 'pie',
             radius: '55%',
             center: ['50%', '50%'],
             data: [
-              {value: this.rateStructureDate.generalIncome, name: '账期总收入'},
-              {value: this.rateStructureDate.personnelCost, name: '人员成本'},
-              {value: this.rateStructureDate.procurementCost, name: '采购支出'},
-              {value: this.rateStructureDate.othersCost, name: '其他支出'},
-              {value: this.rateStructureDate.preTax, name: '税前利润'}
+              // {value: this.rateStructureDate.generalIncome, name: '账期总收入'},
+              // {value: this.rateStructureDate.wagesCost, name: '发放工资'},
+              // {value: this.rateStructureDate.procurementCost, name: '采购支出'},
+              // {value: this.rateStructureDate.othersCost, name: '其他支出'},
+              // {value: this.rateStructureDate.preTax, name: '总计利润'}
+              {value: this.rateDate.general_income[i], name: '账期总收入'},
+              {value: this.rateDate.wages_cost[i], name: '发放工资'},
+              {value: this.rateDate.procurement_cost[i], name: '采购支出'},
+              {value: this.rateDate.others_cost[i], name: '其他支出'},
+              {value: this.rateDate.business_tax[i], name: '总计税额'},
+              {value: this.rateDate.pre_tax[i], name: '总计利润'}
             ],
             emphasis: {
               itemStyle: {

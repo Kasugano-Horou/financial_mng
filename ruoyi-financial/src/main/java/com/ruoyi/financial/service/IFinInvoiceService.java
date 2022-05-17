@@ -75,4 +75,13 @@ public interface IFinInvoiceService
      * @retyrn
      */
     public int insertFinInvoiceFile(Long invoiceId, Long fileId);
+
+    /**
+     * 上传采购发票信息
+     *
+     * @param finInvoice 发票信息
+     * @param fileName 文件名字
+     * @return 结果
+     */
+    public int addInvoice(FinInvoice finInvoice, String fileName);
 }

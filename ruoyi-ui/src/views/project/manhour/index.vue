@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-row :gutter="20">
       <!--项目数据-->
-      <el-col :span="6" :xs="24">
+      <el-col :span="8" :xs="24">
         <div class="head-container">
           <el-input
             v-model="search"
@@ -24,30 +24,44 @@
             @row-click="onClickItem">
             <el-table-column
               type="String"
-              prop="projectId"
+              prop="projectNumber"
               label="项目编号"
-              width="95"
+              width="155"
             >
             </el-table-column>
             <el-table-column
               type="String"
               prop="projectName"
               label="项目名称"
-              width="140"
+              width="230"
             >
             </el-table-column>
             <el-table-column
+              type="String"
               prop="leader"
-              label="负责人">
+              label="负责人"
+              width="80">
+            </el-table-column>
+            <el-table-column label="项目状态" align="center" prop="status">
+              <template slot-scope="scope">
+                <dict-tag :options="dict.type.pro_project_status" :value="scope.row.status"/>
+              </template>
             </el-table-column>
           </el-table>
+          <pagination
+            v-show="projectTotal>0"
+            :total="projectTotal"
+            :page.sync="projectQueryParams.pageNum"
+            :limit.sync="projectQueryParams.pageSize"
+            @pagination="getProjectList"
+          />
 
 
 
         </div>
       </el-col>
       <!--工时数据-->
-      <el-col :span="18" :xs="24">
+      <el-col :span="16" :xs="24">
         <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
           <el-form-item label="项目ID" prop="projectId">
             <el-input
@@ -130,7 +144,6 @@
 
         <el-table v-loading="loading" :data="manhourList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="55" align="center" />
-          <el-table-column label="工时ID" align="center" prop="manhourId" />
           <el-table-column label="项目名称" align="center" key="projectName" prop="proProject.projectName" />
           <el-table-column label="员工姓名" align="center" key="empName" prop="sysEmp.empName" />
           <el-table-column label="项目工时" align="center" prop="manhour" />
@@ -154,7 +167,6 @@
             </template>
           </el-table-column>
         </el-table>
-        
         <pagination
           v-show="total>0"
           :total="total"
@@ -168,11 +180,25 @@
     <!-- 添加或修改工时对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="项目ID" prop="projectId">
-          <el-input v-model="form.projectId" placeholder="请输入项目ID" />
+        <el-form-item label="项目" prop="projectId">
+          <el-select v-model="form.projectId" placeholder="请选择项目" filterable style="width:350px">
+            <el-option
+              v-for="project in tableData"
+              :key="project.projectId"
+              :label="project.projectName"
+              :value="project.projectId"
+            ></el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="员工ID" prop="empId">
-          <el-input v-model="form.empId" placeholder="请输入员工ID" />
+        <el-form-item label="员工" prop="empId">
+          <el-select v-model="form.empId" placeholder="请选择员工" filterable style="width:350px">
+            <el-option
+              v-for="emp in empList"
+              :key="emp.empId"
+              :label="emp.empName"
+              :value="emp.empId"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="项目工时" prop="manhour">
           <el-input v-model="form.manhour" placeholder="请输入项目工时" />
@@ -192,8 +218,11 @@
 <script>
 import { listManhour, listManhourByProjectId, getManhour, delManhour, addManhour, updateManhour } from "@/api/project/manhour";
 import { tableDataProject} from "@/api/project/projectInfo";
+import { listEmp } from "@/api/system/emp";
+
 export default {
   name: "Manhour",
+  dicts: ['pro_project_type','pro_project_status'], 
   data() {
     return {
       // 遮罩层
@@ -208,8 +237,12 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
+      // 项目总条数
+      projectTotal: 0,
       // 工时表格数据
       manhourList: [],
+      // 员工表格数据
+      empList: undefined,
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -221,10 +254,21 @@ export default {
       // 查询参数
       queryParams: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 15,
         projectId: undefined,
         empId: undefined,
         manhour: undefined,
+      },
+      projectQueryParams: {
+        pageNum: 1,
+        pageSize: 10,
+        projectNumber: null,
+        projectName: null,
+        contractId: null,
+        projectType: null,
+        status: null,
+        parta: null,
+        leader: null,
       },
       // 表单参数
       form: {},
@@ -269,12 +313,14 @@ export default {
   created() {
     this.getProjectList();
     this.getManhourList();
+    this.getEmpList();
   },
 
   methods: {
 
     onClickItem(row) {
       this.projectId = row.projectId;
+
       this.getManhourListByProjectId();
     },
     
@@ -302,11 +348,11 @@ export default {
 
     /** 查询项目列表 */
     getProjectList() {
-      this.loading = true;
-      tableDataProject(this.queryParams).then(response => {
+      tableDataProject(this.projectQueryParams).then(response => {
         this.tableData = response.rows;
-        this.total = response.total;
-        this.loading = false;
+        console.log("tableData");
+        console.log(this.tableData);
+        this.projectTotal = response.total;
       });
     },
 
@@ -325,10 +371,19 @@ export default {
     /** 查询工时列表 */
     getManhourList() {
       this.loading = true;
+      if(this.projectId!=null){
+        this.queryParams.projectId = this.projectId;
+      }
       listManhour(this.queryParams).then(response => {
         this.manhourList = response.rows;
         this.total = response.total;
         this.loading = false;
+      });
+    },
+    /** 查询员工列表 */
+    getEmpList(){
+      listEmp().then(response => {
+        this.empList = response.rows;
       });
     },
     // 取消按钮
@@ -350,6 +405,7 @@ export default {
         updateTime: null,
         remark: null
       };
+      this.projectId = null;
       this.resetForm("form");
     },
     /** 搜索按钮操作 */
@@ -359,7 +415,7 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.resetForm("queryForm");
+      this.reset();
       this.handleQuery();
     },
     // 多选框选中数据

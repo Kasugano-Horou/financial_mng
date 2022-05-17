@@ -921,12 +921,14 @@ export default {
     /** ----------------------合同文件上传-------------------------- */
     /** 合同文件上传按钮操作 */
     handleFileUpload(row) {
+
+
       this.fileUpload.contractId = row.contractId || this.ids;
       this.fileUpload.title = "合同导入";
       this.fileUpload.open = true;
       // console.log("fileUpload.contractId");
       // console.log(this.fileUpload.contractId);
-            console.log("this.selection");
+      console.log("this.selection");
       console.log(this.selection);
     },
     // 文件上传中处理
@@ -963,14 +965,20 @@ export default {
     /** ----------------------提交审批流程-------------------------- */
     // 提交审批
     handleApproval(row) {
-      if(this.selection.status == '0'){
-        this.approval.contractId = row.contractId || this.ids;
-        this.approval.open = true;
-        this.approval.title = "发起流程";
-        this.listDefinition();
-      }else{
-        this.$modal.msgWarning("此合同处于不能提交审核的状态！");
-      }
+      this.reset();
+      const contractId = row.contractId || this.ids;
+      getContract(contractId).then((response) => {
+        this.form = response.data;
+        if(this.form.status == '2'){
+          this.approval.contractId = row.contractId || this.ids;
+          this.approval.open = true;
+          this.approval.title = "发起流程";
+          this.listDefinition();
+        }else{
+          this.$modal.msgWarning("此合同处于不能提交审核的状态！");
+        }
+      });
+      
     },
     //打开流程列表
     listDefinition() {

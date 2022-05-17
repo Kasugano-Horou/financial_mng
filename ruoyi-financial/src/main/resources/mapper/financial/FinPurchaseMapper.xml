@@ -20,8 +20,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
         <result property="remark"    column="remark"    />
+        <association property="emp"    column="emp_id" javaType="SysEmp" resultMap="empResult" />
         <association property="project"    column="project_id" javaType="ProProject" resultMap="projectResult" />
         <association property="sysFileInfo"    column="file_id" javaType="SysFileInfo" resultMap="fileInfoResult" />
+    </resultMap>
+
+    <resultMap id="empResult" type="SysEmp">
+        <id     property="empId"   column="emp_id"     />
+        <result property="empName" column="emp_name"   />
+        <result property="empCode" column="emp_code"   />
+        <result property="status"   column="emp_status" />
     </resultMap>
 
     <resultMap id="projectResult" type="ProProject">
@@ -40,11 +48,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <sql id="selectFinPurchaseVo">
         select pu.purchase_id, pu.project_id, pu.invoice_id, pu.purchase_name, pu.purchase_type, pu.purchaser, pu.supplier, pu.status, pu.purchase_date, pu.del_flag, pu.create_by, pu.create_time, pu.update_by, pu.update_time, pu.remark,
                p.project_number, p.project_name, p.leader, p.project_type,
+               e.emp_id, e.emp_name, e.emp_code, e.status as emp_status,
                sfi.file_name, sfi.file_path
         from fin_purchase pu
             left join pro_project p on p.project_id = pu.project_id
+            left join sys_emp e on e.emp_id = pu.purchaser
             left join (select a.* from sys_invoice_file a where file_id = ( select MAX(file_id) from sys_invoice_file where invoice_id = a.invoice_id)) sif on sif.invoice_id = pu.invoice_id
             left join sys_file_info sfi on sif.file_id = sfi.file_id
+            left join sys_user u on u.user_name = pu.create_by
     </sql>
 
     <select id="selectFinPurchaseList" parameterType="FinPurchase" resultMap="FinPurchaseResult">
@@ -57,7 +68,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="supplier != null  and supplier != ''"> and pu.supplier = #{supplier}</if>
             <if test="status != null  and status != ''"> and pu.status = #{status}</if>
             <if test="params.beginPurchaseDate != null and params.beginPurchaseDate != '' and params.endPurchaseDate != null and params.endPurchaseDate != ''"> and pu.purchase_date between #{params.beginPurchaseDate} and #{params.endPurchaseDate}</if>
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
         </where>
+        order by pu.create_time desc
     </select>
     
     <select id="selectFinPurchaseByPurchaseId" parameterType="Long" resultMap="FinPurchaseResult">

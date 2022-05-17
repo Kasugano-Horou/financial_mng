@@ -6,6 +6,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <resultMap type="FinWages" id="FinWagesResult">
         <id property="wageId"    column="wage_id"    />
+        <result property="empId"    column="emp_id"    />
         <result property="empCode"    column="emp_code"    />
         <result property="empName"    column="emp_name"    />
         <result property="issuingDate"    column="issuing_date"    />
@@ -22,31 +23,63 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
         <result property="remark"    column="remark"    />
+        <association property="emp"    column="emp_id" javaType="SysEmp" resultMap="empResult" />
+    </resultMap>
+
+    <resultMap id="empResult" type="SysEmp">
+        <id     property="empId"        column="emp_id"         />
+        <result property="empCode"      column="emp_code"       />
+        <result property="empName"      column="emp_name"       />
+        <result property="sex"          column="sex"            />
+        <result property="status"       column="status"         />
+        <result property="education"    column="education"      />
+        <result property="phonenumber"  column="phonenumber"    />
+        <result property="email"        column="email"          />
+        <result property="address"      column="address"        />
+        <result property="deptId"       column="dept_id"        />
+        <result property="hiredate"     column="hiredate"       />
+        <result property="termdate"     column="termdate"       />
+        <result property="baseWages"    column="base_wages"     />
+        <result property="houseWages"   column="house_wages"    />
+        <result property="delFlag"      column="del_flag"       />
     </resultMap>
     
     <sql id="selectFinWagesVo">
-        select wage_id, emp_code, emp_name, issuing_date, base_wages, bonus, insurance, house_fund, deducted, `others`, tax, final_wage, create_by, create_time, update_by, update_time, remark
-        from fin_wages
+        select fw.wage_id, fw.emp_id, fw.emp_code, fw.emp_name, fw.issuing_date, fw.base_wages, fw.bonus, fw.insurance, fw.house_fund, fw.deducted, fw.`others`, fw.tax, fw.final_wage, fw.create_by, fw.create_time, fw.update_by, fw.update_time, fw.remark,
+               e.emp_id, e.emp_code, e.emp_name, e.sex, e.status, e.education, e.phonenumber, e.email, e.address, e.dept_id, e.hiredate, e.termdate, e.base_wages, e.house_wages, e.del_flag
+        from fin_wages fw
+            left join sys_emp e on e.emp_code=fw.emp_code and e.del_flag ='0'
+            left join sys_user u on e.emp_id=u.emp_id
+
     </sql>
 
     <select id="selectFinWagesList" parameterType="FinWages" resultMap="FinWagesResult">
         <include refid="selectFinWagesVo"/>
-        <where>  
-            <if test="empCode != null  and empCode != ''"> and emp_code like concat('%', #{empCode}, '%')</if>
-            <if test="empName != null  and empName != ''"> and emp_name like concat('%', #{empName}, '%')</if>
-            <if test="issuingDate != null "> and date_format(issuing_date,'%y%m') = date_format(#{issuingDate},'%y%m')</if>
-            <if test="baseWages != null "> and base_wages = #{baseWages}</if>
+        <where>
+            fw.del_flag = '0'
+            <if test="empId != null  and empId != ''"> and fw.emp_id = #{empId}</if>
+            <if test="empCode != null  and empCode != ''"> and fw.emp_code like concat('%', #{empCode}, '%')</if>
+            <if test="empName != null  and empName != ''"> and fw.emp_name like concat('%', #{empName}, '%')</if>
+            <if test="issuingDate != null "> and date_format(fw.issuing_date,'%y%m') = date_format(#{issuingDate},'%y%m')</if>
+            <if test="baseWages != null "> and fw.base_wages = #{baseWages}</if>
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
+
         </where>
+        order by fw.issuing_date desc
     </select>
     
     <select id="selectFinWagesByWageId" parameterType="Long" resultMap="FinWagesResult">
         <include refid="selectFinWagesVo"/>
-        where wage_id = #{wageId}
+        where fw.wage_id = #{wageId}
+        <!-- 数据范围过滤 -->
+        ${params.dataScope}
     </select>
         
     <insert id="insertFinWages" parameterType="FinWages" useGeneratedKeys="true" keyProperty="wageId">
         insert into fin_wages
         <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="empId != null and empId != ''">emp_id,</if>
             <if test="empCode != null and empCode != ''">emp_code,</if>
             <if test="empName != null and empName != ''">emp_name,</if>
             <if test="issuingDate != null">issuing_date,</if>
@@ -63,6 +96,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             create_time
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="empId != null and empId != ''">#{empId},</if>
             <if test="empCode != null and empCode != ''">#{empCode},</if>
             <if test="empName != null and empName != ''">#{empName},</if>
             <if test="issuingDate != null">#{issuingDate},</if>
@@ -83,6 +117,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="updateFinWages" parameterType="FinWages">
         update fin_wages
         <trim prefix="SET" suffixOverrides=",">
+            <if test="empId != null and empId != ''">emp_id = #{empId},</if>
             <if test="empCode != null and empCode != ''">emp_code = #{empCode},</if>
             <if test="empName != null and empName != ''">emp_name = #{empName},</if>
             <if test="issuingDate != null">issuing_date = #{issuingDate},</if>

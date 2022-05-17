@@ -93,17 +93,17 @@
 
     <el-table v-loading="loading" :data="projectCostList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="50" align="center" />
-      <el-table-column label="项目编号" align="center" prop="proProject.projectNumber" />
-      <el-table-column label="项目名称" align="center" prop="proProject.projectName" />
-      <el-table-column label="合同编号" align="center" prop="finContract.contractNumber" />
+      <el-table-column label="项目编号" align="center" prop="proProject.projectNumber" width="160"/>
+      <el-table-column label="项目名称" align="center" prop="proProject.projectName" width="280"/>
+      <el-table-column label="合同编号" align="center" prop="finContract.contractNumber" width="160"/>
       <el-table-column label="帐期总收入" align="center" prop="generalIncome" width="105"/>
-      <el-table-column label="营业税金" align="center" prop="businessTax" />
-      <el-table-column label="管理成本" align="center" prop="managenmentCost" />
-      <el-table-column label="人员成本" align="center" prop="personnelCost" />
-      <el-table-column label="采购支出" align="center" prop="procurementCost" />
-      <el-table-column label="其他支出" align="center" prop="othersCost" />
-      <el-table-column label="维护成本" align="center" prop="maintenanceCost" />
-      <el-table-column label="税前利润" align="center" prop="preTax" />
+      <el-table-column label="营业税金" align="center" prop="businessTax" width="105"/>
+      <el-table-column label="管理成本" align="center" prop="managenmentCost" width="105"/>
+      <el-table-column label="人员成本" align="center" prop="personnelCost" width="105"/>
+      <el-table-column label="采购支出" align="center" prop="procurementCost" width="105"/>
+      <el-table-column label="其他支出" align="center" prop="othersCost" width="105"/>
+      <!-- <el-table-column label="维护成本" align="center" prop="maintenanceCost" width="105"/> -->
+      <el-table-column label="税前利润" align="center" prop="preTax" width="105"/>
       <el-table-column label="最后核算时间" align="center" prop="updateTime"  width="100">
       <template slot-scope="scope">
               <span>{{
@@ -139,8 +139,27 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
-
+    
     <!-- 添加或修改项目成本对话框 -->
+    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="项目" prop="projectId">
+          <el-select v-model="form.projectId" placeholder="请选择项目" filterable>
+            <el-option
+              v-for="project in projectList"
+              :key="project.projectId"
+              :label="project.projectName"
+              :value="project.projectId"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
+    <!-- 添加或修改项目成本对话框
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="项目ID" prop="projectId">
@@ -164,14 +183,11 @@
         <el-form-item label="维护成本" prop="maintenanceCost">
           <el-input v-model="form.maintenanceCost" placeholder="请输入维护成本" />
         </el-form-item>
-        <el-form-item label="帐期总收入" prop="generalIncome">
+        <el-form-item label="帐期总收入" prop="generalIncome" label-width="80px">
           <el-input v-model="form.generalIncome" placeholder="请输入帐期总收入" />
         </el-form-item>
         <el-form-item label="税前利润" prop="preTax">
           <el-input v-model="form.preTax" placeholder="请输入税前利润" />
-        </el-form-item>
-        <el-form-item label="删除标志" prop="delFlag">
-          <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -181,12 +197,13 @@
         <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 
 <script>
 import { listProjectCost, getProjectCost, delProjectCost, addProjectCost, updateProjectCost, AccountProjectCost } from "@/api/financial/projectCost";
+import { listProject } from "@/api/project/projectInfo";
 
 export default {
   name: "ProjectCost",
@@ -210,6 +227,8 @@ export default {
       total: 0,
       // 项目成本表格数据
       projectCostList: [],
+      // 项目列表选择
+      projectList: undefined,
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -237,6 +256,7 @@ export default {
   },
   created() {
     this.getList();
+    this.getProjectList();
   },
   methods: {
     /** 查询项目成本列表 */
@@ -249,7 +269,12 @@ export default {
         this.loading = false;
       });
     },
-
+    /** 查询项目列表 */
+    getProjectList() {
+      listProject().then(response => {
+        this.projectList = response.rows;
+      });
+    },
     account(rows){
       this.projectCostList = rows;
     },
@@ -269,7 +294,7 @@ export default {
         personnelCost: null,
         procurementCost: null,
         othersCost: null,
-        maintenanceCost: null,
+        // maintenanceCost: null,
         generalIncome: null,
         preTax: null,
         delFlag: null,

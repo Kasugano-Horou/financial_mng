@@ -1,6 +1,8 @@
 package com.ruoyi.financial.service.impl;
 
 import java.util.List;
+
+import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,6 +41,7 @@ public class FinWagesServiceImpl implements IFinWagesService
      * @return 工资
      */
     @Override
+    @DataScope(deptAlias = "d", userAlias = "u")
     public List<FinWages> selectFinWagesList(FinWages finWages)
     {
         return finWagesMapper.selectFinWagesList(finWages);

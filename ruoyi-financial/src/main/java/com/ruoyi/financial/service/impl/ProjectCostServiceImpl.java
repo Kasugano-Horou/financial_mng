@@ -79,6 +79,8 @@ public class ProjectCostServiceImpl implements IProjectCostService
             BigDecimal tax = new BigDecimal("0.00");
             FinInvoice finInvoice = new FinInvoice();
             finInvoice.setProjectId(projectId);
+            finInvoice.setStatus("3");
+            finInvoice.setInvoiceFrom("4");
             List<FinInvoice> finInvoices = finInvoiceMapper.selectFinInvoiceList(finInvoice);
             for(FinInvoice invoice : finInvoices){
                 tax = tax.add(invoice.getTax());
@@ -98,7 +100,12 @@ public class ProjectCostServiceImpl implements IProjectCostService
                 }else{
                     rate = new BigDecimal("0.13");
                 }
-                projectCost.setManagenmentCost(receivable.multiply(rate).setScale(2,BigDecimal.ROUND_HALF_UP));
+                if(proProject.getStatus().equals("7")){
+                    projectCost.setManagenmentCost(receivable.multiply(rate).setScale(2,BigDecimal.ROUND_HALF_UP));
+                }else{
+                    projectCost.setManagenmentCost(new BigDecimal(0));
+                }
+
             }
 
             //项目人员成本（人员基本成本、项目人员奖金和、项目负责人成本）
@@ -111,7 +118,7 @@ public class ProjectCostServiceImpl implements IProjectCostService
             List<ProManhour> proManhours = proManhourMapper.selectProManhourList(proManhour);
             for(ProManhour manhour : proManhours) {
                 SysEmp emp = sysEmpMapper.selectEmpByEmpId(manhour.getEmpId());
-                if (emp.getEmpId().equals(proProject.getLeader())) {
+                if (emp.getEmpName().equals(proProject.getLeader())) {
                     //项目负责人成本*40%
                     leaderWages = emp.getBaseWages().multiply(new BigDecimal(Double.toString(manhour.getManhour() != null ? manhour.getManhour() : 0.0)).divide(peerHour, 2, BigDecimal.ROUND_HALF_UP));
                     wages = wages.add(leaderWages);
@@ -136,6 +143,7 @@ public class ProjectCostServiceImpl implements IProjectCostService
             BigDecimal procurement = new BigDecimal("0.00");
             FinPurchase finPurchase = new FinPurchase();
             finPurchase.setProjectId(projectId);
+            finPurchase.setStatus("4");
             List<FinPurchase> finPurchases = finPurchaseMapper.selectFinPurchaseList(finPurchase);
             for(FinPurchase purchase : finPurchases){
                 procurement = procurement.add(OptionalUtil.or(() -> finInvoiceMapper.selectFinInvoiceByInvoiceId(purchase.getInvoiceId()).getTotal(), new BigDecimal("0.00")));
@@ -146,6 +154,7 @@ public class ProjectCostServiceImpl implements IProjectCostService
             BigDecimal others = new BigDecimal("0.00");
             FinReimburse finReimburse = new FinReimburse();
             finReimburse.setProjectId(projectId);
+            finReimburse.setStatus("4");
             List<FinReimburse> finReimburses = finReimburseMapper.selectFinReimburseList(finReimburse);
             for(FinReimburse reimburse : finReimburses){
                 others = others.add(reimburse.getAmount());
@@ -154,10 +163,13 @@ public class ProjectCostServiceImpl implements IProjectCostService
 
             //项目维护成本
             BigDecimal maintenance_cost = new BigDecimal("0.00");
-            if(receivable!=null) {
-                maintenance_cost = receivable.multiply(new BigDecimal(MAINTANCERATE)).setScale(2, BigDecimal.ROUND_HALF_UP);
-                projectCost.setMaintenanceCost(maintenance_cost);
-            }
+            //取消维护成本计算
+            projectCost.setMaintenanceCost(maintenance_cost);
+//            if(receivable!=null) {
+//
+//                maintenance_cost = receivable.multiply(new BigDecimal(MAINTANCERATE)).setScale(2, BigDecimal.ROUND_HALF_UP);
+//                projectCost.setMaintenanceCost(maintenance_cost);
+//            }
 
             //计算税前利润=项目帐期总收入-(营业税费+项目管理成本+项目人员成本+采购支出+其他相关支出+项目维护成本)
             projectCost.setPreTax(projectCost.getGeneralIncome().subtract(projectCost.getBusinessTax()).subtract(projectCost.getManagenmentCost()).subtract(projectCost.getPersonnelCost()).subtract(projectCost.getProcurementCost()).subtract(projectCost.getOthersCost()).subtract(projectCost.getMaintenanceCost()).setScale(2, BigDecimal.ROUND_HALF_UP));
@@ -268,7 +280,9 @@ public class ProjectCostServiceImpl implements IProjectCostService
     public AjaxResult selectRate(){
 
         AjaxResult ajaxResult = new AjaxResult();
-        ajaxResult.put("invoiceList", finInvoiceMapper.selectFinInvoiceList(new FinInvoice()));
+        FinInvoice finInvoice = new FinInvoice();
+        finInvoice.setStatus("3");
+        ajaxResult.put("invoiceList", finInvoiceMapper.selectFinInvoiceList(finInvoice));
         ajaxResult.put("finWagesList", finWagesMapper.selectFinWagesList(new FinWages()));
 
 

@@ -87,6 +87,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 
         </where>
+        order by pc.create_time desc
     </select>
     
     <select id="selectProjectCostByProjectCostId" parameterType="Long" resultMap="ProjectCostResult">

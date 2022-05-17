@@ -48,7 +48,7 @@ public class ProjectCostController extends BaseController
     /**
      * 获取利润分析数据
      */
-    @PreAuthorize("@ss.hasPermi('financial:projectCost:account')")
+//    @PreAuthorize("@ss.hasPermi('financial:projectCost:account')")
     @Log(title = "项目成本", businessType = BusinessType.OTHER)
     @GetMapping("/rate")
     public AjaxResult rate()
@@ -101,6 +101,7 @@ public class ProjectCostController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody ProjectCost projectCost)
     {
+        projectCost.setCreateBy(getUsername());
         return toAjax(projectCostService.insertProjectCost(projectCost));
     }
 

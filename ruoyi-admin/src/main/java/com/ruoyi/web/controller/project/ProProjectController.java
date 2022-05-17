@@ -92,7 +92,6 @@ public class ProProjectController extends BaseController
     public AjaxResult add(@RequestBody ProProject proProject)
     {
         proProject.setCreateBy(getUsername());
-
         return toAjax(proProjectService.insertProProject(proProject));
     }
 

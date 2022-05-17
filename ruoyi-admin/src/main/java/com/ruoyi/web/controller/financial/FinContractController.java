@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.file.FileUploadUtils;
@@ -152,20 +153,6 @@ public class FinContractController extends BaseController
     }
 
     /**
-     * 状态修改
-     */
-    //@PreAuthorize("@ss.hasPermi('financial:contract:edit')")
-    //@Log(title = "合同管理", businessType = BusinessType.UPDATE)
-    @GetMapping("/test")
-    public String test()
-    {
-        System.out.println("changeStatus changeStatus");
-        System.out.println();
-        //finContract.setStatus("3");
-        return "wwww";
-    }
-
-    /**
      * 合同文件上传
      */
     @Log(title = "合同文件上传", businessType = BusinessType.UPLOAD)
@@ -177,7 +164,7 @@ public class FinContractController extends BaseController
             System.out.println("contractId:" + contractId);
             FinContract finContract = finContractService.selectFinContractByContractId(contractId);
             if(finContract != null ){
-                if(Integer.parseInt(finContract.getStatus()) >= 2 ){
+                if(Integer.parseInt(finContract.getStatus()) >= 99 ){//暂时关闭合同上传限制
                     return AjaxResult.error("合同:("+finContract.getContractName()+")所在状态不能上传合同文件");
                 }
             }

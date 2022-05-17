@@ -114,7 +114,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                 .antMatchers("/druid/**").anonymous()
 
                 .antMatchers("/financial/contract/changeStatus").permitAll()
-                .antMatchers("/financial/contract/test").permitAll()
+                .antMatchers("/financial/purchase/changeStatus").permitAll()
+                .antMatchers("/financial/reimburse/changeStatus").permitAll()
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()
                 .and()

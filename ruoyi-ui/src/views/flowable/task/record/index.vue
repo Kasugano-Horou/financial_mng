@@ -17,7 +17,8 @@
 <!--                <el-button  icon="el-icon-edit-outline" type="primary" size="mini" @click="handleAssign">转办</el-button>-->
 <!--                <el-button  icon="el-icon-edit-outline" type="primary" size="mini" @click="handleDelegate">签收</el-button>-->
             <el-button  icon="el-icon-refresh-left" type="warning" size="mini" @click="handleReturn">退回</el-button>
-            <el-button  icon="el-icon-circle-close" type="danger" size="mini" @click="handleReject">驳回</el-button>
+            <!-- <el-button  icon="el-icon-circle-close" type="danger" size="mini" @click="handleReject">驳回</el-button> -->
+            <el-button  icon="el-icon-circle-close" type="danger" size="mini" @click="handleRefuse">拒绝</el-button>
           </div>
      </el-col>
 
@@ -31,37 +32,37 @@
 
     <!--流程流转记录-->
     <el-card class="box-card" v-if="flowRecordList">
-          <div slot="header" class="clearfix">
-            <span class="el-icon-notebook-1">审批记录</span>
-          </div>
-          <el-col :span="16" :offset="4" >
-            <div class="block">
-              <el-timeline>
-                <el-timeline-item
-                  v-for="(item,index ) in flowRecordList"
-                  :key="index"
-                  :icon="setIcon(item.finishTime)"
-                  :color="setColor(item.finishTime)"
-                >
-                  <p style="font-weight: 700">{{item.taskName}}</p>
-                  <el-card :body-style="{ padding: '10px' }">
-                    <label v-if="item.assigneeName" style="font-weight: normal;margin-right: 30px;">实际办理： {{item.assigneeName}} <el-tag type="info" size="mini">{{item.deptName}}</el-tag></label>
-                    <label v-if="item.candidate" style="font-weight: normal;margin-right: 30px;">候选办理： {{item.candidate}}</label>
-                    <label style="font-weight: normal">接收时间： </label><label style="color:#8a909c;font-weight: normal">{{item.createTime}}</label>
-                    <label v-if="item.finishTime" style="margin-left: 30px;font-weight: normal">办结时间： </label><label style="color:#8a909c;font-weight: normal">{{item.finishTime}}</label>
-                    <label v-if="item.duration" style="margin-left: 30px;font-weight: normal">耗时： </label><label style="color:#8a909c;font-weight: normal">{{item.duration}}</label>
+      <div slot="header" class="clearfix">
+        <span class="el-icon-notebook-1">审批记录</span>
+      </div>
+      <el-col :span="16" :offset="4" >
+        <div class="block">
+          <el-timeline>
+            <el-timeline-item
+              v-for="(item,index ) in flowRecordList"
+              :key="index"
+              :icon="setIcon(item.finishTime)"
+              :color="setColor(item.finishTime)"
+            >
+              <p style="font-weight: 700">{{item.taskName}}</p>
+              <el-card :body-style="{ padding: '10px' }">
+                <label v-if="item.assigneeName" style="font-weight: normal;margin-right: 30px;">实际办理： {{item.assigneeName}} <el-tag type="info" size="mini">{{item.deptName}}</el-tag></label>
+                <label v-if="item.candidate" style="font-weight: normal;margin-right: 30px;">候选办理： {{item.candidate}}</label>
+                <label style="font-weight: normal">接收时间： </label><label style="color:#8a909c;font-weight: normal">{{item.createTime}}</label>
+                <label v-if="item.finishTime" style="margin-left: 30px;font-weight: normal">办结时间： </label><label style="color:#8a909c;font-weight: normal">{{item.finishTime}}</label>
+                <label v-if="item.duration" style="margin-left: 30px;font-weight: normal">耗时： </label><label style="color:#8a909c;font-weight: normal">{{item.duration}}</label>
 
-                    <p  v-if="item.comment">
-                      <el-tag type="success" v-if="item.comment.type === '1'">  {{item.comment.comment}}</el-tag>
-                      <el-tag type="warning" v-if="item.comment.type === '2'">  {{item.comment.comment}}</el-tag>
-                      <el-tag type="danger" v-if="item.comment.type === '3'">  {{item.comment.comment}}</el-tag>
-                    </p>
-                  </el-card>
-                </el-timeline-item>
-              </el-timeline>
-            </div>
-          </el-col>
-      </el-card>
+                <p  v-if="item.comment">
+                  <el-tag type="success" v-if="item.comment.type === '1'">  {{item.comment.comment}}</el-tag>
+                  <el-tag type="warning" v-if="item.comment.type === '2'">  {{item.comment.comment}}</el-tag>
+                  <el-tag type="danger" v-if="item.comment.type === '3'">  {{item.comment.comment}}</el-tag>
+                </p>
+              </el-card>
+            </el-timeline-item>
+          </el-timeline>
+        </div>
+      </el-col>
+    </el-card>
     <el-card class="box-card">
         <div slot="header" class="clearfix">
           <span class="el-icon-picture-outline">流程图</span>
@@ -228,6 +229,10 @@ export default {
         deployId: "",  // 流程定义编号
         taskId: "" ,// 流程任务编号
         procDefId: "",  // 流程编号
+        values: {
+          // approval:"",
+          pass:"",
+        },
         vars: "",
         targetKey:""
       },
@@ -246,6 +251,7 @@ export default {
       returnOpen: false,
       rejectOpen: false,
       rejectTitle: null,
+      pass: null,
       userData:[],
       checkSendUser: false // 是否展示选择人员模块
     };
@@ -274,7 +280,9 @@ export default {
     console.log(this.taskForm);
     this.getFlowRecordList( this.taskForm.procInsId, this.taskForm.deployId);
     console.log("wwwwwwwwwyyy");
+
     console.log(this.taskForm);
+
     this.finished =  this.$route.query && this.$route.query.finished
   },
   mounted() {
@@ -344,16 +352,26 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.userData = selection
-      const val = selection.map(item => item.userId)[0];
-      if (val instanceof Array) {
-        this.taskForm.values = {
-          "approval": val.join(',')
-        }
-      } else {
-        this.taskForm.values = {
-          "approval": val
-        }
-      }
+      console.log("selection");
+      console.log(selection);
+
+      const users = selection.map(item => item.userId);
+      // if (val instanceof Array) {
+      //   this.taskForm.values = {
+      //     "approval": val.join(',')
+      //   }
+      // } else {
+      //   this.taskForm.values = {
+      //     "approval": val
+      //   }
+      // }
+      // console.log("users");
+      // console.log(users);
+      // if (users instanceof Array) {
+      //   this.taskForm.values.approval=users.join(',');
+      // } else {
+      //   this.taskForm.values.approval=users;
+      // }
     },
     // 关闭标签
     handleClose(tag) {
@@ -362,15 +380,22 @@ export default {
     },
     /** 流程变量赋值 */
     handleCheckChange(val) {
-      if (val instanceof Array) {
-        this.taskForm.values = {
-          "approval": val.join(',')
-        }
-      } else {
-        this.taskForm.values = {
-          "approval": val
-        }
-      }
+      console.log("val");
+      console.log(val);
+      // if (val instanceof Array) {
+      //   this.taskForm.values = {
+      //     "approval": val.join(',')
+      //   }
+      // } else {
+      //   this.taskForm.values = {
+      //     "approval": val
+      //   }
+      // }
+      // if (val instanceof Array) {
+      //   this.taskForm.values.approval=val.join(',');
+      // } else {
+      //   this.taskForm.values.approval=val;
+      // }
     },
     /** 流程流转记录 */
     getFlowRecordList(procInsId, deployId) {
@@ -415,7 +440,8 @@ export default {
       const params = {taskId: taskId}
       getNextFlowNode(params).then(res => {
         const data = res.data;
-        if (data) {
+        // if (data) {
+        if(false){
           this.checkSendUser = true
           if (data.type === 'assignee') { // 指定人员
             this.userDataList = res.data.userList;
@@ -440,9 +466,10 @@ export default {
     },
     /** 审批任务选择 */
     handleComplete() {
+      this.pass = "true";
       this.completeOpen = true;
       this.completeTitle = "审批流程";
-      this.getTreeselect();
+      // this.getTreeselect();
     },
     /** 审批任务 */
     taskComplete() {
@@ -454,10 +481,22 @@ export default {
         this.$modal.msgError("请输入审批意见");
         return;
       }
+      this.taskForm.values.pass=this.pass;
+
+      // this.$set(this.taskForm.values,pass,'1');
+      console.log('this.taskForm');
+      console.log(this.taskForm);
       complete(this.taskForm).then(response => {
         this.$modal.msgSuccess(response.msg);
         this.goBack();
       });
+    },
+    /** 拒绝任务选择 */
+    handleRefuse() {
+      this.pass = "false";
+      this.completeOpen = true;
+      this.completeTitle = "拒绝通过";
+      // this.getTreeselect();
     },
     /** 委派任务 */
     handleDelegate() {
