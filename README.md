@@ -1,5 +1,5 @@
 <p align="center">
-	<img alt="logo" src="https://oscimg.oschina.net/oscnet/up-d3d0a9303e11d522a06cd263f3079027715.png">
+	<img alt="logo" src="https://raw.githubusercontent.com/Kasugano-Horou/financial_mng/master/ruoyi-ui/public/favicon.ico">
 </p>
 <h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">帆楼财务管理系统</h1>
 <h4 align="center">基于SpringBoot+Vue前后端分离的若依Java快速开发框架</h4>
