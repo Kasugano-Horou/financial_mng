@@ -62,7 +62,7 @@
 <table>
     <tr>
         <td><img src="https://github.com/Kasugano-Horou/financial_mng/blob/master/picture/%E5%8F%91%E7%A5%A8.png"/></td>
-        <td><img src="https://oscimg.oschina.net/oscnet/1cbcf0e6f257c7d3a063c0e3f2ff989e4b3.jpg"/></td>
+        <td><img src="https://github.com/Kasugano-Horou/financial_mng/blob/master/picture/%E5%8F%91%E7%A5%A8.png?raw=true"/></td>
     </tr>
     <tr>
         <td><img src="https://oscimg.oschina.net/oscnet/up-8074972883b5ba0622e13246738ebba237a.png"/></td>
